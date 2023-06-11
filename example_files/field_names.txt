@@ -1,0 +1,14 @@
+transfection_meta_fields:
+- “Experiment ID” (empty string field)
+- “Transfection Scientist” (dropdown of predefined scientist names)
+
+plate_meta_fields:
+- "Cell Line" (dropdown with predefined cell lines)
+- "Cell Line Passage" (int field)
+- "Transfection Reagent" (dropdown with predefined list of transfection reagents)
+- "Transfection Reagent LOT" (str field)
+- "Transfection End-Point" (int field)
+
+cell_meta_fields:
+- "Number of Cells per Well" (int field)
+- "Concentration" (float input)
