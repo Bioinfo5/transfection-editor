@@ -1,0 +1,70 @@
+/*********************
+Styles for Editor.html
+**********************/
+#Console {
+	margin-top: 1em;
+	height: 15em;
+}
+#Footer {
+	clear: both;
+	font-size: 0.8em;
+	text-align: center;
+	padding-top: 20px;
+}
+legend {
+	font-weight: bold;
+}
+.Popup {
+	display: none;
+	padding: 5px;
+	z-index: 2000;
+	position: fixed;
+	background: lightyellow;
+	border: 1px solid orange;
+	border-radius: 5px;
+	box-shadow: 5px 3px 8px black;
+	font-size: 1em;
+	text-align: center;
+}
+.ConsoleIcon {
+	background-image: url("../images/icons_dark.png");
+	width: 1em;
+	height: 1em;
+	background-repeat: no-repeat;
+	display: inline-block;
+	vertical-align: bottom;
+}
+.Table {
+	border-collapse: collapse;
+	text-align: center;
+}
+.Table td {
+	border: 1px solid black;
+	padding: 1px 5px;
+}
+.PreviewTable {
+	font-size: 0.9em;
+}
+.PreviewTable th {
+	border: 1px solid black;
+	padding: 1px 5px;
+}
+.FootNote {
+	font-size: 0.8em;
+	color: darkblue;
+	font-style: italic;
+}
+.Hyperlink {
+	font-size: 0.8em;
+	color: cornflowerblue;
+	cursor: pointer;
+}
+.Hyperlink:hover {
+	color: royalblue;
+}
+.Boxed {
+	font-weight: bold;
+	border: 1px solid black;
+	padding: 0 0.1em;
+	margin-right: 0.2em;
+}

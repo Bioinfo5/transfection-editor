@@ -1,0 +1,34 @@
+class DDOptions {
+  constructor() {}
+
+  static async init() {
+    this.MetadataDDOptions = {
+      transfectionScientist: [],
+      cellLine: [],
+      transfectionReagent: [],
+
+    };
+    this.Error = false;
+    try {
+      const response = await fetch('dist/metadata-dd-options.json');
+      const result = await response.json();
+      this.MetadataDDOptions.transfectionScientist = (result) ? result.transfection_scientist : [];
+      this.MetadataDDOptions.cellLine = (result) ? result.cell_line : [];
+      this.MetadataDDOptions.transfectionReagent = (result) ? result.transfection_reagent : [];
+    } catch (e) {
+      this.Error = true;
+    }
+  };
+
+  static transfectionScientistOptions() {
+    return this.MetadataDDOptions.transfectionScientist
+  }
+
+  static cellLineOptions() {
+    return this.MetadataDDOptions.cellLine
+  }
+
+  static transfectionReagentOptions() {
+    return this.MetadataDDOptions.transfectionReagent
+  }
+}

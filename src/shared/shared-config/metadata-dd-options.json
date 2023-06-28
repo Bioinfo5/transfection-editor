@@ -1,0 +1,17 @@
+{
+  "transfection_scientist": [
+    "Gordon Freeman",
+    "Doc Brown",
+    "Tony Stark"
+  ],
+  "cell_line": [
+    "cell line 1",
+    "cell line 2",
+    "cell line 3"
+  ],
+  "transfection_reagent": [
+    "reagent 1",
+    "reagent 2",
+    "reagent 3"
+  ]
+}

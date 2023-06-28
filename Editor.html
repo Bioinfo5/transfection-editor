@@ -1,0 +1,48 @@
+﻿<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>1E Therapeutics Plate Editor</title>
+	<link href="dist/ui-styles.css" rel="stylesheet" type="text/css">
+	<link href="dist/editor-styles.css" rel="stylesheet" type="text/css">
+	<link href="dist/shared-styles.css" rel="stylesheet" type="text/css">
+	<link rel="icon" href="images/logo.png">
+
+	<script type="text/javascript" src="dependencies/papaparse.min.js"></script> <!--// https://www.papaparse.com //-->
+	<script type="text/javascript" src="dependencies/jszip.min.js"></script> <!--// http://stuk.github.io/jszip //-->
+	<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script> <!--// https://docs.sheetjs.com/ // -->
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+	<script type="text/javascript" src="dist/ui.min.js"></script>
+	<script type="text/javascript" src="dist/shared.min.js"></script>
+	<script type="text/javascript" src="dist/editor.min.js"></script>
+
+	<script type="text/javascript">
+		window.onload = async function() {
+			await DDOptions.init();
+			Editor.init();
+		}
+	</script>
+
+</head>
+
+<body style="font-family: arial; font-size: 16px" ondrop="event.preventDefault()" ondragover="event.preventDefault()">
+
+<div style="display: flex; margin-top: 1em">
+	<div id="Editor_Popup" class="Popup"></div>
+	<div>
+		<div id="Editor_Menu" style="max-height: 85vh; width: 24em; overflow: auto"></div>
+		<div id="Console" class="LinkCtrl_Tab LinkCtrl_Round" style="width: 24em; padding: 0.3em 0">
+			<p style="text-align: center">
+				Welcome to plate editor logs panel.
+			</p>
+		</div>
+	</div>
+
+	<div id="Editor_Main" style="margin-left: 1em; max-height: 85vh; overflow: auto; width: 100%"></div>
+</div>
+
+<div id="Footer"></div>
+
+</body>
+</html>
