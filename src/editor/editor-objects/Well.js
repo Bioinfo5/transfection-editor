@@ -197,6 +197,7 @@ class Well {
 		wellClone.Unit = wellOrigin.Unit;
 		wellClone.RangeIndex = wellOrigin.RangeIndex;
 		wellClone.Area = wellOrigin.Area;
+		wellClone.Metadata = {...wellOrigin.Metadata}
 		return wellClone;
 	}
 

@@ -48,7 +48,7 @@ class Editor {
 		html += "<div id=\"" + this.Anchors.Popup.Conc + "\"></div>"; //Conc information
 		html += "<div id=\"" + this.Anchors.Popup.Select + "\"></div>"; //Selection information
 		html += "<div id=\"" + this.Anchors.Popup.Data + "\"></div>"; //Parameter value information
-		GetId(this.Anchors.Popup.Root).innerHTML = html; //Popuplate the inner html of the popup
+		GetId(this.Anchors.Popup.Root).innerHTML = html; //Populate the inner html of the popup
 		this.Menu = new TabControl({
 			ID: this.Anchors.Menu.Root,
 			Multiple: true,
@@ -64,28 +64,8 @@ class Editor {
 				{
 					Label: "Wells", Content: {
 						Type: "HTML",
-						Value: "<fieldset></fieldset><fieldset id=\"" + this.Anchors.Menu.Areas + "\"><legend>Wells available</legend></fieldset><fieldset id=\"" + this.Anchors.Menu.AreaOptions + "\"><legend>Options</legend></fieldset>",
+						Value: "<fieldset></fieldset><fieldset id=\"" + this.Anchors.Menu.Areas + "\"><legend>Wells available</legend></fieldset>",
 					}
-				},
-				{
-					Label: "Concentration",
-					Content: {
-						Type: "HTML",
-						Value: "<fieldset id=\"" + this.Anchors.Menu.Conc + "\"></fieldset><fieldset id=\"" + this.Anchors.Menu.DRC + "\"><legend>Dose-response</legend></fieldset>"
-					}
-				},
-				{
-					Label: "Results",
-					Disabled: true,
-					Content: {
-						Type: "HTML",
-						Value: "<fieldset></fieldset><fieldset id=\"" + this.Anchors.Menu.Results + "\"><legend>Results available</legend></fieldset>"
-					}
-				},
-				{
-					Label: "Analysis",
-					Disabled: true,
-					Content: {Type: "HTML", Value: "<div id=\"" + this.Anchors.Menu.Analysis + "\"></div>"}
 				},
 				{
 					Label: "Metadata",
@@ -103,7 +83,6 @@ class Editor {
 			Layout: "Menu",
 			Tabs: [
 				{Label: "Layout", Active: true, Content: {Type: "HTML", Value: "<div id=\"" + this.Anchors.Main.Plate + "\"><p>Choose a plate format or load a layout to start</p></div>"} },
-				{Label: "Data", Content: {Type: "HTML", Value: "<div id=\"" + this.Anchors.Main.Results + "\" style=\"position: relative\"><p>Load a result file to continue</p></div>"} }, //The position styling is to correctly display the popup for the lookup select
 			]
 		});
 		this.Tables = {
@@ -124,10 +103,6 @@ class Editor {
 			Plate: {
 				Rows: LinkCtrl.new("Number", {ID: this.Anchors.Menu.Plate, Title: "Number of rows", Min: 1, Max: 48, Default: 4, Label: "Rows", Chain: {Index: 0}}),
 				Cols: LinkCtrl.new("Number", {ID: this.Anchors.Menu.Plate, Title: "Number of columns", Min: 1, Max: 48, Default: 6, Label: "Columns", Chain: {Index: 1, Last: true}}),
-			},
-			Area: {
-				Lock: LinkCtrl.new("Checkbox", {ID: this.Anchors.Menu.AreaOptions, Label: "Lock Wells", Default: true, Preserve: true, Chain: {Index: 0}, Change: function() {}.bind(this), Title: "If checked, prevent tagged areas from being replaced when tagged again"}),
-				Strict: LinkCtrl.new("Checkbox", {ID: this.Anchors.Menu.AreaOptions, Label: "Strict Mode", Default: true, Chain: {Index: 1, Last: true}, Change: function(v) {this.strictMode(v)}.bind(this), Title: "If checked, prevent areas with types 'Sample' or 'Range' to overlap with 'Controls'"}),
 			},
 			Concentration: {
 				Value: LinkCtrl.new("Number", {ID: this.Anchors.Menu.Conc, Title: "Value for the concentration", Min: 0, Default: 20, Label: "Value", Preserve: true, Chain: {Index: 0}}),
@@ -279,32 +254,6 @@ class Editor {
 			{Label: "Untag", Title: "Remove tagged areas from the selection", Click: function() {this.untagArea()}.bind(this)},
 			{Label: "Tag", Title: "Tag the selected area in the selection", Icon: {Type: "Tag", Space: true},  Click: function() {this.tagArea()}.bind(this)},
 		]));
-		GetId(this.Anchors.Menu.Conc).prepend(LinkCtrl.buttonBar([
-			{Label: "Reset", Title: "Reset Concentration data for the whole plate", Icon: {Type: "Reset", Space: true}, Click: function() {this.resetConc()}.bind(this)},
-			{Label: "Untag", Title: "Untag all concentrations from the selection", Click: function() {this.untagConc()}.bind(this)},
-			{Label: "Tag", Title: "Tag the defined concentration in the selection", Icon: {Type: "Tag", Space: true}, Click: function() {this.tagConc()}.bind(this)},
-		]));
-		var drc = GetId(this.Anchors.Menu.DRC);
-		drc.insertAdjacentHTML("beforeend", "<br>");
-		drc.append(LinkCtrl.button(
-			{Label: "Tag DRC", Title: "Tag the defined dose-response in the selection", Icon: {Type: "Tag", Space: true}, Click: function() {this.tagDRC()}.bind(this)}
-		));
-		GetId(this.Anchors.Menu.Results).previousSibling.append(LinkCtrl.buttonBar([
-			{Label: "Add results", Icon: {Type: "New", Space: true}, Title: "Attach new results file to the plate layout", Click: function() {this.newResult()}.bind(this)},
-			{Label: "Edit", Title: "Edit the selected result", Icon: {Type: "Edit", Space: true}, Click: function() {this.editResult()}.bind(this)},
-			{Label: "Pairing", Title: "Tools for pairing of result and definition plates", Click: function() {this.pairing()}.bind(this)},
-		]));
-		GetId(this.Anchors.Menu.Results).previousSibling.append(LinkCtrl.buttonBar([
-			{Label: "Push Layout", Title: "Push the layout data to the selected result file", Click: function() {this.pushLayout()}.bind(this)}, //Need review ith stream-write capabilities
-		]));
-		GetId(this.Anchors.Menu.Analysis).prepend(LinkCtrl.buttonBar([
-			{Label: "Controls", Title: "Aggregate data for the controls defined in the layout and compute Z-factors", Click: function() {this.report("zFactor")}.bind(this)},
-			{Label: "Hits", Title: "Gather wells with parameter values above the given thresholds. Requires controls defined in the plate", Click: function() {this.report("hits")}.bind(this)},
-		]));
-		GetId(this.Anchors.Menu.Analysis).prepend(LinkCtrl.buttonBar([
-			{Label: "Column Analysis", Title: "Compute statistics for the combinations of all areas and concentrations defined in the layout, organized as individual columns", Click: function() {this.report("aggregate")}.bind(this)},
-			{Label: "Grouped Analysis", Title: "Compute statistics for the combinations of all areas and concentrations defined in the layout, organized as two-entry tables", Click: function() {this.report("grouped")}.bind(this)},
-		]));
 		GetId(this.Anchors.Menu.MetadataMainLevel).append(LinkCtrl.buttonBar([{
 			Label: "Apply",
 			Title: "Apply values to the main scope",
@@ -332,8 +281,8 @@ class Editor {
 		let msg = "This will reset the entire project.<br>All tags, areas, definitions and results will be discarded.";
 		let title = "Reset layout";
 		switch(that) {
-			case "tag": msg = "This will remove all tags for all layers on the plate."; title = "Reset tags"; break;
-			case "conc": msg = "This will remove all concentration data for all layers on the plate."; title = "Reset concentrations"; break;
+			case "tag": msg = "This will remove all tags for all plates (layers) on the plate."; title = "Reset tags"; break;
+			case "conc": msg = "This will remove all concentration data for all plates (layers) on the plate."; title = "Reset concentrations"; break;
 		}
 		return new Promise(function (resolve, reject) {
 			Form.open({
@@ -349,16 +298,12 @@ class Editor {
 	}
 	static reset() { //Reset the whole thing, or part of it
 		this.Plate = undefined; //Reset the plate
-		this.Main.init(); //Reset the plate vizualization panel
+		this.Main.init(); //Reset the plate visualization panel
 		Object.values(this.Tables).forEach(function(t) {t.empty()}); //Reset the areas and results tables
 		this.Console.log({Message: "Project reset", Gravity: "Success", Reset: true});
 	}
 	static newPlate(r, c, options = {}) { //Create a new plate
 		if(this.Plate) { //A plate already exist
-			if (options.copyingAllowed) {
-				this.Plate.CopyingAllowed = true;
-				this.Plate.update();
-			}
 			if(this.Plate.Rows != r || this.Plate.Cols != c) { //Confirmation before resizing
 				let id = "Form_Resize";
 				let idArea = id + "_RadioArea";
@@ -425,10 +370,18 @@ class Editor {
 	}
 
 	static saveXLSX() { //Save the layout
-		if(!this.Plate) {this.Console.log({Message: "Nothing to save", Gravity: "Warning"}); return this} //No area + no plate = nothing to save
+		if(!this.Plate) {
+			this.Console.log({Message: "Nothing to save", Gravity: "Warning"});
+			return this;
+		} //No area + no plate = nothing to save
+		const [isValid, reasons] = this.isPlateValid();
+		if (!isValid) {
+			reasons.forEach(reason => this.Console.log({Message: reason, Gravity: "Error"}));
+			return this;
+		}
 		const data = this.Plate.exportToXLSX()
 		const save = this.exportToXLSX(data);
-		Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: "Layout.xlsx"});
+		Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: "TRANSFECTION_FILE.xlsx"});
 		return this;
 	}
 
@@ -471,6 +424,48 @@ class Editor {
 		return Excel.generateExcelFileFromArray(dataArray);
 	}
 
+	static isPlateValid() {
+		let isValid = true;
+		let reasons = [];
+
+		if (
+			!this.Plate.Metadata.ExperimentID
+			|| !this.Plate.Metadata.TransfectionScientist
+		) {
+			isValid = false;
+			reasons.push("Transfection metadata should be filled");
+		}
+
+		this.Plate.Layers.forEach(layer => {
+			if (
+				!layer.Metadata.CellLine
+				|| !(typeof layer.Metadata.CellLinePassage === 'number')
+				|| !layer.Metadata.TransfectionReagent
+				|| !(typeof layer.Metadata.TransfectionReagentAmount === 'number')
+				|| !layer.Metadata.TransfectionReagentLOT
+				|| !(typeof layer.Metadata.TransfectionEndPoint === 'number')
+			) {
+				isValid = false;
+				reasons.push(`Plate ${layer.Index} metadata should be filled`);
+			}
+
+			layer.Wells.forEach(well => {
+				if (
+					well.Area
+					&& (
+						!(typeof well.Metadata.NumberOfCellsPerWell === 'number')
+						|| !(typeof well.Metadata.Concentration === 'number')
+					)
+				) {
+					isValid = false;
+					reasons.push(`Well ${well.Name} metadata should be filled`)
+				}
+			})
+		})
+
+		return [isValid, reasons];
+	}
+
 	static load() { //Load a layout from file
 		const id = "Form_Load";
 		const FileCtrl = LinkCtrl.new("File", {
@@ -480,24 +475,17 @@ class Editor {
 			Title: "Click to select the file containing the layout definition",
 			Accept: ".save, .xls, .xlsx"
 		});
-		const DirectInput = LinkCtrl.new("Text", {
-			ID: id + "_Text",
-			Default: "",
-			Label: "Direct JSON input",
-			Title: "Copy the JSON content here",
-			Size: 18
-		});
 
 		Form.open({
 			ID: id,
-			HTML: "<p>Select the Layout file to load</p><div id=\"" + FileCtrl.ID + "\"></div><br><div id=\"" + DirectInput.ID + "\"></div>",
+			HTML: "<p>Select the Layout file to load</p><div id=\"" + FileCtrl.ID + "\"></div>",
 			Title: "Load layout",
 			Buttons: [
 				{
 					Label: "Next",
 					Click: function () {
 						let files = FileCtrl.getValue();
-						if (files.length == 0 && DirectInput.getValue() == "") {
+						if (files.length === 0) {
 							alert("No valid input found");
 							return this
 						}
@@ -509,19 +497,17 @@ class Editor {
 								|| file.type === 'application/vnd.ms-excel'
 							) {
 								reader.onload = function (e) {
-									const {data, copyingAllowed} = this.parseExcelFile(e.target.result);
-									this.loadPreview(data, {copyingAllowed});
+									const {data} = this.parseExcelFile(e.target.result);
+									this.loadPreview(data);
 								}.bind(this);
 								reader.readAsArrayBuffer(file);
 
 							} else {
 								reader.onload = function (e) {
-									this.loadPreview(e.target.result, {copyingAllowed: true});
+									this.loadPreview(e.target.result);
 								}.bind(this);
 								reader.readAsText(file);
 							}
-						} else { //Process string directly
-							this.loadPreview(DirectInput.getValue(), {copyingAllowed: true});
 						}
 						Form.close(id);
 					}.bind(this)
@@ -536,7 +522,6 @@ class Editor {
 			],
 			onInit: function () {
 				FileCtrl.init();
-				DirectInput.init()
 			},
 		});
 		return this;
@@ -548,8 +533,8 @@ class Editor {
 		const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
 		return (this.isMetadataIncluded(xlData))
-			? {data: this.transformMetadataJSONToSave(xlData), copyingAllowed: false}
-			: {data: this.transformJSONToSave(xlData), copyingAllowed: true};
+			? {data: this.transformMetadataJSONToSave(xlData)}
+			: {data: this.transformJSONToSave(xlData)};
 	}
 
 	static isMetadataIncluded(data) {
@@ -557,13 +542,13 @@ class Editor {
 		return _.some(headers, item => (['SAMPLE_NAME', 'TRANSFECTION_POS', 'TRANSFECTION_CONCENTRATION', 'TRANSFECTION_CELL_AMOUNT', 'TRANSFECTION_PLATE_NAME', 'TRANSFECTION_CELL_LINE', 'TRANSFECTION_CELL_LINE_PASSAGE', 'TRANSFECTION_REAGENT', 'TRANSFECTION_REAGENT_AMOUNT', 'TRANSFECTION_REAGENT_LOT', 'TRANSFECTION_END_POINT', 'TRANSFECTION_ID', 'TRANSFECTION_SCIENTIST', 'TRANSFECTION_DATE'].includes(item)));
 	}
 
-	static transformMetadataJSONToSave(data) {
+	static transformMetadataJSONToSave(rawData) {
+		const data = this.prepareData(rawData);
 		const [Rows, Cols] = this.getMetadataFileRowsAndColumnsCount(data);
 		const result = [
 			{
 				Rows,
 				Cols,
-				KeepSelected: true,
 				Digits: 1,
 				Layers: [...this.mapLayers(data)],
 				LayersMetadata: this.mapLayersMetadata(data),
@@ -599,6 +584,16 @@ class Editor {
 			.value();
 
 		return [rows, columns];
+	}
+
+	static prepareData(data) {
+		return data.map(item => {
+			const {SAMPLE_NAME, ...rest} = item;
+			return {
+				...rest,
+				SAMPLE_NAME: _.replace(SAMPLE_NAME, /_\d{1,2}$/i, ''),
+			}
+		})
 	}
 
 	static getUniqLayerNames(data) {
@@ -905,9 +900,7 @@ class Editor {
 		if(this.Plate === undefined) {return this}
 		var a = this.Tables.Areas.Selected;
 		if(a.length == 0) {this.Console.log({Message: "No area selected", Gravity: "Error"}); return this}
-		var lock = this.Controls.Area.Lock.getValue();
-		var strict = this.Controls.Area.Strict.getValue();
-		Plate.tagArea(this.Plate, a[0], {Lock: lock, Strict: strict}).then(function(R) { //Tag and return a feedback object
+		Plate.tagArea(this.Plate, a[0], {Lock: true, Strict: true}).then(function(R) { //Tag and return a feedback object
 			if(R.Cancel) {return this} //Custom tag was cancelled
 			if(R.Selected == 0) {this.Console.log({Message: "No wells selected", Gravity: "Error"}); return this}
 			if(a[0].Type == "Range") {this.Plate.updateRange(a[0])} //Update range information if needed
@@ -1178,16 +1171,23 @@ class Editor {
 				Concentration: this.Controls.MetadataWellLevel.Concentration.getValue()
 			}
 			let totalUpdated = 0;
+			let totalEmpty = 0;
+
 			this.Plate.Layers.forEach(layer => {
-				const updatedCount = layer.applyWellsMetadata(values);
-				if (updatedCount) {totalUpdated += updatedCount;}
+				const [updated, empty] = layer.applyWellsMetadata(values);
+				if (updated) {totalUpdated += updated;}
+				if (empty) {totalEmpty += empty;}
 			});
 
-			if (totalUpdated) {
-				this.Console.log({Message: `Metadata of ${totalUpdated} well${(totalUpdated > 0) ? 's' : ''} updated with following values:`, Gravity: "Success"});
+			if (totalUpdated > 0) {
+				this.Console.log({Message: `Metadata of ${totalUpdated} well${(totalUpdated > 1) ? 's' : ''} updated with following values:`, Gravity: "Success"});
 				this.Console.log({Message: `Number of Cells per Well: ${values.NumberOfCellsPerWell}`, Gravity: "Success"});
 				this.Console.log({Message: `Concentration: ${values.Concentration}`, Gravity: "Success"});
-			} else {
+			}
+			if (totalEmpty > 0) {
+				this.Console.log({Message: `Metadata of ${totalEmpty} empty well${(totalEmpty > 1) ? 's' : ''} was not updated`, Gravity: "Warning"});
+			}
+			if (totalUpdated === 0 && totalEmpty === 0) {
 				this.Console.log({Message: "No well selected", Gravity: "Error"});
 			}
 		} else {

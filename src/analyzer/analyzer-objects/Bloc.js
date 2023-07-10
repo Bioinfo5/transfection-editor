@@ -1,5 +1,5 @@
 //*****************************************************************************
-// BLOC object - First layer used to organize reporting of data in the analyzer
+// BLOC object - First plate (layer) used to organize reporting of data in the analyzer
 //*****************************************************************************
 class Bloc {
 	constructor(I) {

@@ -1,5 +1,5 @@
 //***********************************************************************************************************
-// PLATE object - Plate is an array of layers; layer is an array of wells; well is a collection of properties
+// PLATE object - Plate is an array of plates (layers); plate (layer) is an array of wells; well is a collection of properties
 //***********************************************************************************************************
 class Plate {
 	constructor(root, r, c, options = {}) {
@@ -10,7 +10,6 @@ class Plate {
 		this.WellMargin = 5;
 		this.Highlighting = undefined; //Well currently highlighted
 		this.Selecting = undefined; //Object to handle the selection
-		this.CopyingAllowed = options.copyingAllowed || false;
 		this.Metadata = {};
 		this.SelectedLayer = undefined;
 
@@ -21,28 +20,26 @@ class Plate {
 			LayerSelect: root + "_LayerSelect",
 		}
 		this.Options = {
-			KeepSelected: LinkCtrl.new("Checkbox", {ID: this.Anchors.Options, Title: "If checked, the selection will remain active after a tag (area or concentration)", Default: true, Label: "Keep selection", Chain: {Index: 0}}),
-			Digits: LinkCtrl.new("Select", {ID: this.Anchors.Options, Title: "Number of digits to show for the concentrations", Label: "Digits", Default: 1, List: [2, 3, 4, 5, 6, "All"], Chain: {Index: 1, Last: true}, Change: function(v) {this.digit()}.bind(this)}),
 			AddToSel: LinkCtrl.new("Checkbox", {ID: this.Anchors.Selection, Default: false, Label: "Multiple", Title: "If turned on, selected wells will be added to the current selection. If you have a keyboard, keep the Ctrl key pressed down while selecting to obtain the same effect."}),
 		}
 		this.Controls = {
-			LayerSelect: LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Default: 0, Label: "Layer", List: [1], NavBar: true, Change: function(v) {
+			LayerSelect: LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Default: 0, Label: "Plate", List: [1], NavBar: true, Change: function(v) {
 				this.Layers[v].concMap(this.Anchors.LayerSelect)
-			}.bind(this), Title: "Select the layer to use for display"}),
+			}.bind(this), Title: "Select the plate to use for display"}),
 		}
 		this.TypeMap = new TypeMap(this);
 		this.Grid = document.createElement("canvas");
 		this.Highlight = document.createElement("canvas");
 		this.Header = document.createElement("canvas");
 		this.Layers = [new Layer({Rows: r, Cols: c, Index: 0, ArrayIndex: 0, Plate: this})];
-		this.LastKey = 1; //Index to use for new layers, to guarantee unicity
+		this.LastKey = 1; //Index to use for new plates (layers), to guarantee unicity
 		this.LayerTab = new TabControl({
 			ID: this.Anchors.LayerTab,
 			Multiple: true,
 			Tabs: [{
-				Label: "Layer 1",
+				Label: "Plate 1",
 				Active: true,
-				Controls: ["Select", this.CopyingAllowed && "Duplicate", "Delete"].filter(Boolean),
+				Controls: ["Select", "Duplicate", "Delete"],
 				Content: {Type: "HTML", Value: Layer.rootHTML(0, this.Layers[0].Root)}
 			}],
 			AfterDelete: function(l) {this.deleteLayer(l)}.bind(this),
@@ -95,8 +92,6 @@ class Plate {
 		return JSON.stringify({
 			Rows: plate.Rows,
 			Cols: plate.Cols,
-			KeepSelected: plate.Options.KeepSelected.getValue(),
-			Digits: plate.Options.Digits.getValue(),
 			Layers: out
 		});
 	}
@@ -117,8 +112,8 @@ class Plate {
 			const TRANSFECTION_END_POINT = layer.Metadata.TransfectionEndPoint || '';
 
 			layer.Wells.forEach(well => {
-				const SAMPLE_NAME = (well.Area) ? well.Area.Name : '';
-				const TRANSFECTION_POS = `${Well.alphabet(well.Row)}${well.Col + 1}`;
+				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${well.Index}` : '';
+				const TRANSFECTION_POS = `${well.Name}`;
 				const TRANSFECTION_CONCENTRATION = well.Metadata.Concentration || '';
 				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || '';
 
@@ -139,22 +134,20 @@ class Plate {
 		if(plate) {
 			html += "Rows: <b>" + plate.Rows + "</b>; ";
 			html += "Cols: <b>" + plate.Cols + "</b><br>";
-			html += "Layers: <b>" + plate.Layers.length + "</b>";
+			html += "Plates: <b>" + plate.Layers.length + "</b>";
 		}
 		else {html = "<p class=\"Error\">No data</p>"}
 		GetId(id).insertAdjacentHTML("beforeend", html);
 	}
-	static load(plate, data) { //Update the provided plate with the layers data provided
-		plate.Options.KeepSelected.setValue(data.KeepSelected);
-		plate.Options.Digits.setValue(data.Digits);
+	static load(plate, data) { //Update the provided plate with the plates (layers) data provided
 		if (data.Metadata) {
 			plate.applyMetadata(data.Metadata);
 			Editor.Controls.MetadataMainLevel.ExperimentID.setValue(data.Metadata.ExperimentID);
 			Editor.Controls.MetadataMainLevel.TransfectionScientist.setSelected(data.Metadata.TransfectionScientist);
 		}
 		data.Layers.forEach(function(l, i) {
-			if(i > 0) {plate.addLayer()} //First layer is already created, but need to create the others
-			Layer.load(plate.Layers[i], l, plate.Options.Digits.Selected, plate.WellSize, plate.WellMargin);
+			if(i > 0) {plate.addLayer()} //First plate (layer) is already created, but need to create the others
+			Layer.load(plate.Layers[i], l, 1, plate.WellSize, plate.WellMargin);
 		});
 		if (data.LayersMetadata) {
 			data.LayersMetadata.forEach((l, i) => {
@@ -172,8 +165,7 @@ class Plate {
 	}
 //*******************
 	static resize(plate, r, c) { //Resize the plate to the new dimensions, keeping concentration data if needed
-		var digit = plate.Options.Digits.Selected;
-		plate.Layers.forEach(function(l, i) { //For each layer, travel the new dimensions and update the wells arrays
+		plate.Layers.forEach(function(l, i) { //For each plate (layer), travel the new dimensions and update the wells arrays
 			Layer.resize(l, r, c);
 		});
 		plate.TypeMap.resize(r, c); //Resize the typeMap by keeping only relevant wells
@@ -187,7 +179,6 @@ class Plate {
 		if(results.length > 0) {Editor.ResultManager.draw(results[0], {NoPrompt: true})}
 	}
 	static tagArea(plate, a, I) { //Tag area a in the selected wells
-		I.Keep = plate.Options.KeepSelected.getValue();
 		I.Size = plate.WellSize;
 		I.Margin = plate.WellMargin;
 		I.Map = plate.TypeMap;
@@ -219,11 +210,11 @@ class Plate {
 			else {resolve(plate.tagArea(a, I))}
 		});
 	}
-	static flatten(plate) { //Produce an array the size of the plate where the content of each well is flattened accross layers
+	static flatten(plate) { //Produce an array the size of the plate where the content of each well is flattened across paltes (layers)
 		let flat = []; //Output array
 		let size = plate.Rows * plate.Cols;
 		for(let i=0;i<size;i++) {
-			let content = []; //Aggregate the content across layers in an array
+			let content = []; //Aggregate the content across plates (layers) in an array
 			let ranges = [];
 			plate.Layers.forEach(function(l) {
 				let item = ""; //The item at this location
@@ -252,18 +243,16 @@ class Plate {
 		let out = GetId(this.Root);
 		let html = "";
 		html += "<div style=\"overflow: auto\">"; //Options ribbon
-			html += "<fieldset style=\"float: left\"><legend>Selection</legend><div id=\"" + this.Anchors.Selection + "\"></div></fieldset>";
 			html += "<fieldset style=\"float: left\"><legend>Zoom</legend></fieldset>";
 			html += "<fieldset style=\"float: left\"><legend>Options</legend><div id=\"" + this.Anchors.Options + "\"></div></fieldset>";
-			html += "<fieldset style=\"float: left\"><legend>Views</legend></fieldset>";
 		html += "</div>";
-		html += "<div id=\"" + this.Anchors.LayerTab + "\" style=\"margin-top: 10px\"></div>"; //Tab container for layers
+		html += "<div id=\"" + this.Anchors.LayerTab + "\" style=\"margin-top: 10px\"></div>"; //Tab container for plates (layers)
 		out.innerHTML = html;
 		this.LayerTab.init();
-		this.Layers[0].init(); //Only one layer available at the beginning
+		this.Layers[0].init(); //Only one plate (layer) available at the beginning
 		Object.values(this.Options).forEach(function(o) {o.init()});
 		let b = LinkCtrl.buttonBar([
-			{Label: "Add layer", Title: "Add a new layer to the plate", Click: function() {this.addLayer()}.bind(this)},
+			{Label: "Add plate", Title: "Add a new plate to the layout", Click: function() {this.addLayer()}.bind(this)},
 		], true); //Here true is set so that the buttons are added Inline
 		let o = GetId(this.Anchors.Options);
 		o.insertAdjacentHTML("beforeend", "&nbsp;");
@@ -272,85 +261,73 @@ class Plate {
 			{Label: "", Title: "Zoom in on the layout, each well will be bigger", Icon: {Type: "ZoomIn"}, Click: function() {this.zoom(1)}.bind(this)},
 			{Label: "", Title: "Zoom out on the layout, each well will be smaller", Icon: {Type: "ZoomOut"}, Click: function() {this.zoom(-1)}.bind(this)},
 		]);
-		out.children[0].children[1].append(z);
-		let v = LinkCtrl.buttonBar([ //Views controls
-			{Label: "Types", Title: "Display a map showing the type of area defined for each well", Click: function() {this.typeMap()}.bind(this)},
-			{Label: "Plates", Title: "Display a form to navigate between the different plates available for the definitions", Click: function() {this.plateMap()}.bind(this)},
-			{Label: "Conc.", Title: "Display a map showing the concentrations defined for each well, per layer", Click: function() {this.concMap()}.bind(this)},
-		]);
-		out.children[0].children[3].append(v);
+		out.children[0].children[0].append(z);
 		let s = LinkCtrl.buttonBar([ //Selection controls
-			{Label: "Clear", Title: "Unselect all wells for all layers", Click: function() {this.resetSelection()}.bind(this)},
+			{Label: "Clear", Title: "Unselect all wells for all plates", Click: function() {this.resetSelection()}.bind(this)},
 		], true);
-		o = GetId(this.Anchors.Selection);
-		o.insertAdjacentHTML("beforeend", "&nbsp;");
-		o.append(s);
 		this.grid();
 		Editor.resetMainMetadataControls();
 
 		return this;
 	}
 //*************
-//LAYER METHODS
+//PLATE (LAYER) METHODS
 //*************
-	addLayer() { //Add a new layer to the plate
-		let l = this.LastKey++; //Index of the new layer to add
+	addLayer() { //Add a new plate (layer) to the plate
+		let l = this.LastKey++; //Index of the new plate (layer) to add
 		let lay = this.Layers;
 		let here = lay.length; //Last index in the array is the one to use for the display in html
 		let newLayer = new Layer({Rows: this.Rows, Cols: this.Cols, Index: l, ArrayIndex: here, Plate: this});
 		lay.push(newLayer);
 		this.LayerTab.addTab({
-			Label: "Layer " + (here + 1),
+			Label: "Plate " + (here + 1),
 			SetActive: true,
-			Controls: ["Select", "Delete"],
+			Controls: ["Select", "Duplicate", "Delete"],
 			Content: {Type: "HTML", Value: Layer.rootHTML(here, newLayer.Root)}
 		});
 		newLayer.init().grid(this.Grid);
-		Editor.ResultManager.layerUpdate(); //Update the layer control
+		Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
 		return this;
 	}
-	deleteLayer(l) { //Delete layer with provided ArrayIndex
+	deleteLayer(l) { //Delete plate (layer) with provided ArrayIndex
 		let I = { //Prepare an object to transfer to the clean method
 			Map: this.TypeMap,
 			Results: {Ranges: []}
 		}
-		this.Layers[l].cleanTags(I); //Clean tags from this layer and recover impacted ranges
+		this.Layers[l].cleanTags(I); //Clean tags from this plate (layer) and recover impacted ranges
 		I.Results.Ranges.forEach(function(a) { //Update impacted ranges
 			this.updateRange(a);
 		}, this);
 		Editor.Tables.Areas.update(); //Update the table display so that the ranges have correct information
-		Editor.Tables.Areas.Array.forEach(function(a) {a.cleanTags(this.Layers[l].Index)}, this); //All areas must now delete any reference to this destroyed layer
-		this.Layers.splice(l, 1); //Remove the layer from the array
+		Editor.Tables.Areas.Array.forEach(function(a) {a.cleanTags(this.Layers[l].Index)}, this); //All areas must now delete any reference to this destroyed plate (layer)
+		this.Layers.splice(l, 1); //Remove the plate (layer) from the array
 		let tab = this.LayerTab;
-		this.Layers.forEach(function(L, i) { //Redefine index of the layers and wells
-			if(i > (l - 1)) { //Only update layers above the layer to be removed
+		this.Layers.forEach(function(L, i) { //Redefine index of the plates (layers) and wells
+			if(i > (l - 1)) { //Only update plate (layers) above the plate (layer) to be removed
 				L.setIndex(i);
-				tab.rename(i, "Layer " + (i + 1));
-				Layer.exportControls(L); //Add the control buttons to get the layer as jpg or html
+				tab.rename(i, "Plate " + (i + 1));
+				Layer.exportControls(L); //Add the control buttons to get the plate (layer) as jpg or html
 			}
 		});
-		if ((l === 0) && this.CopyingAllowed) {
-			this.CopyingAllowed = false;
-		}
-		Editor.ResultManager.layerUpdate(); //Update the layer control
+		Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
 		return this;
 	}
-	duplicateLayer(layerIndex, times) { //Copy layer with provided ArrayIndex t times
+	duplicateLayer(layerIndex, times) { //Copy plate (layer) with provided ArrayIndex t times
 		const origin = this.Layers[layerIndex];
 		for (let i = 0; i < times; i++) {
-			const l = this.LastKey++; //Index of the new layer to add
+			const l = this.LastKey++; //Index of the new plate (layer) to add
 			const here = this.Layers.length; //Last index in the array is the one to use for the display in html
 			const newLayer = Layer.clone({...origin, Index: l, ArrayIndex: here});
 			this.Layers.push(newLayer);
 			this.LayerTab.addTab({
-				Label: "Layer " + (here + 1),
+				Label: "Plate " + (here + 1),
 				SetActive: true,
-				Controls: ["Select", "Delete"],
+				Controls: ["Select", "Duplicate", "Delete"],
 				Content: {Type: "HTML", Value: Layer.rootHTML(here, newLayer.Root)}
 			});
 			newLayer.init().grid(this.Grid);
 			this.update(); //Update to display the concentrations and update the range info
-			Editor.ResultManager.layerUpdate(); //Update the layer control
+			Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
 		}
 		return this;
 	}
@@ -397,7 +374,7 @@ class Plate {
 		if(this.Selecting) { //Interrupt the selection
 			this.select(undefined, undefined, {Stop: true});
 		}
-		this.Layers.forEach(function(L) { //redraw all layers
+		this.Layers.forEach(function(L) { //redraw all plates (layers)
 			L.content(size, margin);
 		}, this);
 		return this;
@@ -432,7 +409,7 @@ class Plate {
 		this.header(); //Update fixed layer to match the new dimensions
 		return this;
 	}
-	drawHighlight(w) { //Draw the highlight layer based on zoom level and hovered item w
+	drawHighlight(w) { //Draw the highlight plate (layer) based on zoom level and hovered item w
 		let todo = [];
 		if(w) { //Proceed with the hovered well, if defined
 			let H = this.Highlight;
@@ -484,7 +461,7 @@ class Plate {
 		}
 		return todo;
 	}
-	highlight(e, w) { //Highlight selected well w for all layers and display the info popup
+	highlight(e, w) { //Highlight selected well w for all plates (layers) and display the info popup
 		this.Highlighting = w;
 		let todo = this.drawHighlight(w);
 		this.Layers.forEach(function(l) {
@@ -493,7 +470,7 @@ class Plate {
 		Editor.ResultManager.highlight(todo);
 		return this;
 	}
-	header() { //Draw the header highlight layer at the current zoom level
+	header() { //Draw the header highlight plate (layer) at the current zoom level
 		let margin = this.WellMargin;
 		let size = this.WellSize;
 		let H = this.Header;
@@ -515,7 +492,6 @@ class Plate {
 		if(I.Stop) {
 			if(this.Selecting) {
 				if(I.Layer !== undefined) {
-					//this.Layers[I.Layer].select(this.Selecting.Includes, this.WellSize, this.WellMargin);
 					let L = this.Layers.find(function(e) {return e.Index == I.Layer});
 					if(L !== undefined) {L.select(this.Selecting.Includes, this.WellSize, this.WellMargin)}
 				}
@@ -531,7 +507,7 @@ class Plate {
 		}
 		return this;
 	}
-	resetSelection() { //Reset selection for all the layers
+	resetSelection() { //Reset selection for all the plates (layers)
 		let size = this.WellSize;
 		let margin = this.WellMargin;
 		this.Layers.forEach(function(L) {
@@ -603,10 +579,8 @@ class Plate {
 		let ver = startRow + spanRow;
 		let x = (size + margin) * (startCol + 1);
 		let y = (size + margin) * (startRow + 1);
-		//let L = this.Layers[w.Layer.Index]; //The layer currently hosting the selection process
-		//let L = this.Layers[w.Layer.ArrayIndex];
 		let L = this.Layers.find(function(e) {return e.Index == w.Layer.Index});
-		if(L === undefined) {console.warn("Could not find the layer with index " + w.Layer.Index); return} //Could not find the layer
+		if(L === undefined) {console.warn("Could not find the plate with index " + w.Layer.Index); return} //Could not find the plate (layer)
 		for(let i=startCol;i<hor;i++) { //Loop covering the wells under the lasso, col first
 			for(let j=startRow;j<ver;j++) { //then row
 				if(j == startRow) {y = (size + margin) * (startRow + 1)}
@@ -686,7 +660,7 @@ class Plate {
 		Definition.formPlate(ranges);
 		return this;
 	}
-	concMap() { //Show the map of concentrations for the plate, per layer
+	concMap() { //Show the map of concentrations for the plate, per plate (layer)
 		if(this.Layers.length == 0) {return this}
 		let id = "ConMap";
 		Form.open({ //Open a form showing the map
@@ -704,9 +678,9 @@ class Plate {
 				let c = this.Controls.LayerSelect;
 				let l = this.Layers.length;
 				let list = [];
-				for(let i=0;i<l;i++) {list.push(i + 1)} //Update the list of available layers
+				for(let i=0;i<l;i++) {list.push(i + 1)} //Update the list of available plates (layers)
 				c.List = list;
-				c.init().change(c.Value); //Trigger a change to display the map for selected layer
+				c.init().change(c.Value); //Trigger a change to display the map for selected plate (layer)
 			}.bind(this),
 		});
 		return this;
@@ -729,7 +703,6 @@ class Plate {
 	}
 	untag() { //Untag the selected wells
 		let I = {
-			Keep: this.Options.KeepSelected.getValue(),
 			Size: this.WellSize,
 			Margin: this.WellMargin,
 			Map: this.TypeMap,
@@ -754,7 +727,7 @@ class Plate {
 	tagConc(value, unit) { //Tag the concentration given in the selected wells
 		let I = {
 			Value: value,
-			Digit: this.Options.Digits.Selected,
+			Digit: 1,
 			Unit: unit,
 			Selected: 0,
 			Size: this.WellSize,
@@ -771,14 +744,13 @@ class Plate {
 			Selected: 0,
 			Size: this.WellSize,
 			Margin: this.WellMargin,
-			Keep: this.Options.KeepSelected.getValue(),
 		}
 		this.Layers.forEach(function(l) {
 			l.untagConc(I);
 		});
 		return I.Selected;
 	}
-	resetConc() { //Reset concentrations for all layers
+	resetConc() { //Reset concentrations for all plates (layers)
 		var I = {Size: this.WellSize, Margin: this.WellMargin}
 		this.Layers.forEach(function(l) {
 			l.resetConc(I);
@@ -789,7 +761,6 @@ class Plate {
 		I.Size = this.WellSize;
 		I.Margin = this.WellMargin;
 		I.Keep = this.Options.KeepSelected.getValue();
-		I.Digit = this.Options.Digits.Selected;
 		I.Selected = 0;
 		this.Layers.forEach(function(l) {
 			l.tagDRC(I);
@@ -797,7 +768,7 @@ class Plate {
 		return I.Selected;
 	}
 	digit() { //Change the digit
-		let digit = this.Options.Digits.Selected;
+		let digit = 1;
 		let size = this.WellSize;
 		let margin = this.WellMargin;
 		this.Layers.forEach(function(l) {
@@ -808,9 +779,9 @@ class Plate {
 //*****************
 //EXPORT METHODS
 //*****************
-	getConc() { //This method returns an array of unique concentration values, flattened for all layers, organized per unit, with the well indices indicated
+	getConc() { //This method returns an array of unique concentration values, flattened for all plates (layers), organized per unit, with the well indices indicated
 		let out = [];
-		this.Layers.forEach(function(l) { //For all layers
+		this.Layers.forEach(function(l) { //For all plates (layers)
 			let conc = [];
 			l.Wells.forEach(function(w) { //For all wells
 				if(w.Value !== undefined) { //If this well has a value registered

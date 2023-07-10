@@ -36,14 +36,14 @@ class ResultManager {
 		return this;
 	}
 	//Static methods
-	
+
 	//Methods
 	init() { //Prepare the html
 		let html = "";
 		html += "<div style=\"overflow: auto\">"; //Options ribbon
 			html += "<fieldset style=\"float: left\"><legend>Plate view</legend><div id=\"" + this.Anchors.PlateSelect + "\"></div></fieldset>";
 			html += "<fieldset style=\"float: left\"><legend>Pairing</legend><div id=\"" + this.Anchors.Pairing + "\"></div></fieldset>";
-			html += "<fieldset style=\"float: left\"><legend>Linked Layer</legend><div id=\"" + this.Anchors.LayerSelect + "\"></div></fieldset>";
+			html += "<fieldset style=\"float: left\"><legend>Linked Plate</legend><div id=\"" + this.Anchors.LayerSelect + "\"></div></fieldset>";
 			html += "<fieldset style=\"float: left\"><legend>Heatmap</legend><div id=\"" + this.Anchors.HeatmapOptions + "\"></div></fieldset>";
 			html += "<fieldset style=\"float: left\"><legend>Min & Max</legend>";
 				html += "<div id=\"" + this.Anchors.ExtremumSource + "\" style=\"float: left\"></div>";
@@ -55,7 +55,7 @@ class ResultManager {
 		this.PlateSelect.init();
 		this.LayerSelect.init();
 		this.ExtremumSource.init();
-		if(Editor.Plate) {this.layerUpdate()} //Update the layer selection control
+		if(Editor.Plate) {this.layerUpdate()} //Update the plate (layer) selection control
 		Object.values(this.HeatmapOptions).forEach(function(o) {o.init()});
 		Object.values(this.Extremums).forEach(function(o) {o.init()});
 		let update = LinkCtrl.button({Label: "Update", Title: "Click to redraw the heatmaps with the current custom values", Click: function() {
@@ -153,14 +153,14 @@ class ResultManager {
 				this.ResultTab.addTab({ //Add a tab for each parameter to output
 					Label: p.Name,
 					SetActive: true,
-					Controls: ["Delete"],
+					Controls: ["Select", "Duplicate", "Delete"],
 					Content: {Type: "HTML", Value: "<fieldset><legend>" + p.Name + " &bull; </legend><div id=\"" + p.ID + "\" style=\"position: relative\"><span class=\"Error\">Preparing preview, please wait...</span></div></fieldset>"}
 				});
 				let b = LinkCtrl.buttonBar([ //Create the button bar
 					Result.getAsJPGControl(result, i),
 					Result.getAsHTMLControl(result, i),
 					Result.getAsTxtControl(result, i),
-				], true); //The second argument is to get the buttonbar inline 
+				], true); //The second argument is to get the buttonbar inline
 				b.style.fontWeight = "normal";
 				b.style.fontSize = "0.7em";
 				GetId(p.ID).previousSibling.append(b); //Append the button
@@ -172,7 +172,7 @@ class ResultManager {
 		return this;
 	}
 	extremumObject() { //Return an object containing the min/max properties needed to build a heatmap
-		switch(this.ExtremumSource.Selected) { 
+		switch(this.ExtremumSource.Selected) {
 			case "Global": return undefined; //The global values are stored at the parameter level
 			case "Plate": return {Local: true};
 			case "Custom": return {Min: this.Extremums.Min.getValue(), Max: this.Extremums.Max.getValue()};
@@ -206,7 +206,7 @@ class ResultManager {
 			],
 		});
 		let plate = Editor.Plate;
-		if(plate === undefined) {GetId(report).children[0].innerHTML = "No plate defined, cannot validate the well data now"; return} //Failure 
+		if(plate === undefined) {GetId(report).children[0].innerHTML = "No plate defined, cannot validate the well data now"; return} //Failure
 		GetId(report).children[1].style.display = "block";
 		Mapper.scan(result, {Log: true, MinMax: true, Custom: function(output) { //Custom function to run at each row
 			let selected = output.Items;
@@ -293,7 +293,7 @@ class ResultManager {
 					this.HeatmapOptions.High.setValue(colors.High.getValue());
 					this.draw(this.Results.Selected[0]);
 					Form.close(id);
-				}.bind(this)}, 
+				}.bind(this)},
 				{Label: "Cancel", Icon: {Type: "Cancel", Space: true, Color: "Red"}, Click: function() {Form.close(id)}}
 			],
 			onInit: function() { //Init the linkCtrl with the form

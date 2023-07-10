@@ -13,12 +13,12 @@ class Area {
 		this.Definition = undefined;
 		this.MaxRange = 0;
 		this.DefInfo = "none";
-		this.Tags = []; //Wells tagged with this area, as an array of objects with Layer and Wells properties
+		this.Tags = []; //Wells tagged with this area, as an array of objects with Plate (Layer) and Wells properties
 		if(I.Type == "Range") {Area.rangeInfo(this)}
 		return this;
 	}
 	//Static Methods
-	static log(a, l, w) { //Log well w from layer l in area a
+	static log(a, l, w) { //Log well w from plate (layer) l in area a
 		let size = a.Tags.length;
 		if(size == 0) { //Simple case where the array is empty
 			a.Tags.push({Layer: l, Wells: [w]});

@@ -46,7 +46,7 @@ class Result {
 		let sel = 0;
 		let m = r.Mapping[Mapper.import().Name]; //An array of booleans indicating if the parameter is selected or not
 		r.Parameters.forEach(function(p, i) {
-			m[i] = p.Selected; //Update the mapping based on selection 
+			m[i] = p.Selected; //Update the mapping based on selection
 			if(p.Selected) {sel++} //Log the number of selected parameters
 		});
 		this.selected(r, sel);
@@ -234,23 +234,23 @@ class Result {
 		let plateCol = this.Mapping[Mapper.plate().Name];
 		let plate = Editor.Plate;
 		let header = this.Parser.Headers; //Headers for the file
-		for(let i=0; i<l; i++) { //For each layer
+		for(let i=0; i<l; i++) { //For each plate (layer)
 			header = header.concat(["Area", "Value", "Unit"]); //Concat a series of column to hold the values
 		}
 		let data = [header];
 		//
 		//THIS IS THE RIGHT WAY TO DO TO GET THE DEFINITION RESOLVED CORRECTLY AT THEIR PLATE Location
 		//BUT ALL PROMISES ARE PUSHED AT THE SAME TIME, WHICH SATURATE THE MEMORY WITH WORKERS!
-		//NEED TO STAGE THE CREATION OF WORKERS IN SMALL BATCHES 
+		//NEED TO STAGE THE CREATION OF WORKERS IN SMALL BATCHES
 		//
 		/*return new Promise(function(resolve) {
 			this.Parser.stream(function(row, selected, parser) { //Stream the file to build the output
 				let here = Well.parseIndex(row[w], plate); //Location of the well
 				if(here !== undefined) { //If this well is within the plate boundary
-					data.push( //Push a promise that will fulfill with the data for the entire row 
+					data.push( //Push a promise that will fulfill with the data for the entire row
 						new Promise(function(resolveRow) {
 							let p = []; //Array of promises
-							plate.Layers.forEach(function(l) { //Loop the layers
+							plate.Layers.forEach(function(l) { //Loop the plates (layers)
 								let well = l.Wells[here.Index];
 								p.push(Well.layoutData(well, row[plateCol])); //Push a promise that will resolve with the layout data at this well and layer
 							});
@@ -273,7 +273,7 @@ class Result {
 				//console.log("Stream complete");
 				Promise.all(data).then(function(out) { //Wait for all rows to complete then resolve
 					resolve({Aborted: aborted, Data: out});
-				}); 
+				});
 			});
 		}.bind(this));*/
 		//

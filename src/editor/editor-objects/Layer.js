@@ -1,5 +1,5 @@
 //******************************************************************************
-// LAYER object - Layer is an array of wells; well is a collection of properties
+// PLATE (LAYER) object - Plate (Layer) is an array of wells; well is a collection of properties
 //******************************************************************************
 class Layer {
 	constructor(I) {
@@ -27,13 +27,16 @@ class Layer {
 		return this;
 	}
 	//Static methods
-	static rootHTML(l, root) { //Return the html used as root for the layer
-		return "<fieldset><legend>" + this.legendInnerHTML(l) + "</legend><div id=\"" + root + "\" style=\"position: relative;\"></div></fieldset>";
+	static rootHTML(l, root) { //Return the html used as root for the plate (layer)
+		return "<fieldset>" +
+			"<legend>" + this.legendInnerHTML(l) + "</legend>" +
+			"<div id=\"" + root + "\" ></div>" +
+			"</fieldset>";
 	}
-	static legendInnerHTML(l) { //Return the html used as the innerHTML for the legend of the layer fieldset
-		return "Layer " + (l + 1) + " &bull; "; //l is the displayed index and should be 1-based, not 0-based
+	static legendInnerHTML(l) { //Return the html used as the innerHTML for the legend of the plate (layer) fieldset
+		return "Plate " + (l + 1) + " &bull; "; //l is the displayed index and should be 1-based, not 0-based
 	}
-	static exportControls(l) { //Create controls allowing export of the layer as jpg or html, for the passed layer object
+	static exportControls(l) { //Create controls allowing export of the plate (layer) as jpg or html, for the passed plate (layer) object
 		let b = LinkCtrl.buttonBar([ //Create the button bar
 			this.getAsJPGControl(l),
 			this.getAsHTMLControl(l),
@@ -43,7 +46,7 @@ class Layer {
 		b.style.fontSize = "0.7em";
 		GetId(l.Root).previousSibling.append(b); //Append the button
 	}
-	static getAsJPGControl(l) { //Returns an object suitable to create a button (using the LinkCtrl constructor) that will output the layer l as a jpg
+	static getAsJPGControl(l) { //Returns an object suitable to create a button (using the LinkCtrl constructor) that will output the plate (layer) l as a jpg
 		let action = function() { //The click action for the button
 			let canvas = document.createElement("canvas"); //Create an empty canvas element
 			canvas.height = l.Grid.height; //Define its size to match that of the Grid
@@ -54,102 +57,183 @@ class Layer {
 			ctx.drawImage(l.Grid, 0, 0); //Draw the grid and contents, drop the highlight
 			ctx.drawImage(l.Contents, 0, 0);
 			let href = canvas.toDataURL('image/jpeg');
-			Reporter.printable("<p><b>Layer " + (l.ArrayIndex + 1) + "</b></p><img src=\"" + href + "\"></img>");
+			Reporter.printable("<p><b>Plate " + (l.ArrayIndex + 1) + "</b></p><img src=\"" + href + "\"></img>");
 		};
-		return {Label: "jpg", Title: "Click here to view this layer as a .jpg image file", Click: action};
+		return {Label: "jpg", Title: "Click here to view this plate as a .jpg image file", Click: action};
 	}
+
 	static getAsHTMLControl(l) { //Returns an object suitable to create a button (using the LinkCtrl constructor) that will output the layer l as an html array
-		let action = function() { //The click action for the button
-			let id = "Form_GetAsHTML";
-			let controls = id + "_Controls";
-			let output = id + "_Output";
-			let data = Layer.getAsHTML(l); //This will get the html for unresolved items and run the promises to get the content for ranges
+		const id = 'Form_GetAsHTML';
+		const controls = id + '_Controls';
+		const output = id + '_Output';
+
+		const updateOutput = function (dataList) {
+			document.getElementById(output).innerHTML = dataList
+				.sort(([prevLayer], [nextLayer]) => {
+					if (prevLayer.Index > nextLayer.Index) return 1;
+					else if (prevLayer.Index < nextLayer.Index) return -1;
+					else return 0;
+				})
+				.map(([layer, data]) => (
+				'<div><p><b>Plate '
+				+ (layer.ArrayIndex + 1)
+				+ '</b></p>'
+				+ data.HTML
+				+ '</div>'
+			)).join('<br/>');
+		};
+
+		const action = function () { //The click action for the button
+			//Layer.getAsHTML(l) - This will get the html for unresolved items and run the promises to get the content for ranges
+			let dataList = [[l, Layer.getAsHTML(l)]];
+			const layerSelectControls = Editor.Plate.Layers.map(layer => {
+				return LinkCtrl.new("Checkbox", {
+					ID: `plate_checkbox-${layer.Index}`,
+					Default: layer.Index === l.Index,
+					Label: layer.Root,
+					NewLine: true,
+					Change: function(checked) {
+						if (checked) {
+							dataList = [...dataList, [layer, Layer.getAsHTML(layer)]]
+						} else {
+							dataList = dataList.filter(([layerItem]) => layerItem.Index !== layer.Index)
+						}
+
+						updateOutput(dataList);
+					}.bind(this),
+					Title: "Check to display the plate"}
+				)
+			})
+			const layerSelectControlsContainers = Editor.Plate.Layers.map(layer => {
+				return `<div id="plate_checkbox-${layer.Index}"></div>`
+			}).join('');
+
 			Form.open({ //Open an empty form with waiting message
 				ID: id,
-				HTML: "<div id=\"" + controls + "\" style=\"margin: 10px\"><p class=\"Error\">Resolving names, please wait...</p></div><div id=" + output + " style=\"max-height: 500px; overflow: auto\"><p><b>Layer " + (l.ArrayIndex + 1) + "</b></p>" + data.HTML + "</div>",
+				HTML: '<div id="' + controls + '" style="margin: 10px">'
+					+ '<p class="Error">Resolving names, please wait...</p></div>'
+					+ '<div style="display: flex;">' + layerSelectControlsContainers + '</div>'
+					+ '<div id=' + output + ' style="max-height: 500px; overflow: auto"></div>',
 				Size: 700,
-				Title: "Layer as HTML",
+				Title: 'Plate as HTML',
 				Buttons: [
-					{Label: "Printable Version", Click: function() {
-						Reporter.printable(GetId(output).innerHTML);
-					}, Title: "Display the layer in a new window to allow easy printing or copy/pasting to other applications"},
-					{Label: "Close", Icon: {Type: "Cancel", Space: true, Color: "Red"}, Click: function() {Form.close(id)} },
+					{
+						Label: 'Printable Version', Click: function () {
+							Reporter.printable(GetId(output).innerHTML);
+						}, Title: 'Display the plate in a new window to allow easy printing or copy/pasting to other applications'
+					},
+					{Label: 'Close', Icon: {Type: 'Cancel', Space: true, Color: 'Red'}, Click: function () {Form.close(id);}},
 				],
+				onInit: () => {
+					layerSelectControls.forEach(control => control.init());
+					updateOutput(dataList);
+				}
 			});
-			Promise.all(data.Promises).then(function(values) { //Wait for promises to resolve, then process the values
-				if(values.length == 0) {GetId(controls).remove(); return} //There are no ranges/definitions, so no need of controls and we can leave here
-				let r = l.Rows;
-				let c = l.Cols;
-				let table = GetId(output).children[1]; //The table with the layer data
-				for(let i=0; i<r; i++) { //Travel all the rows
-					for(let j=0; j<c; j++) { //Travel all the cols
-						let span = table.rows[i+1].cells[j+1].children[2]; //Important to access at row+1/cell+1 because of the headers
-						if(span && span.hasAttributes("resolved")) { //If this span exists and has the attribute for a resolved name
+			Promise.all(dataList.map(([, data]) => data.Promises).flat()).then(function (values) { //Wait for promises to resolve, then process the values
+				if (values.length == 0) {
+					GetId(controls).remove();
+					return;
+				} //There are no ranges/definitions, so no need of controls and we can leave here
+				const rows = l.Rows;
+				const cols = l.Cols;
+				const table = GetId(output).children[1]; //The table with the plate (layer) data
+				for (let i = 0; i < rows; i++) { //Travel all the rows
+					for (let j = 0; j < cols; j++) { //Travel all the cols
+						const span = table.rows[i + 1].cells[j + 1].children[2]; //Important to access at row+1/cell+1 because of the headers
+						if (span && span.hasAttributes('resolved')) { //If this span exists and has the attribute for a resolved name
 							let resolved = false;
-							values.forEach(function(v) { //Travel the ranges definitions to update the current well
-								let def = v.Definition[i * c + j]; //The definition value
-								if(def !== "") { //We expect only one possible definition per well, since we work on a single layer
-									span.setAttribute("resolved", def);
+							values.forEach(function (v) { //Travel the ranges definitions to update the current well
+								const def = v.Definition[i * cols + j]; //The definition value
+								if (def !== '') { //We expect only one possible definition per well, since we work on a single plaet (layer)
+									span.setAttribute('resolved', def);
 									resolved = true;
 								}
 							});
-							if(resolved == false) {span.setAttribute("resolved", span.getAttribute("generic"))} //This well has no resolvable definitions, its resolved name should be same as the generic name
+							if (resolved == false) {span.setAttribute('resolved', span.getAttribute('generic'));} //This well has no resolvable definitions, its resolved name should be same as the generic name
 						}
 					}
 				}
-				let ctrl = LinkCtrl.new("Checkbox", {ID: controls, Label: "Show resolved Names", Default: false, Change: function(v) { //The control allowing switching from generic to resolved names
-					let coll = GetId(output).getElementsByClassName("Resolved_Definition"); //Get the switchable elements
-					let n = coll.length;
-					for(let k=0; k<n; k++) { //Travel the collection to switch the names
-						if(v) {coll[k].innerHTML = coll[k].getAttribute("resolved")}
-						else {coll[k].innerHTML = coll[k].getAttribute("generic")}
-					}
-				}, Title: "Tick to show the resolved names instead of the generic names for the ranges"});
+				const ctrl = LinkCtrl.new('Checkbox', {
+					ID: controls, Label: 'Show resolved Names', Default: false, Change: function (v) { //The control allowing switching from generic to resolved names
+						const coll = GetId(output).getElementsByClassName('Resolved_Definition'); //Get the switchable elements
+						const n = coll.length;
+						for (let k = 0; k < n; k++) { //Travel the collection to switch the names
+							if (v) {coll[k].innerHTML = coll[k].getAttribute('resolved');} else {coll[k].innerHTML = coll[k].getAttribute('generic');}
+						}
+					}, Title: 'Tick to show the resolved names instead of the generic names for the ranges'
+				});
 				ctrl.init(); //Display the control
 			});
 		};
-		return {Label: "html", Title: "Click here to view this layer as an html array", Click: action}
+		return {Label: "html", Title: "Click here to view this plate as an html array", Click: action}
 	}
-	static getAsHTML(l) { //Returns a html table filled with the content of the layer passed (area & conc data)
-		let r = l.Rows;
-		let c = l.Cols;
-		let ranges = []; //The array of ranges that will need to be processed for definitions
-		let html = "<table style=\"text-align: center; \"><tr><th></th>";
-		for(let j=0;j<c;j++) { //Headers, for each col
-			html += "<th>" + (j + 1) + "</th>";
+
+	static getAsHTML(l) { //Returns a html table filled with the content of the plate (layer) passed (area & conc data)
+		const rows = l.Rows;
+		const cols = l.Cols;
+		const ranges = []; //The array of ranges that will need to be processed for definitions
+		let html = '<table style="text-align: center; "><tr><th></th>';
+		for (let j = 0; j < cols; j++) { //Headers, for each col
+			html += '<th>' + (j + 1) + '</th>';
 		}
-		html += "</tr>";
-		for(let i=0;i<r;i++) { //For each row
-			html += "<tr><th>" + Well.alphabet(i) + "</th>";
-			for(let j=0;j<c;j++) { //For each col
-				let w = l.Wells[i * c + j];
-				let a = w.Area;
-				let bgColor = "white"; //Default values
-				let color = "black";
-				let name = "";
-				if(a) { //Area information
-					bgColor = a.Color;
-					color = CSSCOLORS.font(a.Color); //Adapt font (black/white) depending on the background
-					name = "<span style=\"font-weight: bold; border: 1px solid black; padding: 0em 0.1em; margin-right: 0.2em\">" + TypeMap.symbolForValue(TypeMap.valueForType(a.Type)) + "</span>" + a.Name;
-					if(a.Type == "Range") { //For ranges, first collect all the different ranges as they come, then fetch the items at once at the end. This is way faster than waiting for each well to return the resolved value
-						name += "&nbsp;(#" + w.RangeIndex + ")<br><span style=\"font-style: italic; padding:0.1em\" class=\"Resolved_Definition\" resolved=\"\" generic=\"#" + w.RangeIndex + "\">#" + w.RangeIndex + "</span>"; //Prepare placeholders for generice/resolved values, resolved values will be added later
-						if(ranges.find(function(r) {return r.Name == a.Name}) === undefined) {ranges.push(a)} //Push unique ranges
+		html += '</tr>';
+		for (let i = 0; i < rows; i++) { //For each row
+			html += '<tr><th>' + Well.alphabet(i) + '</th>';
+			for (let j = 0; j < cols; j++) { //For each col
+				const well = l.Wells[i * cols + j];
+				const area = well.Area;
+				let bgColor = 'white'; //Default values
+				let color = 'black';
+				let name = '';
+				let metadataNumberOfCellsPerWell = '';
+				let metadataConcentration = '';
+				if (area) { //Area information
+					bgColor = area.Color;
+					color = CSSCOLORS.font(area.Color); //Adapt font (black/white) depending on the background
+					name = '<span style="font-weight: bold; border: 1px solid black; padding: 0em 0.1em; margin-right: 0.2em">'
+						+ TypeMap.symbolForValue(TypeMap.valueForType(area.Type))
+						+ '</span>'
+						+ area.Name;
+					if (area.Type == 'Range') {
+						//For ranges, first collect all the different ranges as they come, then fetch the items at once at the end.
+						//This is way faster than waiting for each well to return the resolved value
+						name += '&nbsp;(#' + well.RangeIndex
+							+ ')<br><span style="font-style: italic; padding:0.1em" class="Resolved_Definition" resolved="" generic="#'
+							+ well.RangeIndex + '">#'
+							+ well.RangeIndex
+							+ '</span>'; //Prepare placeholders for generice/resolved values, resolved values will be added later
+						if (ranges.find(function (r) {return r.Name == area.Name;}) === undefined) {
+							ranges.push(area); //Push unique ranges
+						}
+					}
+					if (well.Metadata.NumberOfCellsPerWell) {
+						metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${well.Metadata.NumberOfCellsPerWell}</span></div>`
+					}
+					if (well.Metadata.Concentration) {
+						metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${well.Metadata.Concentration}</span></div>`
 					}
 				}
-				html += "<td style=\"background-color:" + bgColor + "; color: " + color + "; padding: 0.2em; border: 1px solid black\">" + name + "<br>" + Well.dose(w) + "</td>";
+				html += '<td style="background-color:' + bgColor
+					+ '; color: ' + color
+					+ '; padding: 0.2em; border: 1px solid black">'
+					+ name
+					+ '<br>'
+					+ metadataNumberOfCellsPerWell
+					+ metadataConcentration
+					+ Well.dose(well) + '</td>';
 			}
-			html += "</tr>";
+			html += '</tr>';
 		}
-		html += "</table>";
-		let promises = [];
-		ranges.forEach(function(r) {
-			if(r.Definition) { //If this range has an existing definition
-				promises.push(Definition.getAsPlate(r.Definition)); //Push the promise
+		html += '</table>';
+		const promises = [];
+		ranges.forEach(function (range) {
+			if (range.Definition) { //If this range has an existing definition
+				promises.push(Definition.getAsPlate(range.Definition)); //Push the promise
 			}
 		});
 		return {HTML: html, Promises: promises}; //Return the promises without waiting for resolution
 	}
-	static getAsTxtControl(l) { //Returns an object suitable to create a button (using the LinkCtrl constructor) that will output the layer l as a tab-delimited txt file
+	static getAsTxtControl(l) { //Returns an object suitable to create a button (using the LinkCtrl constructor) that will output the plate (layer) l as a tab-delimited txt file
 		let Cancelled = false; //Tracker for cancellation
 		let action = function() { //The click action for the button
 			let id = "Form_GetAsTxt";
@@ -160,7 +244,7 @@ class Layer {
 				ID: id,
 				HTML: "<p class=\"Error\">Resolving names, please wait...</p>",
 				Size: 700,
-				Title: "Layer as Txt",
+				Title: "Plate as Txt",
 				Buttons: [
 					{Label: "Cancel", Icon: {Type: "Cancel", Space: true, Color: "Red"}, Click: function() {Cancelled = true; Form.close(id)} },
 				],
@@ -168,11 +252,11 @@ class Layer {
 			Promise.all(data.Promises).then(function(values) { //Wait for promises to resolve, then process the values
 				if(Cancelled) {return} //Action was cancelled
 				let save = l.toTxt(values); //Create the output string
-				Form.close(id); //Clese the waiting form
-				Form.download(save, {FileName: "Layer_" + (l.ArrayIndex + 1) + ".txt"}); //Form for the download
+				Form.close(id); //Close the waiting form
+				Form.download(save, {FileName: "Plate_" + (l.ArrayIndex + 1) + ".txt"}); //Form for the download
 			});
 		};
-		return {Label: "txt", Title: "Click here to generate a tab-separated .txt file representing the content of this layer as a list", Click: action};
+		return {Label: "txt", Title: "Click here to generate a tab-separated .txt file representing the content of this plate as a list", Click: action};
 	}
 	static getAsTxt(l) {
 		let ranges = []; //The array of ranges that will need to be processed for definitions
@@ -193,7 +277,7 @@ class Layer {
 //*******************
 //SAVE & LOAD METHODS
 //*******************
-	static save(lay) { //Return a JSON.stringify version of the layer object for saving
+	static save(lay) { //Return a JSON.stringify version of the plate (layer) object for saving
 		let out = [];
 		lay.Wells.forEach(function(w) { //Area data are saved separately, so only the concentration data are needed here
 			if(w.Conc) {
@@ -202,7 +286,7 @@ class Layer {
 		});
 		return out;
 	}
-	static load(l, data, digit, size, margin) { //Update the provided layer with the data provided
+	static load(l, data, digit, size, margin) { //Update the provided plate (layer) with the data provided
 		data.forEach(function(w) {
 			let target = l.Wells[w.Index];
 			if(target) {
@@ -211,7 +295,7 @@ class Layer {
 		});
 	}
 //*******************
-	static resize(l, r, c) { //Resize the layer to new dimension, keeping concentration data if needed
+	static resize(l, r, c) { //Resize the plate (layer) to new dimension, keeping concentration data if needed
 		let oldRows = l.Rows;
 		let oldCols = l.Cols;
 		let temp = []; //The new Wells array
@@ -233,8 +317,8 @@ class Layer {
 			}
 			i++;
 		}
-		l.Wells = temp; //Update the layer array
-		l.Rows = r; //Update layer size
+		l.Wells = temp; //Update the plate (layer) array
+		l.Rows = r; //Update plate (layer) size
 		l.Cols = c; //
 	}
 	static getCoords(e) { //Returns the coordinates for the event e, normalized for either mouse or touch screen events
@@ -257,21 +341,21 @@ class Layer {
 		}
 	}
 	//Methods
-	init() { //Initialize the html elements for the layer
+	init() { //Initialize the html elements for the plate (layer)
 		let html = "";
 		html += "<canvas style=\"position: absolute;\"></canvas>"; //Highlights should be at the bottom, so that the events fire with Contents as a target //style=\"position: absolute; left: 0; top: 0; z-index: 0\"
 		html += "<canvas style=\"position: absolute;\"></canvas>"; //Grid
 		html += "<canvas style=\"position: absolute;\"></canvas>"; //Contents
 		let out = GetId(this.Root);
 		out.innerHTML = html;
-		Layer.exportControls(this); //Prepare the control buttons to get the layer as jpg or html
+		Layer.exportControls(this); //Prepare the control buttons to get the plate (layer) as jpg or html
 		this.Highlight = out.children[0];
 		this.Grid = out.children[1];
 		this.Contents = out.children[2];
 		this.bindEvents(out);
 		return this;
 	}
-	bindEvents(root) { //Bind events to the layer
+	bindEvents(root) { //Bind events to the plate (layer)
 		let plate = this.Plate;
 		let timeOut = undefined;
 		let down = function(e) { //Mouse down (or touch start)
@@ -331,11 +415,11 @@ class Layer {
 		root.addEventListener("wheel", stop, {passive: true});
 		return this;
 	}
-	grid(G) { //Draw the grid layer using the grid provided from plate
+	grid(G) { //Draw the grid plate (layer) using the grid provided from plate
 		let h = G.height;
 		let w = G.width;
 		let r = Editor.pixelRatio;
-		[this.Grid, this.Highlight, this.Contents].forEach(function(c) { // Also resize canvas layers to match grid size
+		[this.Grid, this.Highlight, this.Contents].forEach(function(c) { // Also resize canvas plate (layer) to match grid size
 			c.height = h;
 			c.width = w;
 			c.style.height = h / r + "px";
@@ -412,10 +496,9 @@ class Layer {
 		});
 		return this;
 	}
-	setIndex(i) { //Update the ArrayIndex property and html displayed following layer deletion
-		this.ArrayIndex = i; //Update layer object property
+	setIndex(i) { //Update the ArrayIndex property and html displayed following plate (layer) deletion
+		this.ArrayIndex = i; //Update plate (layer) object property
 		GetId(this.Root).previousSibling.innerHTML = Layer.legendInnerHTML(i); //Also change the html displayed
-
 	}
 	tagArea(a, I) { //Tag the area in selection
 		let R = I.Results; //Results of the tagging
@@ -443,7 +526,7 @@ class Layer {
 		}
 		return this;
 	}
-	untag(I) { //Untage the areas in the selected wells
+	untag(I) { //Untag the areas in the selected wells
 		let R = I.Results;
 		if(this.Selected) {
 			I.Layer = this;
@@ -459,7 +542,7 @@ class Layer {
 		}
 		return this;
 	}
-	cleanTags(I) { //Clean-up the tags from this layer. This should be done only as part of the removal process of this layer
+	cleanTags(I) { //Clean-up the tags from this plate (layer). This should be done only as part of the removal process of this plate (layer)
 		I.Layer = this;
 		this.Wells.forEach(function(w) { //Travel all the wells and remove the tags when needed
 			w.untag(I); //This will take care of updating: the Tags for the impacted areas, the TypeMap and I with the impacted Ranges
@@ -515,7 +598,7 @@ class Layer {
 		});
 		return this;
 	}
-	concMap(root) { //Display a map of the concentrations for this layer, in the container adjacent to the provided root
+	concMap(root) { //Display a map of the concentrations for this plate (layer), in the container adjacent to the provided root
 		let r = this.Rows;
 		let c = this.Cols;
 		let html = "<table class=\"PlateTable\"><tr><th></th>";
@@ -598,7 +681,7 @@ class Layer {
 		});
 		return this;
 	}
-	toTxt(values) { //Output the layer as a tab-delimited list in a string format. Use the resolved values when available
+	toTxt(values) { //Output the plate (layer) as a tab-delimited list in a string format. Use the resolved values when available
 		let out = "Well\tRow\tCol\tWell Index\tArea\tConc.\tUnit\tDefinition\n";
 		this.Wells.forEach(function(w, i) {
 			if(i > 0) {out += "\n"}
@@ -616,7 +699,7 @@ class Layer {
 			if(a !== undefined) { //Area present in this well: add the resolved name if available
 				values.forEach(function(v) { //Travel the ranges definitions to update the current well
 					let def = v.Definition[i]; //The definition value
-					if(def !== "") { //We expect only one possible definition per well, since we work on a single layer
+					if(def !== "") { //We expect only one possible definition per well, since we work on a single plate (layer)
 						out += def;
 					}
 				});
@@ -634,6 +717,7 @@ class Layer {
 			Plate: layerOrigin.Plate
 		});
 		clone.Wells = layerOrigin.Wells.map(well => Well.clone(well, layerOrigin));
+		clone.Metadata = {...layerOrigin.Metadata}
 		return clone;
 	}
 
@@ -652,10 +736,19 @@ class Layer {
 		}
 	}
 
-	applyWellsMetadata (I) {
+	applyWellsMetadata(I) {
+		let updated = 0;
+		let empty = 0;
 		if (this.Selected) {
-			this.Selected.forEach(well => well.applyMetadata(I));
-			return this.Selected.length;
+			this.Selected.forEach(well => {
+				if (well.Area) {
+					well.applyMetadata(I);
+					updated += 1;
+				} else {
+					empty += 1;
+				}
+			});
 		}
+		return [updated, empty];
 	}
 }

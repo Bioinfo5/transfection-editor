@@ -81,14 +81,14 @@ class TypeMap {
 	get(index) { //Return the type at the index location
 		return this.Map[index];
 	}
-	types(index, l) { //Return the array of types for all layer except l, at the well index location.
+	types(index, l) { //Return the array of types for all plate (layer) except l, at the well index location.
 //*********************************************************
-//Can be used with l=-1 to retrieve types across all layers
+//Can be used with l=-1 to retrieve types across all plates (layers)
 //However, it is much easier to use Map[index] in this case
 //*********************************************************
 		let types = [];
-		this.Plate.Layers.forEach(function(L) { //Collect the types at location index, across the layers, excluding l
-			if(L.Index != l) { //All layers excluding l
+		this.Plate.Layers.forEach(function(L) { //Collect the types at location index, across the plates (layers), excluding l
+			if(L.Index != l) { //All plates (layers) excluding l
 				let w = L.Wells[index];
 				if(w.Area) { //If an area is defined
 					types.push(TypeMap.valueForType(w.Area.Type));
@@ -104,7 +104,7 @@ class TypeMap {
 		else {this.Map[index] = b} //This position was empty
 		return this;
 	}
-	unlog(index, l) { //Recompute the type that will remain at position index after removal of the type on layer l
+	unlog(index, l) { //Recompute the type that will remain at position index after removal of the type on plate (layer) l
 		let types = this.types(index, l); //Recover the array of types
 		this.Map[index] = TypeMap.reduce(types); //Update with new computed type
 	}
