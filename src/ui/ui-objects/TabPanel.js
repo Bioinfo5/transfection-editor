@@ -60,6 +60,7 @@ class TabPanel {
 					case "Delete": o.Title = "Click here to delete this tab"; break;
 					case "Duplicate": o.Title = "Click here to duplicate this tab"; break;
 					case "Select": o.Title = "Click here to select this tab"; break;
+					case "Rename": o.Title = "Click here to rename this tab"; break;
 				}
 			}
 			html += LinkCtrl.icon(o);
@@ -71,7 +72,9 @@ class TabPanel {
 		let style = "none"; //Hide content of inactive tabs
 		if(this.Active) {style = "block"}
 		if(!this.Parent.Stack) {style += "; float: left"}
-		html += "<div id=\"" + this.Anchors.Content + "\" class=\"LinkCtrl_TabPanel\" style=\"display: " + style + "\">";
+		html += '<div id="' + this.Anchors.Content + '" class="LinkCtrl_TabPanel" data-tabKey="'
+			+ this.Key
+			+ '" style="display: ' + style + '">';
 		html += this.initContentInternal();
 		html += "</div>";
 		return html;

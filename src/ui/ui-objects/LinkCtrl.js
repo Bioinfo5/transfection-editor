@@ -100,6 +100,7 @@ class LinkCtrl {
 			case "Move": position = "-150px 0px"; break;
 			case "Delete": position = "-200px 0px"; break;
 			case "Duplicate": position = "-150px -150px"; break;
+			case "Rename": position = "0px -50px"; break;
 			case "Edit": position = "0px -50px"; break;
 			case "Tag": position = "-50px -50px"; break;
 			case "Ok": position = "-100px -50px"; break;

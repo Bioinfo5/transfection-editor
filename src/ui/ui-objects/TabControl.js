@@ -16,7 +16,8 @@ class TabControl {
     }); //Additional actions to be taken after deletion of a tab. The function receives the index of the deleted tab as argument
     this.AfterDuplicate = (I.AfterDuplicate || function (i) {
     });
-    this.AfterSelect = (I.AfterSelect || function (i) {
+		this.AfterRename = (I.AfterRename || function(i) {});
+		this.AfterSelect = (I.AfterSelect || function (i) {
     });
     if (I.Tabs) {
       I.Tabs.forEach(function (t, i) { //Create the TabPanel Object using user input
@@ -166,7 +167,7 @@ class TabControl {
       let content = GetId(t.Anchors.Content);
 
       header.addEventListener("click", this.click.bind(this)); //Need to bind the object otherwise this refers to the header in the callback
-      content.addEventListener("click", e => this.clickOnPlate(e, t));
+      content.addEventListener("click", (e) => this.clickOnContent(e, t));
     }, this);
     return this;
   }
@@ -192,7 +193,10 @@ class TabControl {
         case "Select":
           this.AfterSelect(index);
           break;
-        default:
+				case "Rename":
+					this.renamingConfirm(index);
+					break;
+				default:
           break;
       }
     } else { //Click was on the tab
@@ -214,15 +218,15 @@ class TabControl {
     return this;
   }
 
-  clickOnPlate(e, t) { //Action to be taken when click event occurs in a tab section
-    let parentKey = parseInt(t.Label.replace('Plate ', '')) - 1;
-    let index = parentKey !== -1 ? parentKey : 0;
+	clickOnContent(e, t) {
+    let content = GetId(t.Anchors.Content);
+		let key = Number(content.getAttribute("data-tabKey")); //The unique Key of the TabPanel
+		let index = this.getTabIndex(key);
 
-    if (index !== undefined) {
+    if (index >= 0) {
       this.AfterSelect(index);
     }
-    return this;
-  }
+	}
 
   jumpTo(index) { //Jump to the tab with the provided index
     this.Tabs[index].set("Active");
@@ -424,6 +428,40 @@ class TabControl {
     });
     return this;
   }
+
+	renamingConfirm(index) { //Confirmation of tab deletion
+		const ui = this; //Shortcut inside the function
+		const id = 'Form_RenamePlate';
+		const inputId = 'Form_RenamePlate_Input';
+		const currentPlate = Editor.Plate.Layers[index];
+
+		Form.open({
+			ID: id,
+			HTML: '<div style="text-align: center">' +
+				'<p style="color: black;">This will rename current tab.</p>' +
+				'<p>Current name: ' + currentPlate.Name + '</p>' +
+				'<input id=' + inputId + ' type="text" class="LinkCtrl_Text" style="margin-bottom: 1em" value="'
+				+ currentPlate.Name
+				+ '">' +
+				'</div>',
+			Title: 'Confirm renaming',
+			Buttons: [
+				{
+					Label: 'Ok', Click: function () {
+						const input = document.getElementById(inputId);
+						if (input.value) {
+							ui.rename(index, input.value);
+							ui.AfterRename(index, input.value);
+						}
+						Form.close(id);
+					}
+				},
+				{Label: 'Cancel', Click: function () {Form.close(id);}}
+			],
+			Size: 500,
+		});
+		return this;
+	}
 
   rename(index, name) { //Rename tab index with new name
     this.Tabs[index].rename(name);

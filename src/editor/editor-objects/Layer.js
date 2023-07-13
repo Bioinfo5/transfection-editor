@@ -16,6 +16,7 @@ class Layer {
 		this.Grid = undefined;		//
 		this.Selected = undefined; //Wells currently selected
 		this.Root = "Layer_" + I.Index;
+		this.Name = `Plate ${this.Index + 1}`;
 		this.Metadata = {};
 		let index = 0;
 		for(let i=0;i<r;i++) { //Rows
@@ -26,15 +27,14 @@ class Layer {
 		}
 		return this;
 	}
+
 	//Static methods
-	static rootHTML(l, root) { //Return the html used as root for the plate (layer)
-		return "<fieldset>" +
-			"<legend>" + this.legendInnerHTML(l) + "</legend>" +
-			"<div id=\"" + root + "\" ></div>" +
-			"</fieldset>";
+	static rootHTML(name, root) { //Return the html used as root for the plate (layer)
+		return '<fieldset><legend id="legend_' + root + '">' + this.legendInnerHTML(name) + '</legend><div id="' + root + '" style="position: relative;"></div></fieldset>';
 	}
-	static legendInnerHTML(l) { //Return the html used as the innerHTML for the legend of the plate (layer) fieldset
-		return "Plate " + (l + 1) + " &bull; "; //l is the displayed index and should be 1-based, not 0-based
+
+	static legendInnerHTML(name) { //Return the html used as the innerHTML for the legend of the layer fieldset
+		return `<span>${name} &bull; </span>`;
 	}
 	static exportControls(l) { //Create controls allowing export of the plate (layer) as jpg or html, for the passed plate (layer) object
 		let b = LinkCtrl.buttonBar([ //Create the button bar
@@ -67,54 +67,207 @@ class Layer {
 		const controls = id + '_Controls';
 		const output = id + '_Output';
 
-		const updateOutput = function (dataList) {
+		const updateOutput = function (dataList, metadataDisplayState) {
 			document.getElementById(output).innerHTML = dataList
 				.sort(([prevLayer], [nextLayer]) => {
 					if (prevLayer.Index > nextLayer.Index) return 1;
 					else if (prevLayer.Index < nextLayer.Index) return -1;
 					else return 0;
 				})
-				.map(([layer, data]) => (
-				'<div><p><b>Plate '
-				+ (layer.ArrayIndex + 1)
-				+ '</b></p>'
-				+ data.HTML
-				+ '</div>'
-			)).join('<br/>');
+				.map(([layer]) => {
+					return [layer, Layer.getAsHTML(l, metadataDisplayState)];
+				})
+				.map(([layer, data]) => {
+					const showPlateMetadata = _.some(Object.values(metadataDisplayState.plate), Boolean);
+					const plateMetadataSection = showPlateMetadata
+						? '<p>'
+						+ ((metadataDisplayState.plate.cellLine)
+							? '<div>Cell line: ' + (layer.Metadata.CellLine || '') + '</div>'
+							: '')
+						+ ((metadataDisplayState.plate.cellLinePassage)
+							? '<div>Cell line passage: ' + (layer.Metadata.CellLinePassage || '') + '</div>'
+							: '')
+						+ ((metadataDisplayState.plate.transfectionReagent)
+							? '<div>Transfection reagent: ' + (layer.Metadata.TransfectionReagent || '') + '</div>'
+							: '')
+						+ ((metadataDisplayState.plate.transfectionReagentLOT)
+							? '<div>Transfection reagent LOT: ' + (layer.Metadata.TransfectionReagentLOT || '') + '</div>'
+							: '')
+						+ ((metadataDisplayState.plate.transfectionEndPoint)
+							? '<div>Transfetcion end point: ' + (layer.Metadata.TransfectionEndPoint || '') + '</div>'
+							: '')
+						+ '</p>'
+						: '';
+
+					return (
+						'<div><p><b>'
+						+ (layer.Name)
+						+ '</b></p>'
+						+ plateMetadataSection
+						+ data.HTML
+						+ '</div>'
+					);
+				}).join('<br/>');
 		};
 
 		const action = function () { //The click action for the button
+			const metadataDisplayState = {
+				plate: {
+					cellLine: false,
+					cellLinePassage: false,
+					transfectionReagent: false,
+					transfectionReagentLOT: false,
+					transfectionEndPoint: false,
+				},
+				well: {
+					cellsPerWell: true,
+					concentration: true,
+					transfectionReagentAmount: true,
+				}
+			};
 			//Layer.getAsHTML(l) - This will get the html for unresolved items and run the promises to get the content for ranges
-			let dataList = [[l, Layer.getAsHTML(l)]];
+			let dataList = [[l]];
 			const layerSelectControls = Editor.Plate.Layers.map(layer => {
-				return LinkCtrl.new("Checkbox", {
-					ID: `plate_checkbox-${layer.Index}`,
-					Default: layer.Index === l.Index,
-					Label: layer.Root,
-					NewLine: true,
-					Change: function(checked) {
-						if (checked) {
-							dataList = [...dataList, [layer, Layer.getAsHTML(layer)]]
-						} else {
-							dataList = dataList.filter(([layerItem]) => layerItem.Index !== layer.Index)
-						}
-
-						updateOutput(dataList);
-					}.bind(this),
-					Title: "Check to display the plate"}
-				)
-			})
+				return LinkCtrl.new('Checkbox', {
+						ID: `plate_checkbox-${layer.Index}`,
+						Default: layer.Index === l.Index,
+						Label: layer.Name,
+						NewLine: true,
+						Change: function (checked) {
+							if (checked) {
+								dataList = [...dataList, [layer]];
+							} else {
+								dataList = dataList.filter(([layerItem]) => layerItem.Index !== layer.Index);
+							}
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the plate'
+					}
+				);
+			});
 			const layerSelectControlsContainers = Editor.Plate.Layers.map(layer => {
-				return `<div id="plate_checkbox-${layer.Index}"></div>`
+				return `<div id="plate_checkbox-${layer.Index}"></div>`;
 			}).join('');
+
+			const layerMetadataControls = [
+				LinkCtrl.new('Checkbox', {
+						ID: `plate_metadata_checkbox-cellLine`,
+						Default: metadataDisplayState.plate.cellLine,
+						Label: 'Cell line',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.plate.cellLine = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `plate_metadata_checkbox-cellLinePassage`,
+						Default: metadataDisplayState.plate.cellLinePassage,
+						Label: 'Cell Line Passage',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.plate.cellLinePassage = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `plate_metadata_checkbox-transfectionReagent`,
+						Default: metadataDisplayState.plate.transfectionReagent,
+						Label: 'Transfection Reagent',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.plate.transfectionReagent = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `plate_metadata_checkbox-transfectionReagentLOT`,
+						Default: metadataDisplayState.plate.transfectionReagentLOT,
+						Label: 'Transfection Reagent LOT',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.plate.transfectionReagentLOT = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `plate_metadata_checkbox-transfectionEndPoint`,
+						Default: metadataDisplayState.plate.transfectionEndPoint,
+						Label: 'Transfection End-Point',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.plate.transfectionEndPoint = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+			];
+			const layerMetadataControlsContainers = `<span id="plate_metadata_checkbox-cellLine"></span>`
+				+ `<span id="plate_metadata_checkbox-cellLinePassage"></span>`
+				+ `<span id="plate_metadata_checkbox-transfectionReagent"></span>`
+				+ `<span id="plate_metadata_checkbox-transfectionReagentLOT"></span>`
+				+ `<span id="plate_metadata_checkbox-transfectionEndPoint"></span>`;
+
+			const wellMetadataControls = [
+				LinkCtrl.new('Checkbox', {
+						ID: `well_metadata_checkbox-cellsPerWell`,
+						Default: metadataDisplayState.well.cellsPerWell,
+						Label: 'Number of Cells per Well',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.well.cellsPerWell = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `well_metadata_checkbox-concentration`,
+						Default: metadataDisplayState.well.concentration,
+						Label: 'Concentration',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.well.concentration = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+				LinkCtrl.new('Checkbox', {
+						ID: `well_metadata_checkbox-transfectionReagentAmount`,
+						Default: metadataDisplayState.well.transfectionReagentAmount,
+						Label: 'Transfection Reagent Amount',
+						NewLine: false,
+						Change: function (checked) {
+							metadataDisplayState.well.transfectionReagentAmount = checked;
+							updateOutput(dataList, metadataDisplayState);
+						}.bind(this),
+						Title: 'Check to display the cell line value'
+					}
+				),
+			];
+			const wellMetadataControlsContainers = `<span id="well_metadata_checkbox-cellsPerWell"></span>`
+				+ `<span id="well_metadata_checkbox-concentration"></span>`
+				+ `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`;
 
 			Form.open({ //Open an empty form with waiting message
 				ID: id,
 				HTML: '<div id="' + controls + '" style="margin: 10px">'
 					+ '<p class="Error">Resolving names, please wait...</p></div>'
 					+ '<div style="display: flex;">' + layerSelectControlsContainers + '</div>'
-					+ '<div id=' + output + ' style="max-height: 500px; overflow: auto"></div>',
-				Size: 700,
+					+ '<div><h4>Show plate metadata</h4>' + layerMetadataControlsContainers + '</div>'
+					+ '<div><h4>Show well metadata</h4>' + wellMetadataControlsContainers + '</div>'
+					+ '<div id=' + output + ' style="overflow: auto"></div>',
+				Size: 1000,
 				Title: 'Plate as HTML',
 				Buttons: [
 					{
@@ -125,50 +278,62 @@ class Layer {
 					{Label: 'Close', Icon: {Type: 'Cancel', Space: true, Color: 'Red'}, Click: function () {Form.close(id);}},
 				],
 				onInit: () => {
-					layerSelectControls.forEach(control => control.init());
-					updateOutput(dataList);
+					[
+						...layerSelectControls,
+						...layerMetadataControls,
+						...wellMetadataControls,
+					].forEach(control => control.init());
+					updateOutput(dataList, metadataDisplayState);
 				}
 			});
-			Promise.all(dataList.map(([, data]) => data.Promises).flat()).then(function (values) { //Wait for promises to resolve, then process the values
-				if (values.length == 0) {
-					GetId(controls).remove();
-					return;
-				} //There are no ranges/definitions, so no need of controls and we can leave here
-				const rows = l.Rows;
-				const cols = l.Cols;
-				const table = GetId(output).children[1]; //The table with the plate (layer) data
-				for (let i = 0; i < rows; i++) { //Travel all the rows
-					for (let j = 0; j < cols; j++) { //Travel all the cols
-						const span = table.rows[i + 1].cells[j + 1].children[2]; //Important to access at row+1/cell+1 because of the headers
-						if (span && span.hasAttributes('resolved')) { //If this span exists and has the attribute for a resolved name
-							let resolved = false;
-							values.forEach(function (v) { //Travel the ranges definitions to update the current well
-								const def = v.Definition[i * cols + j]; //The definition value
-								if (def !== '') { //We expect only one possible definition per well, since we work on a single plaet (layer)
-									span.setAttribute('resolved', def);
-									resolved = true;
-								}
-							});
-							if (resolved == false) {span.setAttribute('resolved', span.getAttribute('generic'));} //This well has no resolvable definitions, its resolved name should be same as the generic name
+			Promise.all(
+				dataList
+					.map(([layer]) => {
+						return [layer, Layer.getAsHTML(l, metadataDisplayState)];
+					})
+					.map(([, data]) => data.Promises)
+					.flat()
+			)
+				.then(function (values) { //Wait for promises to resolve, then process the values
+					if (values.length == 0) {
+						GetId(controls).remove();
+						return;
+					} //There are no ranges/definitions, so no need of controls and we can leave here
+					const rows = l.Rows;
+					const cols = l.Cols;
+					const table = GetId(output).children[1]; //The table with the plate (layer) data
+					for (let i = 0; i < rows; i++) { //Travel all the rows
+						for (let j = 0; j < cols; j++) { //Travel all the cols
+							const span = table.rows[i + 1].cells[j + 1].children[2]; //Important to access at row+1/cell+1 because of the headers
+							if (span && span.hasAttributes('resolved')) { //If this span exists and has the attribute for a resolved name
+								let resolved = false;
+								values.forEach(function (v) { //Travel the ranges definitions to update the current well
+									const def = v.Definition[i * cols + j]; //The definition value
+									if (def !== '') { //We expect only one possible definition per well, since we work on a single plaet (layer)
+										span.setAttribute('resolved', def);
+										resolved = true;
+									}
+								});
+								if (resolved == false) {span.setAttribute('resolved', span.getAttribute('generic'));} //This well has no resolvable definitions, its resolved name should be same as the generic name
+							}
 						}
 					}
-				}
-				const ctrl = LinkCtrl.new('Checkbox', {
-					ID: controls, Label: 'Show resolved Names', Default: false, Change: function (v) { //The control allowing switching from generic to resolved names
-						const coll = GetId(output).getElementsByClassName('Resolved_Definition'); //Get the switchable elements
-						const n = coll.length;
-						for (let k = 0; k < n; k++) { //Travel the collection to switch the names
-							if (v) {coll[k].innerHTML = coll[k].getAttribute('resolved');} else {coll[k].innerHTML = coll[k].getAttribute('generic');}
-						}
-					}, Title: 'Tick to show the resolved names instead of the generic names for the ranges'
+					const ctrl = LinkCtrl.new('Checkbox', {
+						ID: controls, Label: 'Show resolved Names', Default: false, Change: function (v) { //The control allowing switching from generic to resolved names
+							const coll = GetId(output).getElementsByClassName('Resolved_Definition'); //Get the switchable elements
+							const n = coll.length;
+							for (let k = 0; k < n; k++) { //Travel the collection to switch the names
+								if (v) {coll[k].innerHTML = coll[k].getAttribute('resolved');} else {coll[k].innerHTML = coll[k].getAttribute('generic');}
+							}
+						}, Title: 'Tick to show the resolved names instead of the generic names for the ranges'
+					});
+					ctrl.init(); //Display the control
 				});
-				ctrl.init(); //Display the control
-			});
 		};
-		return {Label: "html", Title: "Click here to view this plate as an html array", Click: action}
+		return {Label: 'html', Title: 'Click here to view this plate as an html array', Click: action};
 	}
 
-	static getAsHTML(l) { //Returns a html table filled with the content of the plate (layer) passed (area & conc data)
+	static getAsHTML(l, metadataDisplayState) { //Returns a html table filled with the content of the plate (layer) passed (area & conc data)
 		const rows = l.Rows;
 		const cols = l.Cols;
 		const ranges = []; //The array of ranges that will need to be processed for definitions
@@ -187,6 +352,7 @@ class Layer {
 				let name = '';
 				let metadataNumberOfCellsPerWell = '';
 				let metadataConcentration = '';
+				let metadataTransfectionReagentAmount = '';
 				if (area) { //Area information
 					bgColor = area.Color;
 					color = CSSCOLORS.font(area.Color); //Adapt font (black/white) depending on the background
@@ -206,11 +372,14 @@ class Layer {
 							ranges.push(area); //Push unique ranges
 						}
 					}
-					if (well.Metadata.NumberOfCellsPerWell) {
-						metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${well.Metadata.NumberOfCellsPerWell}</span></div>`
+					if (metadataDisplayState.well.cellsPerWell && typeof well.Metadata.NumberOfCellsPerWell === 'number') {
+						metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${well.Metadata.NumberOfCellsPerWell || ''}</span></div>`
 					}
-					if (well.Metadata.Concentration) {
-						metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${well.Metadata.Concentration}</span></div>`
+					if (metadataDisplayState.well.concentration && typeof well.Metadata.Concentration === 'number') {
+						metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${well.Metadata.Concentration || ''}</span></div>`
+					}
+					if (metadataDisplayState.well.transfectionReagentAmount && typeof well.Metadata.TransfectionReagentAmount === 'number') {
+						metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Reagent amount: </span><span>${well.Metadata.TransfectionReagentAmount || ''}</span></div>`
 					}
 				}
 				html += '<td style="background-color:' + bgColor
@@ -220,6 +389,7 @@ class Layer {
 					+ '<br>'
 					+ metadataNumberOfCellsPerWell
 					+ metadataConcentration
+					+ metadataTransfectionReagentAmount
 					+ Well.dose(well) + '</td>';
 			}
 			html += '</tr>';
@@ -496,10 +666,6 @@ class Layer {
 		});
 		return this;
 	}
-	setIndex(i) { //Update the ArrayIndex property and html displayed following plate (layer) deletion
-		this.ArrayIndex = i; //Update plate (layer) object property
-		GetId(this.Root).previousSibling.innerHTML = Layer.legendInnerHTML(i); //Also change the html displayed
-	}
 	tagArea(a, I) { //Tag the area in selection
 		let R = I.Results; //Results of the tagging
 		if(this.Selected) {
@@ -730,7 +896,6 @@ class Layer {
 			CellLine: I.CellLine,
 			CellLinePassage: I.CellLinePassage,
 			TransfectionReagent: I.TransfectionReagent,
-			TransfectionReagentAmount: I.TransfectionReagentAmount,
 			TransfectionReagentLOT: I.TransfectionReagentLOT,
 			TransfectionEndPoint: I.TransfectionEndPoint,
 		}
@@ -750,5 +915,10 @@ class Layer {
 			});
 		}
 		return [updated, empty];
+	}
+
+	rename(newName) {
+		this.Name = newName;
+		document.getElementById(`legend_${this.Root}`).firstChild.innerHTML = `<span>${this.Name} &bull; </span>`;
 	}
 }

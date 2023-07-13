@@ -31,20 +31,22 @@ class Plate {
 		this.Grid = document.createElement("canvas");
 		this.Highlight = document.createElement("canvas");
 		this.Header = document.createElement("canvas");
-		this.Layers = [new Layer({Rows: r, Cols: c, Index: 0, ArrayIndex: 0, Plate: this})];
-		this.LastKey = 1; //Index to use for new plates (layers), to guarantee unicity
+		const firstLayer = new Layer({Rows: r, Cols: c, Index: 0, ArrayIndex: 0, Plate: this});
+		this.Layers = [firstLayer];
+		this.LastKey = 1; //Index to use for new layers, to guarantee unicity
 		this.LayerTab = new TabControl({
 			ID: this.Anchors.LayerTab,
 			Multiple: true,
 			Tabs: [{
-				Label: "Plate 1",
+				Label: firstLayer.Name,
 				Active: true,
-				Controls: ["Select", "Duplicate", "Delete"],
-				Content: {Type: "HTML", Value: Layer.rootHTML(0, this.Layers[0].Root)}
+				Controls: ["Rename", "Select", "Duplicate", "Delete"],
+				Content: {Type: "HTML", Value: Layer.rootHTML(firstLayer.Name, this.Layers[0].Root)}
 			}],
 			AfterDelete: function(l) {this.deleteLayer(l)}.bind(this),
 			AfterDuplicate: function (l, t) {this.duplicateLayer(l, t)}.bind(this),
 			AfterSelect: function (l) {this.selectLayer(l)}.bind(this),
+			AfterRename: function (index, value) {this.renameLayer(index, value)}.bind(this),
 		});
 		return this;
 	}
@@ -102,12 +104,11 @@ class Plate {
 		const TRANSFECTION_SCIENTIST = this.Metadata.TransfectionScientist || '';
 		const TRANSFECTION_ID = this.Metadata.ExperimentID || '';
 		const output = [];
-		this.Layers.forEach((layer, index) => {
-			const TRANSFECTION_PLATE_NAME = `plate_${index}`;
+		this.Layers.forEach((layer) => {
+			const TRANSFECTION_PLATE_NAME = `${layer.Name}_${layer.Index}`;
 			const TRANSFECTION_CELL_LINE = layer.Metadata.CellLine || '';
 			const TRANSFECTION_CELL_LINE_PASSAGE = layer.Metadata.CellLinePassage || '';
 			const TRANSFECTION_REAGENT = layer.Metadata.TransfectionReagent || '';
-			const TRANSFECTION_REAGENT_AMOUNT = layer.Metadata.TransfectionReagentAmount || '';
 			const TRANSFECTION_REAGENT_LOT = layer.Metadata.TransfectionReagentLOT || '';
 			const TRANSFECTION_END_POINT = layer.Metadata.TransfectionEndPoint || '';
 
@@ -116,6 +117,7 @@ class Plate {
 				const TRANSFECTION_POS = `${well.Name}`;
 				const TRANSFECTION_CONCENTRATION = well.Metadata.Concentration || '';
 				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || '';
+				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount || '';
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
@@ -148,6 +150,13 @@ class Plate {
 		data.Layers.forEach(function(l, i) {
 			if(i > 0) {plate.addLayer()} //First plate (layer) is already created, but need to create the others
 			Layer.load(plate.Layers[i], l, 1, plate.WellSize, plate.WellMargin);
+			if (data.LayersNames) {
+				const [currentLayerInfo] = data.LayersNames.filter(item => item.Index === i);
+				if (currentLayerInfo) {
+					plate.Layers[i].rename(currentLayerInfo.Name);
+					plate.LayerTab.rename(i, currentLayerInfo.Name);
+				}
+			}
 		});
 		if (data.LayersMetadata) {
 			data.LayersMetadata.forEach((l, i) => {
@@ -280,10 +289,10 @@ class Plate {
 		let newLayer = new Layer({Rows: this.Rows, Cols: this.Cols, Index: l, ArrayIndex: here, Plate: this});
 		lay.push(newLayer);
 		this.LayerTab.addTab({
-			Label: "Plate " + (here + 1),
+			Label: newLayer.Name,
 			SetActive: true,
-			Controls: ["Select", "Duplicate", "Delete"],
-			Content: {Type: "HTML", Value: Layer.rootHTML(here, newLayer.Root)}
+			Controls: ["Rename", "Select", "Duplicate", "Delete"],
+			Content: {Type: "HTML", Value: Layer.rootHTML(newLayer.Name, newLayer.Root)}
 		});
 		newLayer.init().grid(this.Grid);
 		Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
@@ -301,14 +310,6 @@ class Plate {
 		Editor.Tables.Areas.update(); //Update the table display so that the ranges have correct information
 		Editor.Tables.Areas.Array.forEach(function(a) {a.cleanTags(this.Layers[l].Index)}, this); //All areas must now delete any reference to this destroyed plate (layer)
 		this.Layers.splice(l, 1); //Remove the plate (layer) from the array
-		let tab = this.LayerTab;
-		this.Layers.forEach(function(L, i) { //Redefine index of the plates (layers) and wells
-			if(i > (l - 1)) { //Only update plate (layers) above the plate (layer) to be removed
-				L.setIndex(i);
-				tab.rename(i, "Plate " + (i + 1));
-				Layer.exportControls(L); //Add the control buttons to get the plate (layer) as jpg or html
-			}
-		});
 		Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
 		return this;
 	}
@@ -320,10 +321,10 @@ class Plate {
 			const newLayer = Layer.clone({...origin, Index: l, ArrayIndex: here});
 			this.Layers.push(newLayer);
 			this.LayerTab.addTab({
-				Label: "Plate " + (here + 1),
+				Label: newLayer.Name,
 				SetActive: true,
-				Controls: ["Select", "Duplicate", "Delete"],
-				Content: {Type: "HTML", Value: Layer.rootHTML(here, newLayer.Root)}
+				Controls: ["Rename", "Select", "Duplicate", "Delete"],
+				Content: {Type: "HTML", Value: Layer.rootHTML(newLayer.Name, newLayer.Root)}
 			});
 			newLayer.init().grid(this.Grid);
 			this.update(); //Update to display the concentrations and update the range info
@@ -495,9 +496,15 @@ class Plate {
 					let L = this.Layers.find(function(e) {return e.Index == I.Layer});
 					if(L !== undefined) {L.select(this.Selecting.Includes, this.WellSize, this.WellMargin)}
 				}
-				this.Selecting.Box.remove(); //Remove the 2 HTML canvas elements
-				this.Selecting.Select.remove();
-				this.Selecting = undefined;
+				setTimeout(() => {
+					/* this.Selecting.Box.remove(); for some reasons blocks the click event propagation,
+					so execution is postponed to few ms */
+					if (this.Selecting) {
+						this.Selecting.Box.remove(); //Remove the 2 HTML canvas elements
+						this.Selecting.Select.remove();
+					}
+					this.Selecting = undefined;
+				}, 100)
 			}
 			GetId(Editor.Anchors.Popup.Select).innerHTML = ""; //Remove the selection information
 			if(GetId(Editor.Anchors.Popup.Area).innerHTML.length + GetId(Editor.Anchors.Popup.Conc).innerHTML.length == 0) {this.infoPopup()} //Hide the tooltip if nothing else to show
@@ -829,6 +836,13 @@ class Plate {
 					}
 				}
 			})
+		}
+	}
+
+	renameLayer(index, value) {
+		if (index >= 0) {
+			const layer = this.Layers[index];
+			layer.rename(value);
 		}
 	}
 

@@ -204,7 +204,8 @@ class Well {
 	applyMetadata(I) {
 		this.Metadata = {
 			NumberOfCellsPerWell: I.NumberOfCellsPerWell,
-			Concentration: I.Concentration
+			Concentration: I.Concentration,
+			TransfectionReagentAmount: I.TransfectionReagentAmount,
 		}
 	}
 

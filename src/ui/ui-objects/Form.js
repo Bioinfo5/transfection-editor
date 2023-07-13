@@ -27,7 +27,7 @@ class Form {
 		let f = GetId(id);
 		if(f) {f.remove()} //Remove the form if it exists
 		this.closeMask(); //Remove the mask
-		if(this.Dialogs) { 
+		if(this.Dialogs) {
 			this.Dialogs--;
 			if(this.Dialogs > 0) {this.addMask({Location: "beforebegin"})} //If there are remaining forms, add the mask before the last form
 		}
@@ -58,7 +58,7 @@ class Form {
 		let size = (I.Size || 400);
 		f.style.width = size + "px";
 		f.style.left = ((window.innerWidth - size) / 2) + window.pageXOffset + (15 * (this.Dialogs - 1)) + "px"; //Position the form at the center of the page, with an offset in case of multiple forms
-		f.style.top = (window.innerHeight / 4) + window.pageYOffset + (15 * (this.Dialogs - 1)) + "px"; //Position the form close to the top, with an offset in case of multiple forms
+		f.style.top = '3rem'; //Position the form close to the top, with an offset in case of multiple forms
 		f.innerHTML = this.header(size, I) + this.body(I);
 		f.append(this.footer(I)); //Footer is created as a node and added
 		document.body.append(f); //Add the element to the page
