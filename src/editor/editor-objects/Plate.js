@@ -141,17 +141,20 @@ class Plate {
 		else {html = "<p class=\"Error\">No data</p>"}
 		GetId(id).insertAdjacentHTML("beforeend", html);
 	}
-	static load(plate, data) { //Update the provided plate with the plates (layers) data provided
+	static load(plate, data, options) { //Update the provided plate with the plates (layers) data provided
+		const {append} = options;
+		const startIndex = append ? plate.Layers.length : 0;
 		if (data.Metadata) {
 			plate.applyMetadata(data.Metadata);
 			Editor.Controls.MetadataMainLevel.ExperimentID.setValue(data.Metadata.ExperimentID);
 			Editor.Controls.MetadataMainLevel.TransfectionScientist.setSelected(data.Metadata.TransfectionScientist);
 		}
-		data.Layers.forEach(function(l, i) {
-			if(i > 0) {plate.addLayer()} //First plate (layer) is already created, but need to create the others
+		data.Layers.forEach(function(l, dataLayerIndex) {
+			const i = startIndex + dataLayerIndex;
+			if(i >= plate.Layers.length) {plate.addLayer()} //First plate (layer) is already created, but need to create the others
 			Layer.load(plate.Layers[i], l, 1, plate.WellSize, plate.WellMargin);
 			if (data.LayersNames) {
-				const [currentLayerInfo] = data.LayersNames.filter(item => item.Index === i);
+				const [currentLayerInfo] = data.LayersNames.filter(item => item.Index === dataLayerIndex);
 				if (currentLayerInfo) {
 					plate.Layers[i].rename(currentLayerInfo.Name);
 					plate.LayerTab.rename(i, currentLayerInfo.Name);
@@ -159,7 +162,8 @@ class Plate {
 			}
 		});
 		if (data.LayersMetadata) {
-			data.LayersMetadata.forEach((l, i) => {
+			data.LayersMetadata.forEach((l, layerIndex) => {
+				const i = startIndex + layerIndex;
 				if (l.Metadata) {
 					plate.Layers[i].applyMetadata(l.Metadata);
 				}
@@ -167,11 +171,12 @@ class Plate {
 		}
 		if (data.WellsMetadata) {
 			data.WellsMetadata.forEach(item => {
-				const [currentWell] = plate.Layers[item.Layer].Wells.filter(well => well.Index === item.Index);
+				const [currentWell] = plate.Layers[item.Layer + startIndex].Wells.filter(well => well.Index === item.Index);
 				currentWell.applyMetadata(item.Metadata);
 			})
 		}
 	}
+
 //*******************
 	static resize(plate, r, c) { //Resize the plate to the new dimensions, keeping concentration data if needed
 		plate.Layers.forEach(function(l, i) { //For each plate (layer), travel the new dimensions and update the wells arrays

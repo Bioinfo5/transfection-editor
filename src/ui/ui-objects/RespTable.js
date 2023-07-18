@@ -148,11 +148,18 @@ class RespTable {
 		if(this.onUpdate) (this.onUpdate(I));
 		return this;
 	}
-	addRow(O) { //Add a row to the table with a new cell per element in array
-		this.Array.push(O); //Update internal array
-		this.update({Action: "Add Row"}); //Update the table
-		return O;
+
+	addRow(item) { //Add a row to the table with a new cell per element in array
+		const existedItem = this.Array.find(existed => existed.Name === item.Name);
+		if (existedItem) {
+			return existedItem;
+		} else {
+			this.Array.push(item); //Update internal array
+			this.update({Action: 'Add Row'}); //Update the table
+			return item;
+		}
 	}
+
 	removeRows(rows) { //Remove the rows with indices given in the provided array rows
 		let l = rows.length;
 		if(l == 0) {return this} //No items

@@ -475,10 +475,18 @@ class Editor {
 			Title: "Click to select the file containing the layout definition",
 			Accept: ".save, .xls, .xlsx"
 		});
+		const CheckboxResetData = LinkCtrl.new("Checkbox", {
+			ID: `load_checkbox_${id}`,
+			Default: !Boolean(Editor.Plate),
+			Label: 'Reset existing plates',
+			NewLine: true,
+			Title: "Check to replace existing plates with loaded data",
+			Disabled: !Boolean(Editor.Plate),
+		});
 
 		Form.open({
 			ID: id,
-			HTML: "<p>Select the Layout file to load</p><div id=\"" + FileCtrl.ID + "\"></div>",
+			HTML: "<div id=\"" + CheckboxResetData.ID + "\"></div><p>Select the Layout file to load</p><div id=\"" + FileCtrl.ID + "\"></div>",
 			Title: "Load layout",
 			Buttons: [
 				{
@@ -492,19 +500,18 @@ class Editor {
 						if (files.length > 0) { //Process files
 							const [file] = files;
 							const reader = new FileReader();
-							if (
-								file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-								|| file.type === 'application/vnd.ms-excel'
-							) {
+							const isExcelFile = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+								|| file.type === 'application/vnd.ms-excel';
+
+							if (isExcelFile) {
 								reader.onload = function (e) {
-									const {data} = this.parseExcelFile(e.target.result);
-									this.loadPreview(data);
+									const {type, data} = Editor.parseExcelFile(e.target.result);
+									this.loadPreview(data, {reset: Editor.shouldToReset(type, CheckboxResetData.Value)});
 								}.bind(this);
 								reader.readAsArrayBuffer(file);
-
 							} else {
 								reader.onload = function (e) {
-									this.loadPreview(e.target.result);
+									this.loadPreview(e.target.result, {reset: CheckboxResetData.Value});
 								}.bind(this);
 								reader.readAsText(file);
 							}
@@ -522,24 +529,51 @@ class Editor {
 			],
 			onInit: function () {
 				FileCtrl.init();
+				CheckboxResetData.init();
 			},
 		});
 		return this;
 	}
 
+	static shouldToReset(type, checked) {
+		if (type === 'transfection-file') {
+			return true;
+		} else {
+			return checked;
+		}
+	}
+
 	static parseExcelFile(file) {
 		const workbook = XLSX.read(file);
 		const sheet_name_list = workbook.SheetNames;
-		const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-		return (this.isMetadataIncluded(xlData))
-			? {data: this.transformMetadataJSONToSave(xlData)}
-			: {data: this.transformJSONToSave(xlData)};
+		if (this.isMetadataIncluded(file)) {
+			const xlData = sheet_name_list
+				.map((item) => {
+					return XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+				})
+				.flat();
+
+			return {type: 'transfection-file', data: this.transformMetadataJSONToSave(xlData)};
+		} else {
+			const xlData = sheet_name_list
+				.map((item) => {
+					return XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+				});
+
+			return {type: 'base-plate', data: this.transformJSONToSave(xlData, sheet_name_list)};
+		}
 	}
 
-	static isMetadataIncluded(data) {
+	static isMetadataIncluded(file) {
+		const exportedFileHeaders = ['SAMPLE_NAME', 'TRANSFECTION_POS', 'TRANSFECTION_CONCENTRATION', 'TRANSFECTION_CELL_AMOUNT', 'TRANSFECTION_PLATE_NAME', 'TRANSFECTION_CELL_LINE', 'TRANSFECTION_CELL_LINE_PASSAGE', 'TRANSFECTION_REAGENT', 'TRANSFECTION_REAGENT_AMOUNT', 'TRANSFECTION_REAGENT_LOT', 'TRANSFECTION_END_POINT', 'TRANSFECTION_ID', 'TRANSFECTION_SCIENTIST', 'TRANSFECTION_DATE'];
+
+		const workbook = XLSX.read(file);
+		const firstSheet = workbook.SheetNames[0];
+		const data = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 		const headers = Object.keys(data[0]);
-		return _.some(headers, item => (['SAMPLE_NAME', 'TRANSFECTION_POS', 'TRANSFECTION_CONCENTRATION', 'TRANSFECTION_CELL_AMOUNT', 'TRANSFECTION_PLATE_NAME', 'TRANSFECTION_CELL_LINE', 'TRANSFECTION_CELL_LINE_PASSAGE', 'TRANSFECTION_REAGENT', 'TRANSFECTION_REAGENT_AMOUNT', 'TRANSFECTION_REAGENT_LOT', 'TRANSFECTION_END_POINT', 'TRANSFECTION_ID', 'TRANSFECTION_SCIENTIST', 'TRANSFECTION_DATE'].includes(item)));
+
+		return _.some(headers, item => (exportedFileHeaders.includes(item)));
 	}
 
 	static transformMetadataJSONToSave(rawData) {
@@ -588,14 +622,18 @@ class Editor {
 	}
 
 	static prepareData(data) {
-		return data.map(item => {
+		const originalPlateNames = data
+			.filter((obj, index) => data.findIndex((item) => item.TRANSFECTION_PLATE_NAME === obj.TRANSFECTION_PLATE_NAME) === index)
+			.map(item => item.TRANSFECTION_PLATE_NAME);
+
+		return data.map((item) => {
 			const {SAMPLE_NAME, TRANSFECTION_PLATE_NAME, ...rest} = item;
 
 			return {
 				...rest,
 				SAMPLE_NAME: _.replace(SAMPLE_NAME, /_\d{1,2}$/i, ''),
 				TRANSFECTION_PLATE_NAME: _.replace(TRANSFECTION_PLATE_NAME, /_\d{1,2}$/i, ''),
-				TRANSFECTION_PLATE_INDEX: parseInt(TRANSFECTION_PLATE_NAME.match(/\d{1,2}$/)[0], 10),
+				TRANSFECTION_PLATE_INDEX: parseInt(originalPlateNames.findIndex(item => item === TRANSFECTION_PLATE_NAME), 10),
 			}
 		})
 	}
@@ -690,7 +728,7 @@ class Editor {
 				Direction: "Horizontal",
 				Priority: "Row",
 				Tags: [
-					...layers.map((layerName, layerIndex) => {
+					...layers.map((layerName) => {
 						const Wells = _.chain(data)
 							.filter(item => item.TRANSFECTION_PLATE_NAME === layerName)
 							.filter(item => item.SAMPLE_NAME === areaName)
@@ -716,21 +754,25 @@ class Editor {
 				]
 			}
 		})
-			.filter(area => area.Name !== 'undefined');
+			.filter(area => area.Name !== 'undefined')
+			.filter(area => area.Name !== '');
 	}
 
-	static transformJSONToSave(data) {
+	static transformJSONToSave(data, sheets = []) {
+		const Rows = this.getRowCount(data[0]);
+		const Cols = this.getColumnsCount(data[0]);
 		const result = [
 			{
-				Rows: this.getRowCount(data),
-				Cols: this.getColumnsCount(data),
+				Rows,
+				Cols,
 				KeepSelected: true,
 				Digits: 1,
 				Layers: [
-					[]
-				]
+					...sheets.map(() => [])
+				],
+				LayersNames: [...sheets],
 			},
-			[...this.mapAreas(data)]
+			[...this.mapPagesToAreas(data, {Rows, Cols})]
 		];
 		return JSON.stringify(result);
 	}
@@ -744,50 +786,70 @@ class Editor {
 		return Math.max(...maxColumnIndexes);
 	}
 
-	static mapAreas(data) {
-		// build a flat map of file representing what area contain each index
-		const rows = this.getRowCount(data);
-		const columns = this.getColumnsCount(data);
-		const indexesMap = {};
-		let index = 0;
+	static mapPagesToAreas(pages, {Rows, Cols}) {
+		const areas = pages.map((data, pageIndex) => {
+			// build a flat map of file representing what area contain each index
+			const indexesMap = {};
+			let index = 0;
 
-		for (let i = 0; i < rows; i++) {
-			for (let j = 1; j < columns + 1; j++) { // offset by 1 column to remove a column of letter indexes
-				indexesMap[index] = data[i][j];
-				index += 1;
-			}
-		}
-
-		// build a flat map of areas representing what indexes contain each area
-		const areasMap = {};
-
-		for (const [index, area] of Object.entries(indexesMap)) {
-			areasMap[area] = (areasMap[area]) ? [...areasMap[area], index] : [index];
-		}
-
-		return Object.keys(areasMap)
-			.map((area) => {
-				return {
-					Name: area,
-					Color: this.randomizeAreaColor(),
-					Type: "Sample",
-					Replicates: 1,
-					Direction: "Horizontal",
-					Priority: "Row",
-					Tags: [
-						{
-							Layer: 0,
-							Wells: [
-								...areasMap[area].map(indexStr => ({
-									Index: parseInt(indexStr, 10),
-									RangeIndex: 1
-								})),
-							]
-						}
-					]
+			for (let i = 0; i < Rows; i++) {
+				for (let j = 1; j < Cols + 1; j++) { // offset by 1 column to remove a column of letter indexes
+					indexesMap[index] = data[i][j];
+					index += 1;
 				}
-			})
-			.filter(area => area.Name !== 'undefined');
+			}
+
+			// build a flat map of areas representing what indexes contain each area
+			const areasMap = {};
+
+			for (const [index, area] of Object.entries(indexesMap)) {
+				areasMap[area] = (areasMap[area]) ? [...areasMap[area], index] : [index];
+			}
+
+			return Object.keys(areasMap)
+				.map((area) => {
+					return {
+						Name: area,
+						Color: Editor.randomizeAreaColor(),
+						Type: 'Sample',
+						Replicates: 1,
+						Direction: 'Horizontal',
+						Priority: 'Row',
+						Tags: [
+							{
+								Layer: pageIndex,
+								Wells: [
+									...areasMap[area].map(indexStr => ({
+										Index: parseInt(indexStr, 10),
+										RangeIndex: 1
+									})),
+								]
+							}
+						]
+					};
+				})
+				.filter(area => area.Name !== 'undefined')
+				.filter(area => area.Name !== '');
+		})
+			.flat();
+
+		const result = [];
+		areas.forEach((area) => {
+			// merge duplicated results
+			const existedAreaIndex = _.findIndex(result, item => item.Name === area.Name);
+			if (existedAreaIndex === -1) {
+				result.push(area);
+			} else {
+				area.Tags.forEach(tag => {
+					const existedTagIndex = _.findIndex(result[existedAreaIndex].Tags, item => _.some(area.Tags, {Layer: item.Layer}));
+					if (existedTagIndex === -1) {
+						result[existedAreaIndex].Tags.push(tag);
+					}
+				})
+			}
+		})
+
+		return result;
 	}
 
 	static randomizeAreaColor() {
@@ -803,47 +865,86 @@ class Editor {
 	}
 
 	static loadPreview(data, options = {}) { //Load provided data, for preview
+		const {reset} = options;
+		const id = 'Form_LoadPreview';
+		const idPlate = id + '_Plate';
+		const idAreas = id + '_Areas';
+
 		let loadedData = undefined;
-		try {loadedData = JSON.parse(data)} catch(error) {this.Console.log({Message: "Unable to load the layout. <i>" + error + "</i>", Gravity: "Error"}); return this}
-		let plate = loadedData[0];
-		let areas = loadedData[1];
-		let id = "Form_LoadPreview";
-		let idPlate = id + "_Plate";
-		let idAreas = id + "_Areas";
+		try {
+			loadedData = JSON.parse(data);
+		} catch (error) {
+			this.Console.log({Message: 'Unable to load the layout. <i>' + error + '</i>', Gravity: 'Error'});
+			return this;
+		}
+		const [plate, areas] = loadedData;
+
+		const previewAreas = () => {//show original samples colors
+			return areas.map((item) => {
+				const existedItem = this.Tables && this.Tables.Areas.Array.find(existed => existed.Name === item.Name);
+
+				if (existedItem) {
+					return existedItem;
+				} else {
+					return item;
+				}
+			})
+		}
+
+		if (!reset) {
+			if (Editor.Plate && (plate.Rows !== Editor.Plate.Rows || plate.Cols !== Editor.Plate.Cols)) {
+				this.Console.log({Message: 'Can\'t add imported plates. Sizes of existed plates and imported ones should be the same.', Gravity: 'Error'});
+				Form.close(id);
+				return this;
+			}
+		}
+
 		Form.open({
 			ID: id,
-			HTML: "<fieldset id=\"" + idPlate + "\"><legend>Plate data</legend></fieldset><fieldset id=\"" + idAreas + "\"><legend>Areas data</legend></fieldset>",
-			Title: "Layout preview",
+			HTML: '<fieldset id="' + idPlate + '"><legend>Plate data</legend></fieldset><fieldset id="' + idAreas + '"><legend>Areas data</legend></fieldset>',
+			Title: 'Layout preview',
 			Buttons: [
-				{Label: "Load", Click: function() {
-					this.warn().then(function() { //Confirmation for reset, then load data
-						this.reset();
-						this.loadData(plate, areas, options);
+				{
+					Label: 'Load', Click: function () {
+						if (reset) {
+							this.warn()
+								.then(function () { //Confirmation for reset, then load data
+									this.reset();
+									this.loadData(plate, areas, options);
+								}.bind(this));
+						} else {
+							this.loadData(plate, areas, options);
+						}
 						Form.close(id);
-					}.bind(this), function() {});
-				}.bind(this)},
-				{Label: "Cancel", Icon: {Type: "Cancel", Space: true, Color: "Red"}, Click: function() {Form.close(id)}}
+					}.bind(this)
+				},
+				{Label: 'Cancel', Icon: {Type: 'Cancel', Space: true, Color: 'Red'}, Click: function () {Form.close(id);}}
 			],
-			onInit: function() {
-				Area.loadPreview(areas, idAreas);
-				Plate.loadPreview(plate, idPlate);
+			onInit: function () {
+				Plate.loadPreview(plate, idPlate, reset);
+				Area.loadPreview(previewAreas(), idAreas, reset);
 			},
 		});
 	}
+
 	static loadData(plate, areas, options = {}) { //Load the plate and areas data. Make sure the layout has been reset before using
-		if(plate) { //Load plate data if present
-			this.newPlate(plate.Rows, plate.Cols, options);
-			Plate.load(this.Plate, plate);
+		const {reset} = options;
+		if (plate) { //Load plate data if present
+			if (reset) {
+				this.newPlate(plate.Rows, plate.Cols, options);
+			}
+			Plate.load(this.Plate, plate, {append: !reset});
 		}
-		if(areas && areas.length > 0) {
-			Area.load(this.Tables.Areas, areas, this.Plate, plate);
+		if (areas && areas.length > 0) {
+			Area.load(this.Tables.Areas, areas, this.Plate, plate, {append: !reset});
 			this.Tables.Areas.update(); //Update the table to reflect any changes in the ranges
 		}
 		this.Plate.update(); //Update to display the concentrations and update the range info
 		this.Menu.closeAll().jumpTo(1);
-		this.Console.log({Message: "Layout successfully loaded", Gravity: "Success", Reset: true});
+		this.Console.log({Message: 'Layout successfully loaded', Gravity: 'Success', Reset: true});
 		return this;
 	}
+
 //*********************
 // AREA-RELATED METHODS
 //*********************

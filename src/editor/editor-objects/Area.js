@@ -167,8 +167,8 @@ class Area {
 				html += "<td>" + a.Type;
 				if(a.Type == "Range") {Area.rangeInfo(a); html += " (" + a.Other + ")"}
 				html += "</td><td>";
-				if(a.Tags) {
-					 html += a.Tags.reduce(function(a, b) {return a + b.Wells.length}, 0)
+				if (a.Tags) {
+					html += a.Tags[0].Wells.length
 				}
 				else {html += 0}
 				html += "</td></tr>";
@@ -178,33 +178,48 @@ class Area {
 		else {html = "<p class=\"Error\">No data</p>"}
 		GetId(id).insertAdjacentHTML("beforeend", html);
 	}
-	static load(table, areaData, plate, plateData) { //Load the provided areas data in the provided plate and table
-		areaData.forEach(function(a) { //For each area to load
+
+	static load(table, areaData, plate, plateData, options) { //Load the provided areas data in the provided plate and table
+		const {append} = options;
+		areaData.forEach(function (a) { //For each area to load
 			let targetArea = undefined;
-			if(a.Type == "Range") { //Create the object and log it in the table
-				targetArea = table.addRow(new Area({Name: a.Name, Color: a.Color, Type: a.Type, Replicates: a.Replicates, Direction: a.Direction, Priority: a.Priority, Custom: a.Custom}));
-			}
-			else {
+			if (a.Type == 'Range') { //Create the object and log it in the table
+				targetArea = table.addRow(new Area({
+					Name: a.Name,
+					Color: a.Color,
+					Type: a.Type,
+					Replicates: a.Replicates,
+					Direction: a.Direction,
+					Priority: a.Priority,
+					Custom: a.Custom
+				}));
+			} else {
 				targetArea = table.addRow(new Area({Name: a.Name, Color: a.Color, Type: a.Type}));
 			}
-			if(plateData) { //Do the tagging if plateData are available to load as well
-				let map = plate.TypeMap;
-				a.Tags.forEach(function(t) { //Go throught the array of tag object
-					let lay = plate.Layers[t.Layer];
-					t.Wells.forEach(function(w) { //Go through the wells for this layer
+			if (plateData) { //Do the tagging if plateData are available to load as well
+				const startIndex = (append) ? plate.Layers.length - plateData.Layers.length : 0;
+				const map = plate.TypeMap;
+				a.Tags.forEach(function (tag) { //Go throught the array of tag object
+					const lay = plate.Layers[startIndex + tag.Layer];
+					tag.Wells.forEach(function (w) { //Go through the wells for this layer
 						let targetWell = lay.Wells[w.Index]; //The well to tag
-						if(targetWell) {
+						if (targetWell) {
 							targetWell.Area = targetArea; //Tag with the area
-							if(a.Type == "Range" && a.Custom) {targetWell.RangeIndex = w.RangeIndex}
+							if (a.Type == 'Range' && a.Custom) {
+								targetWell.RangeIndex = w.RangeIndex;
+							}
 							map.log(w.Index, a.Type); //Log the type at this location
 							Area.log(targetArea, lay, targetWell); //Log the well in the Area Tags
 						}
 					});
 				});
-				if(a.Type == "Range") {plate.updateRange(targetArea)}
+				if (a.Type == 'Range') {
+					plate.updateRange(targetArea);
+				}
 			}
 		});
 	}
+
 	static resize(areas, plate, r, c) { //Resize the selection of each area to fit within the new dimensions
 		areas.forEach(function(a) { //For each area
 			a.Tags.forEach(function(t) { //Go through the selection

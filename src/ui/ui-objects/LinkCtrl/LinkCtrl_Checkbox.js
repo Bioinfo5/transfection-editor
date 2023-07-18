@@ -9,21 +9,29 @@ class LinkCtrl_Checkbox extends LinkCtrl {
 	}
 	//Methods
 	html() { //Initialize the html for the control
-		var val = "";
-		if(this.Value) {val = " checked"}
-		var html = "<label id=\"" + this.Me + "\" title=\"" + this.Title + "\" class=\"LinkCtrl" + this.Classes + "\">"; //Opening label for the control
-		if(this.ControlLeft) { //The control is first, the label after
-			html += "<input type=\"checkbox\" id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\"LinkCtrl_ChkBox\"" + val + ">";
-			if(this.HasLabel) {html += "&nbsp;" + this.Label} //Add the label
+		let val = '';
+		if (this.Value) {val = ' checked';}
+		let html = '<label id="' + this.Me + '" title="' + this.Title + '" class="LinkCtrl' + this.Classes + '">'; //Opening label for the control
+		if (this.ControlLeft) { //The control is first, the label after
+			html += '<input type="checkbox" ' +
+				'id="' + this.Control + '" ' +
+				'title="' + this.Title + '" ' +
+				'class="LinkCtrl_ChkBox"' + val + ' '
+				+ (this.Disabled ? 'disabled' : '') + '>';
+			if (this.HasLabel) {html += '&nbsp;' + this.Label;} //Add the label
+		} else { //The other way around
+			if (this.HasLabel) {html += this.Label + '&nbsp;';} //Add the label
+			html += '<input type="checkbox" ' +
+				'id="' + this.Control + '" ' +
+				'title="' + this.Title + '" ' +
+				'class="LinkCtrl_ChkBox"' + val + ' '
+				+ (this.Disabled ? 'disabled' : '') + '>';
 		}
-		else { //The other way around
-			if(this.HasLabel) {html += this.Label + "&nbsp;"} //Add the label
-			html += "<input type=\"checkbox\" id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\"LinkCtrl_ChkBox\"" + val + ">"; 
-		}
-		html += "</label>"; //Closure of the control
-		if(this.NewLine) {html += "<br>"} //Newline after this control if needed
+		html += '</label>'; //Closure of the control
+		if (this.NewLine) {html += '<br>';} //Newline after this control if needed
 		return html;
 	}
+
 	bindEvents() { //Bind the events to the control
 		GetId(this.Me).children[0].addEventListener("click", function(e) {
 			var newVal = e.target.checked;
