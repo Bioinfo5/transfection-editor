@@ -104,20 +104,34 @@ class Plate {
 		const TRANSFECTION_SCIENTIST = this.Metadata.TransfectionScientist || '';
 		const TRANSFECTION_ID = this.Metadata.ExperimentID || '';
 		const output = [];
+		this.Layers.forEach(layer => {
+			const sameNames = this.Layers.filter(item => item.Name === layer.Name);
+			if (sameNames.length > 1) {
+				sameNames.forEach((item, itemIndex) => {
+					const i = _.findIndex(this.Layers, l => l.Index === item.Index)
+					if (i >= 0) {
+						this.Layers[i].ExportedName = `${item.Name}_${Editor.alphabet[itemIndex].toLowerCase()}`;
+					}
+				});
+			} else {
+				sameNames.forEach(item => item.ExportedName = item.Name);
+			}
+		})
+
 		this.Layers.forEach((layer) => {
-			const TRANSFECTION_PLATE_NAME = `${layer.Name}_${layer.Index}`;
+			const TRANSFECTION_PLATE_NAME = layer.ExportedName;
 			const TRANSFECTION_CELL_LINE = layer.Metadata.CellLine || '';
-			const TRANSFECTION_CELL_LINE_PASSAGE = layer.Metadata.CellLinePassage || '';
+			const TRANSFECTION_CELL_LINE_PASSAGE = layer.Metadata.CellLinePassage || 0;
 			const TRANSFECTION_REAGENT = layer.Metadata.TransfectionReagent || '';
 			const TRANSFECTION_REAGENT_LOT = layer.Metadata.TransfectionReagentLOT || '';
-			const TRANSFECTION_END_POINT = layer.Metadata.TransfectionEndPoint || '';
+			const TRANSFECTION_END_POINT = layer.Metadata.TransfectionEndPoint || 0;
 
 			layer.Wells.forEach(well => {
-				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${well.Index}` : '';
+				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${well.Index + 1}` : '';
 				const TRANSFECTION_POS = `${well.Name}`;
-				const TRANSFECTION_CONCENTRATION = well.Metadata.Concentration || '';
-				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || '';
-				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount || '';
+				const TRANSFECTION_CONCENTRATION = well.Metadata.Concentration || 0;
+				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || 0;
+				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount || 0;
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,

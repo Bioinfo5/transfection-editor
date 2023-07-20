@@ -3,6 +3,7 @@
 //******************************************************
 class Editor {
 	constructor() {}
+	static alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 	//Static Methods
 	static init() { //Initialize the editor. This generates all the controls and buttons
 		this.Root = "Editor";
@@ -595,6 +596,7 @@ class Editor {
 			},
 			[...this.mapMetadataAreas(data, {Rows, Cols})]
 		];
+
 		return JSON.stringify(result);
 	}
 
@@ -632,7 +634,7 @@ class Editor {
 			return {
 				...rest,
 				SAMPLE_NAME: _.replace(SAMPLE_NAME, /_\d{1,2}$/i, ''),
-				TRANSFECTION_PLATE_NAME: _.replace(TRANSFECTION_PLATE_NAME, /_\d{1,2}$/i, ''),
+				TRANSFECTION_PLATE_NAME: _.replace(TRANSFECTION_PLATE_NAME, /_\w$/i, ''),
 				TRANSFECTION_PLATE_INDEX: parseInt(originalPlateNames.findIndex(item => item === TRANSFECTION_PLATE_NAME), 10),
 			}
 		})
@@ -641,6 +643,21 @@ class Editor {
 	static getUniqLayerNames(data) {
 		return _.chain(data)
 			.map(item => item.TRANSFECTION_PLATE_NAME)
+			.uniq()
+			.value();
+	}
+
+	static getUniqLayerIndexes(data) {
+		return _.chain(data)
+			.map(item => item.TRANSFECTION_PLATE_INDEX)
+			.uniq()
+			.value();;
+	}
+
+	static getUniqLayerIndexesByArea(data, area) {
+		return _.chain(data)
+			.filter(item => item.SAMPLE_NAME === area)
+			.map(item => item.TRANSFECTION_PLATE_INDEX)
 			.uniq()
 			.value();
 	}
@@ -661,15 +678,18 @@ class Editor {
 	}
 
 	static mapLayers(data) {
-		const layers = this.getUniqLayerNames(data);
-		return layers.map(() => [])
+		return _.chain(data)
+			.map(item => item.TRANSFECTION_PLATE_INDEX)
+			.uniq()
+			.map(() => [])
+			.value();
 	}
 
 	static mapLayersMetadata(data) {
-		const layerNames = this.getUniqLayerNames(data);
-		return _.map(layerNames, layerName => {
+		const layerIndexes = this.getUniqLayerIndexes(data);
+		return _.map(layerIndexes, layerIndex => {
 			const row = _.chain(data)
-				.filter(item => item.TRANSFECTION_PLATE_NAME === layerName)
+				.filter(item => item.TRANSFECTION_PLATE_INDEX === layerIndex)
 				.first()
 				.value();
 			return {
@@ -686,10 +706,11 @@ class Editor {
 	}
 
 	static mapLayersNames(data) {
-		const layerNames = this.getUniqLayerNames(data);
-		return _.map(layerNames, layerName => {
+		const layerIndexes = this.getUniqLayerIndexes(data);
+
+		return _.map(layerIndexes, layerIndex => {
 			const row = _.chain(data)
-				.filter(item => item.TRANSFECTION_PLATE_NAME === layerName)
+				.filter(item => item.TRANSFECTION_PLATE_INDEX === layerIndex)
 				.first()
 				.value();
 			return {
@@ -718,7 +739,7 @@ class Editor {
 		const uniqAreaNames = this.getUniqAreaNames(data);
 
 		return uniqAreaNames.map((areaName) => {
-			const layers = this.getUniqLayerNamesByArea(data, areaName);
+			const layerIndexes = this.getUniqLayerIndexes(data, areaName);
 
 			return {
 				Name: areaName,
@@ -728,9 +749,9 @@ class Editor {
 				Direction: "Horizontal",
 				Priority: "Row",
 				Tags: [
-					...layers.map((layerName) => {
+					...layerIndexes.map((layerIndex) => {
 						const Wells = _.chain(data)
-							.filter(item => item.TRANSFECTION_PLATE_NAME === layerName)
+							.filter(item => item.TRANSFECTION_PLATE_INDEX === layerIndex)
 							.filter(item => item.SAMPLE_NAME === areaName)
 							.map(item => {
 								const well = Well.parseIndex(item.TRANSFECTION_POS, {Rows, Cols});
@@ -744,7 +765,7 @@ class Editor {
 							.filter(Boolean)
 							.value();
 
-						const [item] = data.filter(item => item.TRANSFECTION_PLATE_NAME === layerName);
+						const [item] = data.filter(item => item.TRANSFECTION_PLATE_INDEX === layerIndex);
 
 						return {
 							Layer: item.TRANSFECTION_PLATE_INDEX,

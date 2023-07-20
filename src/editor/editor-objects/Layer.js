@@ -18,6 +18,7 @@ class Layer {
 		this.Root = "Layer_" + I.Index;
 		this.Name = `Plate ${this.Index + 1}`;
 		this.Metadata = {};
+		this.ExportedName = this.Name;
 		let index = 0;
 		for(let i=0;i<r;i++) { //Rows
 			for(let j=0;j<c;j++) { //Columns
