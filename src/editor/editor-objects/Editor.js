@@ -561,8 +561,9 @@ class Editor {
 				.map((item) => {
 					return XLSX.utils.sheet_to_json(workbook.Sheets[item]);
 				});
+			const {Rows, Cols} = this.getBasePlateRanges(workbook);
 
-			return {type: 'base-plate', data: this.transformJSONToSave(xlData, sheet_name_list)};
+			return {type: 'base-plate', data: this.transformJSONToSave(xlData, sheet_name_list, {Rows, Cols})};
 		}
 	}
 
@@ -575,6 +576,19 @@ class Editor {
 		const headers = Object.keys(data[0]);
 
 		return _.some(headers, item => (exportedFileHeaders.includes(item)));
+	}
+
+	static getBasePlateRanges(workbook) {
+		let Rows = 0;
+		let Cols = 0;
+		workbook.SheetNames.forEach(item => {
+			const worksheet = workbook.Sheets[item];
+			const range = XLSX.utils.decode_range(worksheet['!ref']);
+			Rows = Math.max(Rows, range.e.r - range.s.r);
+			Cols = Math.max(Cols, range.e.c - range.s.c);
+		});
+
+		return {Rows, Cols};
 	}
 
 	static transformMetadataJSONToSave(rawData) {
@@ -779,9 +793,7 @@ class Editor {
 			.filter(area => area.Name !== '');
 	}
 
-	static transformJSONToSave(data, sheets = []) {
-		const Rows = this.getRowCount(data[0]);
-		const Cols = this.getColumnsCount(data[0]);
+	static transformJSONToSave(data, sheets = [], {Rows, Cols}) {
 		const result = [
 			{
 				Rows,
