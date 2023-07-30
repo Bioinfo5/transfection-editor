@@ -17,7 +17,8 @@
     "T98G", "U87", "NCI-H441",
     "NCI-H727", "SK-CO1", "CFPAC1",
     "CAPAN2", "U-2 OS", "HEK-Blue hTLR9",
-    "HEK-Blue mTLR9", "HEK-Blue null", "Rec 1"
+    "HEK-Blue mTLR9", "HEK-Blue null", "Rec 1",
+    "AML-12"
   ],
   "transfection_reagent": [
     "Lipofectamine_2000",
