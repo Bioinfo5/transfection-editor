@@ -9,6 +9,7 @@ class LinkCtrl_Number extends LinkCtrl {
 		this.Min = (I.Min || -Infinity); //Minimum value accepted
 		this.Max = (I.Max || Infinity); //Maximum value accepted
 		this.Step = (I.Step || "any"); //How much to increment between each step
+		this.change = (I.Change || (v => {}));
 		return this;
 	}
 	//Methods
@@ -27,29 +28,42 @@ class LinkCtrl_Number extends LinkCtrl {
 		return html;
 	}
 	htmlInput() { //Html for the input per se
-		var html = "<input type=\"number\" id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\"LinkCtrl_Number\" value=\"" + this.Value + "\" style=\"width: " + this.Size + "em\"";
+		var html = "<input type=\"text\" id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\"LinkCtrl_Number\" value=\"" + this.Value + "\" style=\"width: " + this.Size + "em\"";
 		if(this.Min !== undefined) {html += " min=\"" + this.Min + "\""} //Need to pass the test when min/max = 0,
 		if(this.Max !== undefined) {html += " max=\"" + this.Max + "\""} //
 		if(this.Disabled) {html += " disabled"}
 		html += " step=\"" + this.Step + "\">";
 		return html;
 	}
+
 	bindEvents() { //Bind the events to the control
-		GetId(this.Me).children[0].addEventListener("change", function(e) {
-			let t = e.target;
-			var newVal = Number(t.value);
-			let error = false;
-			if(newVal > this.Max) {newVal = this.Max; error = true} //Adjust the value to fit within the Min/Max
-			if(newVal < this.Min) {newVal = this.Min; error = true} //
-			if(error) {t.style.color = "red"}
-			else {t.style.color = "black"}
-			t.value = newVal;
-			this.Value = newVal;
-			this.change(newVal);
+		GetId(this.Me).children[0].addEventListener('input', function (e) {
+			const element = e.target;
+			const match = element.value.match(/[+-]?[\d]+[.]?[\d]*/);
+			let newVal = match ? match[0] : "";
+			if (newVal) {
+				let error = false;
+				if (parseFloat(newVal) > this.Max) { //Adjust the value to fit within the Min/Max
+					newVal = this.Max;
+					error = true;
+				}
+				if (parseFloat(newVal) < this.Min) {
+					newVal = this.Min;
+					error = true;
+				}
+				if (error) {element.style.color = 'red';} else {element.style.color = 'black';}
+				element.value = newVal;
+				this.Value = newVal;
+				this.change(newVal);
+			} else {
+				element.value = "";
+				this.Value = "";
+				this.change("");
+			}
 		}.bind(this));
 	}
 	updateValue(v, ui) { //Update the value of the html control, following value change. v is the new value, ui refers to the hosting element
-		let val = Number(v);
+		let val = v;
 		if(val > this.Max) {val = this.Max}
 		if(val < this.Min) {val = this.Min}
 		this.Value = val;

@@ -637,7 +637,7 @@ class Layer {
 			const selectedMetadata = selectedWell.getMetadata();
 			Object.entries(selectedMetadata).forEach(([key, value]) => {
 				if (Editor.Controls.MetadataWellLevel[key]) {
-					Editor.Controls.MetadataWellLevel[key].setValue(value);
+					Editor.Controls.MetadataWellLevel[key].setValue(value || "");
 				}
 			})
 		}
@@ -893,12 +893,20 @@ class Layer {
 	}
 
 	applyMetadata(I) {
-		this.Metadata = {
-			CellLine: I.CellLine,
-			CellLinePassage: I.CellLinePassage,
-			TransfectionReagent: I.TransfectionReagent,
-			TransfectionReagentLOT: I.TransfectionReagentLOT,
-			TransfectionEndPoint: I.TransfectionEndPoint,
+		if (I.CellLine) {
+			this.Metadata.CellLine = I.CellLine;
+		}
+		if (I.CellLinePassage) {
+			this.Metadata.CellLinePassage = parseFloat(I.CellLinePassage);
+		}
+		if (I.TransfectionReagent) {
+			this.Metadata.TransfectionReagent = I.TransfectionReagent;
+		}
+		if (I.TransfectionReagentLOT) {
+			this.Metadata.TransfectionReagentLOT = I.TransfectionReagentLOT;
+		}
+		if (I.TransfectionEndPoint) {
+			this.Metadata.TransfectionEndPoint = parseFloat(I.TransfectionEndPoint);
 		}
 	}
 

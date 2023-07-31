@@ -151,7 +151,7 @@ class Editor {
 					ID: this.Anchors.Menu.MetadataPlateLevel,
 					Title: "Cell Line Passage",
 					Min: 0,
-					Default: 0,
+					Default: "",
 					Label: "Cell Line Passage",
 					Preserve: true,
 					NewLine: true,
@@ -180,7 +180,7 @@ class Editor {
 					ID: this.Anchors.Menu.MetadataPlateLevel,
 					Title: "Transfection End-Point",
 					Min: 0,
-					Default: 0,
+					Default: "",
 					Label: "Transfection End-Point",
 					Preserve: true,
 					NewLine: true,
@@ -192,29 +192,53 @@ class Editor {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Title: "Number of Cells per Well",
 					Min: 0,
-					Default: 0,
+					Default: "",
 					Label: "Number of Cells per Well",
 					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 1, Last: false}
+				}),
+				UpdateNumberOfCellsPerWell: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
 					NewLine: true,
-					Chain: {Index: 1, Last: true}
+					Chain: {Index: 2, Last: true}
 				}),
 				Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Title: "Concentration",
 					Min: 0,
-					Default: 0,
+					Default: "",
 					Label: "Concentration",
 					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 3, Last: false}
+				}),
+				UpdateConcentration: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
 					NewLine: true,
-					Chain: {Index: 2, Last: true}
+					Chain: {Index: 4, Last: true}
 				}),
 				TransfectionReagentAmount: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Title: "Transfection Reagent Amount",
 					Min: 0,
-					Default: 0,
+					Default: "",
 					Label: "Transfection Reagent Amount",
 					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 5, Last: false}
+				}),
+				UpdateTransfectionReagentAmount: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
 					NewLine: true,
 					Chain: {Index: 6, Last: true}
 				}),
@@ -440,22 +464,22 @@ class Editor {
 		this.Plate.Layers.forEach(layer => {
 			if (
 				!layer.Metadata.CellLine
-				|| !(typeof layer.Metadata.CellLinePassage === 'number')
+				|| isNaN(layer.Metadata.CellLinePassage)
 				|| !layer.Metadata.TransfectionReagent
 				|| !layer.Metadata.TransfectionReagentLOT
-				|| !(typeof layer.Metadata.TransfectionEndPoint === 'number')
+				|| isNaN(layer.Metadata.TransfectionEndPoint)
 			) {
 				isValid = false;
-				reasons.push(`Plate ${layer.Index} metadata should be filled`);
+				reasons.push(`Plate ${layer.Name} metadata should be filled`);
 			}
 
 			layer.Wells.forEach(well => {
 				if (
 					well.Area
 					&& (
-						!(typeof well.Metadata.NumberOfCellsPerWell === 'number')
-						|| !(typeof well.Metadata.Concentration === 'number')
-						|| !(typeof well.Metadata.TransfectionReagentAmount === 'number')
+						isNaN(well.Metadata.NumberOfCellsPerWell)
+						|| isNaN(well.Metadata.Concentration)
+						|| isNaN(well.Metadata.TransfectionReagentAmount)
 					)
 				) {
 					isValid = false;
@@ -810,15 +834,6 @@ class Editor {
 		return JSON.stringify(result);
 	}
 
-	static getRowCount(data = []) {
-		return data.length;
-	}
-
-	static getColumnsCount(data = []) {
-		const maxColumnIndexes = data.map(row => Object.keys(row).length - 1);
-		return Math.max(...maxColumnIndexes);
-	}
-
 	static mapPagesToAreas(pages, {Rows, Cols}) {
 		const areas = pages.map((data, pageIndex) => {
 			// build a flat map of file representing what area contain each index
@@ -827,7 +842,9 @@ class Editor {
 
 			for (let i = 0; i < Rows; i++) {
 				for (let j = 1; j < Cols + 1; j++) { // offset by 1 column to remove a column of letter indexes
-					indexesMap[index] = data[i][j];
+					if (data[i]) {
+						indexesMap[index] = data[i][j];
+					}
 					index += 1;
 				}
 			}
@@ -1278,13 +1295,17 @@ class Editor {
 		if (this.Plate) {
 			const values = {
 				ExperimentID:  this.Controls.MetadataMainLevel.ExperimentID.getValue(),
-				TransfectionScientist: this.Controls.MetadataMainLevel.TransfectionScientist.Selected,
 			};
+			if (this.Controls.MetadataMainLevel.TransfectionScientist.Value > 0) {
+				values.TransfectionScientist = this.Controls.MetadataMainLevel.TransfectionScientist.Selected;
+			}
 			this.Plate.applyMetadata(values);
 
 			this.Console.log({Message: 'Main metadata updated with following values:', Gravity: "Success"});
 			this.Console.log({Message: `Experiment ID: ${this.Plate.Metadata.ExperimentID}`, Gravity: "Success"});
-			this.Console.log({Message: `Transfection Scientist: ${this.Plate.Metadata.TransfectionScientist}`, Gravity: "Success"});
+			if (this.Controls.MetadataMainLevel.TransfectionScientist.Value > 0) {
+				this.Console.log({Message: `Transfection Scientist: ${this.Plate.Metadata.TransfectionScientist}`, Gravity: "Success"});
+			}
 		} else {
 			this.Console.log({Message: "No plate created", Gravity: "Error"})
 		}
@@ -1293,19 +1314,27 @@ class Editor {
 	static applyPlateMetadata() {
 		if (this.Plate) {
 			const values = {
-				CellLine: this.Controls.MetadataPlateLevel.CellLine.Selected,
 				CellLinePassage: this.Controls.MetadataPlateLevel.CellLinePassage.getValue(),
-				TransfectionReagent: this.Controls.MetadataPlateLevel.TransfectionReagent.Selected,
 				TransfectionReagentLOT: this.Controls.MetadataPlateLevel.TransfectionReagentLOT.getValue(),
 				TransfectionEndPoint: this.Controls.MetadataPlateLevel.TransfectionEndPoint.getValue(),
 			};
+			if (this.Controls.MetadataPlateLevel.CellLine.Value > 0) {
+				values.CellLine = this.Controls.MetadataPlateLevel.CellLine.Selected
+			}
+			if (this.Controls.MetadataPlateLevel.TransfectionReagent.Value > 0) {
+				values.TransfectionReagent = this.Controls.MetadataPlateLevel.TransfectionReagent.Selected
+			}
 			const updatedPlateID = this.Plate.applyLayerMetadata(values);
 
 			if (updatedPlateID >= 0) {
 				Editor.Console.log({Message: `Plate ${updatedPlateID + 1} metadata updated with following values:`, Gravity: "Success"});
-				Editor.Console.log({Message: `Cell Line: ${values.CellLine}`, Gravity: "Success"});
+				if (values.CellLine) {
+					Editor.Console.log({Message: `Cell Line: ${values.CellLine}`, Gravity: "Success"});
+				}
 				Editor.Console.log({Message: `Cell Line Passage: ${values.CellLinePassage}`, Gravity: "Success"});
-				Editor.Console.log({Message: `Transfection Reagent: ${values.TransfectionReagent}`, Gravity: "Success"});
+				if (values.TransfectionReagent) {
+					Editor.Console.log({Message: `Transfection Reagent: ${values.TransfectionReagent}`, Gravity: "Success"});
+				}
 				Editor.Console.log({Message: `Transfection Reagent LOT: ${values.TransfectionReagentLOT}`, Gravity: "Success"});
 				Editor.Console.log({Message: `Transfection End Point: ${values.TransfectionEndPoint}`, Gravity: "Success"});
 			} else {
@@ -1318,10 +1347,15 @@ class Editor {
 
 	static applyWellMetadata() {
 		if (this.Plate) {
-			const values = {
-				NumberOfCellsPerWell: this.Controls.MetadataWellLevel.NumberOfCellsPerWell.getValue(),
-				Concentration: this.Controls.MetadataWellLevel.Concentration.getValue(),
-				TransfectionReagentAmount: this.Controls.MetadataWellLevel.TransfectionReagentAmount.getValue(),
+			const values = {};
+			if (this.Controls.MetadataWellLevel.UpdateNumberOfCellsPerWell.Value) {
+				values.NumberOfCellsPerWell = this.Controls.MetadataWellLevel.NumberOfCellsPerWell.getValue();
+			}
+			if (this.Controls.MetadataWellLevel.UpdateConcentration.Value) {
+				values.Concentration = this.Controls.MetadataWellLevel.Concentration.getValue();
+			}
+			if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
+				values.TransfectionReagentAmount = this.Controls.MetadataWellLevel.TransfectionReagentAmount.getValue();
 			}
 			let totalUpdated = 0;
 			let totalEmpty = 0;
@@ -1334,9 +1368,15 @@ class Editor {
 
 			if (totalUpdated > 0) {
 				this.Console.log({Message: `Metadata of ${totalUpdated} well${(totalUpdated > 1) ? 's' : ''} updated with following values:`, Gravity: "Success"});
-				this.Console.log({Message: `Number of Cells per Well: ${values.NumberOfCellsPerWell}`, Gravity: "Success"});
-				this.Console.log({Message: `Concentration: ${values.Concentration}`, Gravity: "Success"});
-				Editor.Console.log({Message: `Transfection Reagent Amount: ${values.TransfectionReagentAmount}`, Gravity: "Success"});
+				if (this.Controls.MetadataWellLevel.UpdateNumberOfCellsPerWell.Value) {
+					this.Console.log({Message: `Number of Cells per Well: ${values.NumberOfCellsPerWell}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdateConcentration.Value) {
+					this.Console.log({Message: `Concentration: ${values.Concentration}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
+					Editor.Console.log({Message: `Transfection Reagent Amount: ${values.TransfectionReagentAmount}`, Gravity: "Success"});
+				}
 			}
 			if (totalEmpty > 0) {
 				this.Console.log({Message: `Metadata of ${totalEmpty} empty well${(totalEmpty > 1) ? 's' : ''} was not updated`, Gravity: "Warning"});
@@ -1356,15 +1396,15 @@ class Editor {
 
 	static resetPlateMetadataControls() {
 		this.Controls.MetadataPlateLevel.CellLine.setValue(0);
-		this.Controls.MetadataPlateLevel.CellLinePassage.setValue(0);
+		this.Controls.MetadataPlateLevel.CellLinePassage.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionReagent.setValue(0);
 		this.Controls.MetadataPlateLevel.TransfectionReagentLOT.setValue("");
-		this.Controls.MetadataPlateLevel.TransfectionEndPoint.setValue(0);
+		this.Controls.MetadataPlateLevel.TransfectionEndPoint.setValue("");
 	}
 
 	static resetWellMetadataControls() {
-		this.Controls.MetadataWellLevel.NumberOfCellsPerWell.setValue(0);
-		this.Controls.MetadataWellLevel.Concentration.setValue(0);
-		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue(0);
+		this.Controls.MetadataWellLevel.NumberOfCellsPerWell.setValue("");
+		this.Controls.MetadataWellLevel.Concentration.setValue("");
+		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue("");
 	}
 }
