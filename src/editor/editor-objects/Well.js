@@ -202,10 +202,14 @@ class Well {
 	}
 
 	applyMetadata(I) {
-		this.Metadata = {
-			NumberOfCellsPerWell: I.NumberOfCellsPerWell,
-			Concentration: I.Concentration,
-			TransfectionReagentAmount: I.TransfectionReagentAmount,
+		if (I.NumberOfCellsPerWell) {
+			this.Metadata.NumberOfCellsPerWell = parseFloat(I.NumberOfCellsPerWell);
+		}
+		if (I.Concentration) {
+			this.Metadata.Concentration = parseFloat(I.Concentration);
+		}
+		if (I.TransfectionReagentAmount) {
+			this.Metadata.TransfectionReagentAmount = parseFloat(I.TransfectionReagentAmount);
 		}
 	}
 

@@ -849,9 +849,13 @@ class Plate {
 			Object.entries(selectedMetadata).forEach(([key, value]) => {
 				if (Editor.Controls.MetadataPlateLevel[key]) {
 					if (Editor.Controls.MetadataPlateLevel[key].Type === 'Select') {
-						Editor.Controls.MetadataPlateLevel[key].setSelected(value);
+						if (value) {
+							Editor.Controls.MetadataPlateLevel[key].setSelected(value);
+						} else {
+							Editor.Controls.MetadataPlateLevel[key].setValue(0);
+						}
 					} else {
-						Editor.Controls.MetadataPlateLevel[key].setValue(value);
+						Editor.Controls.MetadataPlateLevel[key].setValue(value || "");
 					}
 				}
 			})
@@ -866,10 +870,12 @@ class Plate {
 	}
 
 	applyMetadata(I) {
-		this.Metadata = {
-			ExperimentID: I.ExperimentID,
-			TransfectionScientist: I.TransfectionScientist,
-		};
+		if (I.ExperimentID) {
+			this.Metadata.ExperimentID = I.ExperimentID;
+		}
+		if (I.TransfectionScientist) {
+			this.Metadata.TransfectionScientist = I.TransfectionScientist;
+		}
 	}
 
 	applyLayerMetadata(I) {

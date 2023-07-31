@@ -21,14 +21,14 @@ class DDOptions {
   };
 
   static transfectionScientistOptions() {
-    return this.MetadataDDOptions.transfectionScientist
+    return ['Please select', ...this.MetadataDDOptions.transfectionScientist]
   }
 
   static cellLineOptions() {
-    return this.MetadataDDOptions.cellLine
+    return ['Please select', ...this.MetadataDDOptions.cellLine]
   }
 
   static transfectionReagentOptions() {
-    return this.MetadataDDOptions.transfectionReagent
+    return ['Please select', ...this.MetadataDDOptions.transfectionReagent]
   }
 }
