@@ -76,7 +76,7 @@ class Layer {
 					else return 0;
 				})
 				.map(([layer]) => {
-					return [layer, Layer.getAsHTML(l, metadataDisplayState)];
+					return [layer, Layer.getAsHTML(layer, metadataDisplayState)];
 				})
 				.map(([layer, data]) => {
 					const showPlateMetadata = _.some(Object.values(metadataDisplayState.plate), Boolean);
