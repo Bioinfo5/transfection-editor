@@ -27,5 +27,13 @@
     "Lipofectamine_RNAiMAX",
     "Lipofectamine_LTX",
     "jetPRIME"
+  ],
+  "concentration_units": [
+    "nM",
+    "uM"
+  ],
+  "transfection_reagent_amount_units": [
+    "uL",
+    "mL"
   ]
 }

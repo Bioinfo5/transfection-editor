@@ -216,13 +216,24 @@ class Editor {
 					NewLine: false,
 					Chain: {Index: 3, Last: false}
 				}),
+				ConcentrationUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Concentration Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.ConcentrationUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 4, Last: false}
+				}),
 				UpdateConcentration: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Default: true,
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 4, Last: true}
+					Chain: {Index: 5, Last: true}
 				}),
 				TransfectionReagentAmount: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -232,7 +243,18 @@ class Editor {
 					Label: "Transfection Reagent Amount",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 5, Last: false}
+					Chain: {Index: 6, Last: false}
+				}),
+				TransfectionReagentAmountUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Transfection Reagent Amount Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.TransfectionReagentAmountUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 7, Last: false}
 				}),
 				UpdateTransfectionReagentAmount: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -240,7 +262,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 6, Last: true}
+					Chain: {Index: 8, Last: true}
 				}),
 			}
 		}
@@ -406,7 +428,10 @@ class Editor {
 		}
 		const data = this.Plate.exportToXLSX()
 		const save = this.exportToXLSX(data);
-		Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: "TRANSFECTION_FILE.xlsx"});
+		const today = new Date();
+		const dateStamp = `${today.getDate().toString().padStart(2, '0')}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getFullYear()}`
+		const transfectionId = this.Plate.Metadata.ExperimentID;
+		Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: `${dateStamp}_${transfectionId}_TRANSFECTION_FILE.xlsx`});
 		return this;
 	}
 
@@ -761,13 +786,18 @@ class Editor {
 	static mapWellsMetadata(data, {Rows, Cols}) {
 		return _.map(data, item => {
 			const well = Well.parseIndex(item.TRANSFECTION_POS, {Rows, Cols});
+			const [concentration, concentrationUnit] = item.TRANSFECTION_CONCENTRATION.toString().split('_');
+			const [transfectionReagentAmount, transfectionReagentAmountUnit] = item.TRANSFECTION_REAGENT_AMOUNT.toString().split('_');
+
 			return {
 				Layer: item.TRANSFECTION_PLATE_INDEX,
 				Index: well.Index,
 				Metadata: {
 					NumberOfCellsPerWell: item.TRANSFECTION_CELL_AMOUNT,
-					Concentration: item.TRANSFECTION_CONCENTRATION,
-					TransfectionReagentAmount: item.TRANSFECTION_REAGENT_AMOUNT,
+					Concentration: concentration,
+					ConcentrationUnit: concentrationUnit,
+					TransfectionReagentAmount: transfectionReagentAmount,
+					TransfectionReagentAmountUnit: transfectionReagentAmountUnit,
 				}
 			}
 		});
@@ -1353,9 +1383,11 @@ class Editor {
 			}
 			if (this.Controls.MetadataWellLevel.UpdateConcentration.Value) {
 				values.Concentration = this.Controls.MetadataWellLevel.Concentration.getValue();
+				values.ConcentrationUnit = this.Controls.MetadataWellLevel.ConcentrationUnit.Selected;
 			}
 			if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
 				values.TransfectionReagentAmount = this.Controls.MetadataWellLevel.TransfectionReagentAmount.getValue();
+				values.TransfectionReagentAmountUnit = this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.Selected;
 			}
 			let totalUpdated = 0;
 			let totalEmpty = 0;
@@ -1372,10 +1404,10 @@ class Editor {
 					this.Console.log({Message: `Number of Cells per Well: ${values.NumberOfCellsPerWell}`, Gravity: "Success"});
 				}
 				if (this.Controls.MetadataWellLevel.UpdateConcentration.Value) {
-					this.Console.log({Message: `Concentration: ${values.Concentration}`, Gravity: "Success"});
+					this.Console.log({Message: `Concentration: ${[values.Concentration, values.ConcentrationUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 				}
 				if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
-					Editor.Console.log({Message: `Transfection Reagent Amount: ${values.TransfectionReagentAmount}`, Gravity: "Success"});
+					Editor.Console.log({Message: `Transfection Reagent Amount: ${[values.TransfectionReagentAmount, values.TransfectionReagentAmountUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 				}
 			}
 			if (totalEmpty > 0) {
@@ -1405,6 +1437,8 @@ class Editor {
 	static resetWellMetadataControls() {
 		this.Controls.MetadataWellLevel.NumberOfCellsPerWell.setValue("");
 		this.Controls.MetadataWellLevel.Concentration.setValue("");
+		this.Controls.MetadataWellLevel.ConcentrationUnit.setValue(0);
 		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue("");
+		this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.setValue(0);
 	}
 }

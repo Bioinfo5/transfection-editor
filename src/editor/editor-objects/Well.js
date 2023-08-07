@@ -207,9 +207,11 @@ class Well {
 		}
 		if (I.Concentration) {
 			this.Metadata.Concentration = parseFloat(I.Concentration);
+			this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
 		}
 		if (I.TransfectionReagentAmount) {
 			this.Metadata.TransfectionReagentAmount = parseFloat(I.TransfectionReagentAmount);
+			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
 		}
 	}
 

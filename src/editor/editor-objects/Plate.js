@@ -18,10 +18,9 @@ class Plate {
 			Selection: root + "_Selection",
 			LayerTab: root + "_LayerTab",
 			LayerSelect: root + "_LayerSelect",
+			Views: root + "_Views",
 		}
-		this.Options = {
-			AddToSel: LinkCtrl.new("Checkbox", {ID: this.Anchors.Selection, Default: false, Label: "Multiple", Title: "If turned on, selected wells will be added to the current selection. If you have a keyboard, keep the Ctrl key pressed down while selecting to obtain the same effect."}),
-		}
+		this.Options = { /* LinkCtrl instances */}
 		this.Controls = {
 			LayerSelect: LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Default: 0, Label: "Plate", List: [1], NavBar: true, Change: function(v) {
 				this.Layers[v].concMap(this.Anchors.LayerSelect)
@@ -129,9 +128,13 @@ class Plate {
 			layer.Wells.forEach(well => {
 				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${well.Index + 1}` : '';
 				const TRANSFECTION_POS = `${well.Name}`;
-				const TRANSFECTION_CONCENTRATION = well.Metadata.Concentration || 0;
+				const TRANSFECTION_CONCENTRATION = (well.Metadata.Concentration)
+					? [well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join('_')
+					: '';
 				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || 0;
-				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount || 0;
+				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount
+					?  [well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
+					: '';
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
@@ -268,31 +271,59 @@ class Plate {
 
 	//Methods
 	init() {
-		let out = GetId(this.Root);
-		let html = "";
-		html += "<div style=\"overflow: auto\">"; //Options ribbon
-			html += "<fieldset style=\"float: left\"><legend>Zoom</legend></fieldset>";
-			html += "<fieldset style=\"float: left\"><legend>Options</legend><div id=\"" + this.Anchors.Options + "\"></div></fieldset>";
-		html += "</div>";
-		html += "<div id=\"" + this.Anchors.LayerTab + "\" style=\"margin-top: 10px\"></div>"; //Tab container for plates (layers)
+		const out = GetId(this.Root);
+		let html = '';
+		html += '<div style="overflow: auto">'; //Options ribbon
+		html += '<fieldset style="float: left"><legend>Zoom</legend></fieldset>';
+		html += '<fieldset style="float: left"><legend>Options</legend><div id="' + this.Anchors.Options + '"></div></fieldset>';
+		html += '<fieldset style="float: left"><legend>Views</legend><div id="' + this.Anchors.Views + '"></div></fieldset>';
+		html += '</div>';
+		html += '<div id="' + this.Anchors.LayerTab + '" style="margin-top: 10px"></div>'; //Tab container for plates (layers)
 		out.innerHTML = html;
+
 		this.LayerTab.init();
 		this.Layers[0].init(); //Only one plate (layer) available at the beginning
-		Object.values(this.Options).forEach(function(o) {o.init()});
-		let b = LinkCtrl.buttonBar([
-			{Label: "Add plate", Title: "Add a new plate to the layout", Click: function() {this.addLayer()}.bind(this)},
-		], true); //Here true is set so that the buttons are added Inline
-		let o = GetId(this.Anchors.Options);
-		o.insertAdjacentHTML("beforeend", "&nbsp;");
-		o.append(b);
-		let z = LinkCtrl.buttonBar([ //Zoom controls
-			{Label: "", Title: "Zoom in on the layout, each well will be bigger", Icon: {Type: "ZoomIn"}, Click: function() {this.zoom(1)}.bind(this)},
-			{Label: "", Title: "Zoom out on the layout, each well will be smaller", Icon: {Type: "ZoomOut"}, Click: function() {this.zoom(-1)}.bind(this)},
+		Object.values(this.Options).forEach(function (o) {o.init();});
+
+		const buttonCreateLayout = LinkCtrl.buttonBar([{
+			Label: 'Add plate',
+			Title: 'Add a new plate to the layout',
+			Click: function () {this.addLayer();}.bind(this)
+		}], true); //Here true is set so that the buttons are added Inline
+
+		const optionsContainer = GetId(this.Anchors.Options);
+		optionsContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		optionsContainer.append(buttonCreateLayout);
+
+		const buttonOpenHTMLViewLayout = LinkCtrl.buttonBar([{
+			Label: 'HTML',
+			Title: 'Click here to view this plate as an html array',
+			Click: () => {
+				const htmlView = new HTMLView(this);
+				htmlView.init();
+			}
+		}], true);
+
+		const viewsContainer = GetId(this.Anchors.Views);
+		viewsContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		viewsContainer.append(buttonOpenHTMLViewLayout);
+
+		const buttonsZoomInOut = LinkCtrl.buttonBar([ //Zoom controls
+			{
+				Label: '',
+				Title: 'Zoom in on the layout, each well will be bigger',
+				Icon: {Type: 'ZoomIn'},
+				Click: function () {this.zoom(1);}.bind(this)
+			},
+			{
+				Label: '',
+				Title: 'Zoom out on the layout, each well will be smaller',
+				Icon: {Type: 'ZoomOut'},
+				Click: function () {this.zoom(-1);}.bind(this)
+			},
 		]);
-		out.children[0].children[0].append(z);
-		let s = LinkCtrl.buttonBar([ //Selection controls
-			{Label: "Clear", Title: "Unselect all wells for all plates", Click: function() {this.resetSelection()}.bind(this)},
-		], true);
+		out.children[0].children[0].append(buttonsZoomInOut);
+
 		this.grid();
 		Editor.resetMainMetadataControls();
 
