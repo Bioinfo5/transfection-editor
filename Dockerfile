@@ -1,5 +1,9 @@
 FROM nginx:alpine
 #ENV NODE_ENV=production
+
+ADD cp-https.crt /usr/local/share/ca-certificates/cp-https.crt
+RUN update-ca-certificates
+
 RUN apk update
 RUN apk add vim
 RUN apk add --update net-tools
