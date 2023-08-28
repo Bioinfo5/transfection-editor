@@ -204,6 +204,7 @@ class Well {
 	applyMetadata(I) {
 		if (I.NumberOfCellsPerWell) {
 			this.Metadata.NumberOfCellsPerWell = parseFloat(I.NumberOfCellsPerWell);
+			this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
 		}
 		if (I.Concentration) {
 			this.Metadata.Concentration = parseFloat(I.Concentration);

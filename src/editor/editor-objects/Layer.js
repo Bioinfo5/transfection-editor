@@ -192,7 +192,9 @@ class Layer {
 			if(e.touches !== undefined && e.touches.length > 1) {return}
 			let coords = Layer.getCoords(e);
 			let w = plate.wellAtPointer(coords, this);
-			plate.resetSelection(); //Reset previous selection for the entire plate
+			if (!e.ctrlKey) {
+				plate.resetSelection(); //Reset previous selection for the entire plate
+			}
 			plate.select(e, coords, {Start: w});
 		}.bind(this);
 		let up = function(e) { //Mouseup (touch end)
@@ -571,6 +573,7 @@ class Layer {
 		}
 		if (I.TransfectionEndPoint) {
 			this.Metadata.TransfectionEndPoint = parseFloat(I.TransfectionEndPoint);
+			this.Metadata.TransfectionEndPointUnit = I.TransfectionEndPointUnit;
 		}
 	}
 

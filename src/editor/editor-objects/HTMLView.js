@@ -265,7 +265,7 @@ class HTMLView {
             ? '<div>Transfection reagent LOT: ' + (layer.Metadata.TransfectionReagentLOT || '') + '</div>'
             : '')
           + ((metadataDisplayState.plate.transfectionEndPoint)
-            ? '<div>Transfetcion end point: ' + (layer.Metadata.TransfectionEndPoint || '') + '</div>'
+              ? '<div>Transfection end-point: ' + ([layer.Metadata.TransfectionEndPoint, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
           + '</p>'
           : '';
@@ -322,7 +322,7 @@ class HTMLView {
             }
           }
           if (metadataDisplayState.well.cellsPerWell && typeof well.Metadata.NumberOfCellsPerWell === 'number') {
-            metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${well.Metadata.NumberOfCellsPerWell || ''}</span></div>`;
+            metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${[well.Metadata.NumberOfCellsPerWell, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
           if (metadataDisplayState.well.concentration && typeof well.Metadata.Concentration === 'number') {
             metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${[well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;

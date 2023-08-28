@@ -103,6 +103,8 @@ class Plate {
 		const TRANSFECTION_SCIENTIST = this.Metadata.TransfectionScientist || '';
 		const TRANSFECTION_ID = this.Metadata.ExperimentID || '';
 		const output = [];
+		let sampleNameIndex = 1;
+
 		this.Layers.forEach(layer => {
 			const sameNames = this.Layers.filter(item => item.Name === layer.Name);
 			if (sameNames.length > 1) {
@@ -123,15 +125,19 @@ class Plate {
 			const TRANSFECTION_CELL_LINE_PASSAGE = layer.Metadata.CellLinePassage || 0;
 			const TRANSFECTION_REAGENT = layer.Metadata.TransfectionReagent || '';
 			const TRANSFECTION_REAGENT_LOT = layer.Metadata.TransfectionReagentLOT || '';
-			const TRANSFECTION_END_POINT = layer.Metadata.TransfectionEndPoint || 0;
+			const TRANSFECTION_END_POINT = (layer.Metadata.TransfectionEndPoint)
+				? [layer.Metadata.TransfectionEndPoint, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join('_')
+				: '';
 
 			layer.Wells.forEach(well => {
-				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${well.Index + 1}` : '';
+				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${sampleNameIndex}` : '';
 				const TRANSFECTION_POS = `${well.Name}`;
 				const TRANSFECTION_CONCENTRATION = (well.Metadata.Concentration)
 					? [well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join('_')
 					: '';
-				const TRANSFECTION_CELL_AMOUNT = well.Metadata.NumberOfCellsPerWell || 0;
+				const TRANSFECTION_CELL_AMOUNT = (well.Metadata.NumberOfCellsPerWell)
+					? [well.Metadata.NumberOfCellsPerWell, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join('_')
+					: '';
 				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount
 					?  [well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
 					: '';
@@ -141,7 +147,8 @@ class Plate {
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT,
 					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT
-				})
+				});
+				sampleNameIndex = sampleNameIndex + 1;
 			})
 		})
 
@@ -789,7 +796,7 @@ class Plate {
 			Selected: 0,
 			Size: this.WellSize,
 			Margin: this.WellMargin,
-			Keep: this.Options.KeepSelected.getValue(),
+			Keep: false,
 		}
 		this.Layers.forEach(function(l) {
 			l.tagConc(I);
@@ -817,7 +824,7 @@ class Plate {
 	tagDRC(I) { //Tag the DRC in the selected wells
 		I.Size = this.WellSize;
 		I.Margin = this.WellMargin;
-		I.Keep = this.Options.KeepSelected.getValue();
+		I.Keep = false;
 		I.Selected = 0;
 		this.Layers.forEach(function(l) {
 			l.tagDRC(I);

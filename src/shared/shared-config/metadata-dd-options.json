@@ -28,6 +28,13 @@
     "Lipofectamine_LTX",
     "jetPRIME"
   ],
+  "transfection_end_point_units": [
+    "h"
+  ],
+  "number_of_cells_per_well_units": [
+    "M",
+    "K"
+  ],
   "concentration_units": [
     "nM",
     "uM"
