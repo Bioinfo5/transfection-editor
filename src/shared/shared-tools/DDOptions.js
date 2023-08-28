@@ -6,6 +6,8 @@ class DDOptions {
       transfectionScientist: [],
       cellLine: [],
       transfectionReagent: [],
+      transfectionEndPointUnit: [],
+      numberOfCellsPerWellUnit: [],
       concentrationUnit: [],
       transfectionReagentAmountUnit: [],
     };
@@ -16,6 +18,8 @@ class DDOptions {
       this.MetadataDDOptions.transfectionScientist = (result) ? result.transfection_scientist : [];
       this.MetadataDDOptions.cellLine = (result) ? result.cell_line : [];
       this.MetadataDDOptions.transfectionReagent = (result) ? result.transfection_reagent : [];
+      this.MetadataDDOptions.transfectionEndPointUnit = (result) ? result.transfection_end_point_units : [];
+      this.MetadataDDOptions.numberOfCellsPerWellUnit = (result) ? result.number_of_cells_per_well_units : [];
       this.MetadataDDOptions.concentrationUnit = (result) ? result.concentration_units : [];
       this.MetadataDDOptions.transfectionReagentAmountUnit = (result) ? result.transfection_reagent_amount_units : [];
     } catch (e) {
@@ -33,6 +37,14 @@ class DDOptions {
 
   static transfectionReagentOptions() {
     return ['Please select', ...this.MetadataDDOptions.transfectionReagent];
+  }
+
+  static TransfectionEndPointUnitOptions() {
+    return [...this.MetadataDDOptions.transfectionEndPointUnit];
+  }
+
+  static NumberOfCellsPerWellUnitOptions() {
+    return [...this.MetadataDDOptions.numberOfCellsPerWellUnit];
   }
 
   static ConcentrationUnitOptions() {
