@@ -297,10 +297,20 @@ class Plate {
 			Title: 'Add a new plate to the layout',
 			Click: function () {this.addLayer();}.bind(this)
 		}], true); //Here true is set so that the buttons are added Inline
+		const buttonDuplicateLayouts = LinkCtrl.buttonBar([{
+			Label: 'Duplicate plates',
+			Title: 'Duplicate selected plates',
+			Click: () => {
+				const duplicateMultiPlates = new DuplicateMultiPlates(this);
+				duplicateMultiPlates.init();
+			}
+		}], true); //Here true is set so that the buttons are added Inline
 
 		const optionsContainer = GetId(this.Anchors.Options);
 		optionsContainer.insertAdjacentHTML('beforeend', '&nbsp;');
 		optionsContainer.append(buttonCreateLayout);
+		optionsContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		optionsContainer.append(buttonDuplicateLayouts);
 
 		const buttonOpenHTMLViewLayout = LinkCtrl.buttonBar([{
 			Label: 'HTML',
