@@ -12,13 +12,21 @@ class Plate {
 		this.Selecting = undefined; //Object to handle the selection
 		this.Metadata = {};
 		this.SelectedLayer = undefined;
+		this.DisplayFlowPanel = false;
 
 		this.Anchors = {
+			Zoom: root + "_Zoom",
 			Options: root + "_Options",
 			Selection: root + "_Selection",
 			LayerTab: root + "_LayerTab",
+			TargetLayerTab: root + "_TargetLayerTab",
 			LayerSelect: root + "_LayerSelect",
 			Views: root + "_Views",
+			Mode: root + "_Mode",
+			Actions: root + "_Actions",
+			FlowRecordHistory: root + "_FlowRecordHistory",
+			WellSourcesCountColorsMap: root + "_WellSourcesCountColorsMap",
+			SwitchModeBtn: root + "_SwitchModeBtn",
 		}
 		this.Options = { /* LinkCtrl instances */}
 		this.Controls = {
@@ -46,7 +54,30 @@ class Plate {
 			AfterDuplicate: function (l, t) {this.duplicateLayer(l, t)}.bind(this),
 			AfterSelect: function (l) {this.selectLayer(l)}.bind(this),
 			AfterRename: function (index, value) {this.renameLayer(index, value)}.bind(this),
+			Sortable: true,
 		});
+
+		this.TargetLayerSelecting = undefined;
+		this.TagretLastKey = 1; //Index to use for new layers, to guarantee unicity
+		const firstTargetLayer = new TargetLayer({Rows: r, Cols: c, Index: 0, ArrayIndex: 0, Plate: this});
+		this.TargetLayers = [firstTargetLayer];
+		this.TargetLayerTab = new TabControl({
+			ID: this.Anchors.TargetLayerTab,
+			Multiple: true,
+			Tabs: [{
+				Label: firstTargetLayer.Name,
+				Active: true,
+				Controls: ["Rename", "Duplicate", "Delete"],
+				Content: {Type: "HTML", Value: TargetLayer.rootHTML(firstTargetLayer.Name, this.TargetLayers[0].Root)}
+			}],
+			AfterDelete: function(l) {this.deleteLayer(l)}.bind(this),
+			AfterDuplicate: function (l, t) {this.duplicateLayer(l, t)}.bind(this),
+			AfterSelect: function (l) {this.selectLayer(l)}.bind(this),
+			AfterRename: function (index, value) {this.renameLayer(index, value)}.bind(this),
+		});
+
+		this.FlowActionsHistory = new FlowActionsHistory(this);
+
 		return this;
 	}
 	//Static Methods
@@ -99,19 +130,29 @@ class Plate {
 
 	exportToXLSX() {
 		const today = new Date();
-		const TRANSFECTION_DATE = `${today.getDate()}${today.getMonth() + 1}${today.getFullYear()}`;
+		const TRANSFECTION_DATE = `${today.getDate()}.${("0" + (today.getMonth() + 1)).slice(-2)}.${today.getFullYear()}`;
 		const TRANSFECTION_SCIENTIST = this.Metadata.TransfectionScientist || '';
-		const TRANSFECTION_ID = this.Metadata.ExperimentID || '';
+		const TRANSFECTION_ID = (this.Metadata.ExperimentID || this.Metadata.ExperimentID === 0)
+			? `${this.Metadata.ExperimentID}`
+			: '';
 		const output = [];
 		let sampleNameIndex = 1;
 
-		this.Layers.forEach(layer => {
-			const sameNames = this.Layers.filter(item => item.Name === layer.Name);
+		const layersCopy = _.cloneDeep(this.Layers);
+		const tabs = Array.from(GetId(this.LayerTab.Anchors.TabHeaders).children);
+		tabs.forEach((tab, index) => {
+			const order = parseInt(tab.getAttribute('tabkey'), 10);
+			layersCopy[order].TabOrder = index;
+		})
+		const layers = _.sortBy(layersCopy, layer => layer.TabOrder);
+
+		layers.forEach(layer => {
+			const sameNames = layers.filter(item => item.Name === layer.Name);
 			if (sameNames.length > 1) {
 				sameNames.forEach((item, itemIndex) => {
-					const i = _.findIndex(this.Layers, l => l.Index === item.Index)
+					const i = _.findIndex(layers, l => l.Index === item.Index)
 					if (i >= 0) {
-						this.Layers[i].ExportedName = `${item.Name}_${Editor.alphabet[itemIndex].toLowerCase()}`;
+						layers[i].ExportedName = `${item.Name}_${Editor.alphabet[itemIndex].toLowerCase()}`;
 					}
 				});
 			} else {
@@ -119,33 +160,38 @@ class Plate {
 			}
 		})
 
-		this.Layers.forEach((layer) => {
+		layers.forEach((layer) => {
 			const TRANSFECTION_PLATE_NAME = layer.ExportedName;
 			const TRANSFECTION_CELL_LINE = layer.Metadata.CellLine || '';
-			const TRANSFECTION_CELL_LINE_PASSAGE = layer.Metadata.CellLinePassage || 0;
+			const TRANSFECTION_CELL_LINE_PASSAGE = (layer.Metadata.CellLinePassage || layer.Metadata.CellLinePassage === 0)
+				? `${layer.Metadata.CellLinePassage}`
+				: '';
 			const TRANSFECTION_REAGENT = layer.Metadata.TransfectionReagent || '';
 			const TRANSFECTION_REAGENT_LOT = layer.Metadata.TransfectionReagentLOT || '';
-			const TRANSFECTION_END_POINT = (layer.Metadata.TransfectionEndPoint)
-				? [layer.Metadata.TransfectionEndPoint, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join('_')
+			const TRANSFECTION_END_POINT = (layer.Metadata.TransfectionEndPoint || layer.Metadata.TransfectionEndPoint === 0)
+				? [`${layer.Metadata.TransfectionEndPoint}`, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join('_')
+				: '';
+			const VIABILITY_PERCENTAGE = (layer.Metadata.ViabilityPercentage || layer.Metadata.ViabilityPercentage === 0)
+				? [`${layer.Metadata.ViabilityPercentage}`, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join('_')
 				: '';
 
 			layer.Wells.forEach(well => {
 				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${sampleNameIndex}` : '';
 				const TRANSFECTION_POS = `${well.Name}`;
-				const TRANSFECTION_CONCENTRATION = (well.Metadata.Concentration)
-					? [well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join('_')
+				const TRANSFECTION_CONCENTRATION = (well.Metadata.Concentration || well.Metadata.Concentration === 0)
+					? [`${well.Metadata.Concentration}`, well.Metadata.ConcentrationUnit].filter(Boolean).join('_')
 					: '';
-				const TRANSFECTION_CELL_AMOUNT = (well.Metadata.NumberOfCellsPerWell)
-					? [well.Metadata.NumberOfCellsPerWell, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join('_')
+				const TRANSFECTION_CELL_AMOUNT = (well.Metadata.NumberOfCellsPerWell || well.Metadata.NumberOfCellsPerWell === 0)
+					? [`${well.Metadata.NumberOfCellsPerWell}`, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join('_')
 					: '';
-				const TRANSFECTION_REAGENT_AMOUNT = well.Metadata.TransfectionReagentAmount
-					?  [well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
+				const TRANSFECTION_REAGENT_AMOUNT = (well.Metadata.TransfectionReagentAmount || well.Metadata.TransfectionReagentAmount === 0)
+					?  [`${well.Metadata.TransfectionReagentAmount}`, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
 					: '';
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
-					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT,
+					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
 					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT
 				});
 				sampleNameIndex = sampleNameIndex + 1;
@@ -242,7 +288,7 @@ class Plate {
 							Form.close(id);
 						} },
 					],
-					onInit: function() {RangeIndex.init()},
+					onInit: function() {},
 				});
 			}
 			else {resolve(plate.tagArea(a, I))}
@@ -281,16 +327,43 @@ class Plate {
 		const out = GetId(this.Root);
 		let html = '';
 		html += '<div style="overflow: auto">'; //Options ribbon
-		html += '<fieldset style="float: left"><legend>Zoom</legend></fieldset>';
+		html += '<fieldset style="float: left"><legend>Mode</legend><div id="' + this.Anchors.Mode + '"></div></fieldset>';
+		html += '<fieldset style="float: left"><legend>Zoom</legend><div id="' + this.Anchors.Zoom + '"></div></fieldset>';
+
+		html += '<fieldset style="float: left"><legend>Flow Actions</legend><div id="' + this.Anchors.Actions + '"></div></fieldset>';
+
+
 		html += '<fieldset style="float: left"><legend>Options</legend><div id="' + this.Anchors.Options + '"></div></fieldset>';
 		html += '<fieldset style="float: left"><legend>Views</legend><div id="' + this.Anchors.Views + '"></div></fieldset>';
 		html += '</div>';
+
 		html += '<div id="' + this.Anchors.LayerTab + '" style="margin-top: 10px"></div>'; //Tab container for plates (layers)
+		html += '<div id="' + this.Anchors.TargetLayerTab + '" style="margin-top: 10px"></div>'; //Tab container for plates (layers)
+		html += '<div style="overflow: auto; display: flex"><fieldset style="margin-top: 10px; width: 50%;"><legend>Flow</legend><div id="' + this.Anchors.FlowRecordHistory + '"></div></fieldset>';
+		html += '<fieldset style="margin-top: 10px; width: 50%; height: max-content;"><legend>Legend</legend><div id="' + this.Anchors.WellSourcesCountColorsMap + '" class="WellColorMap">';
+		html += TargetWellColorsMap.getLegendHTML();
+		html += '</fieldset></div></div>';
+
 		out.innerHTML = html;
 
 		this.LayerTab.init();
 		this.Layers[0].init(); //Only one plate (layer) available at the beginning
+		this.TargetLayerTab.init();
+		this.TargetLayers[0].init(); //Only one plate (layer) available at the beginning
 		Object.values(this.Options).forEach(function (o) {o.init();});
+
+		const buttonSwitchMode = LinkCtrl.buttonBar([{
+			ID: this.Anchors.SwitchModeBtn,
+			Label: 'Flow',
+			Title: 'Switch mode',
+			Click: function () {
+				this.DisplayFlowPanel ? this.setEditMode() : this.setFlowRecordMode();
+			}.bind(this)
+		}], true);
+
+		const modeContainer = GetId(this.Anchors.Mode);
+		modeContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		modeContainer.append(buttonSwitchMode);
 
 		const buttonCreateLayout = LinkCtrl.buttonBar([{
 			Label: 'Add plate',
@@ -338,9 +411,47 @@ class Plate {
 				Icon: {Type: 'ZoomOut'},
 				Click: function () {this.zoom(-1);}.bind(this)
 			},
-		]);
-		out.children[0].children[0].append(buttonsZoomInOut);
+		], true);
 
+		const zoomContainer = GetId(this.Anchors.Zoom);
+		zoomContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		zoomContainer.append(buttonsZoomInOut);
+
+		const actionsButtons = LinkCtrl.buttonBar([
+			{
+				Label: 'Add target plate',
+				Title: 'Creates a new target plate',
+				Click: function () {this.addTargetLayer()}.bind(this)
+			},
+			{
+				Label: 'Copy',
+				Title: 'Copy selected wells',
+				Click: function () {this.openVolumeForm()}.bind(this)
+			},
+			{
+				Label: 'Paste',
+				Title: 'Paste into selected wells',
+				Click: function () {this.pasteSelected()}.bind(this)
+			},
+			{
+				Label: 'Reset',
+				Title: 'Reset record',
+				Click: function () {this.resetFlowHistory()}.bind(this)
+			},
+			{
+				Label: 'Export to CSV',
+				Title: 'Export to CSV file',
+				Click: function () {this.FlowActionsHistory.exportToCSV()}.bind(this)
+			}
+		], true);
+
+		const actionsContainer = GetId(this.Anchors.Actions);
+		actionsContainer.insertAdjacentHTML('beforeend', '&nbsp;');
+		actionsContainer.append(actionsButtons);
+
+		this.FlowActionsHistory.init()
+
+		this.setEditMode();
 		this.grid();
 		Editor.resetMainMetadataControls();
 
@@ -410,6 +521,217 @@ class Plate {
 			return {Col: col, Row: row, Layer: l, Index: row * this.Cols + col, Header: true}
 		}
 	}
+
+	setEditMode() {
+		[
+			GetId(this.Anchors.Actions),
+			GetId(this.Anchors.FlowRecordHistory),
+			GetId(this.Anchors.WellSourcesCountColorsMap),
+		].forEach((element) => {
+			element.parentElement.style.display = 'none';
+		});
+		[
+			GetId(this.Anchors.TargetLayerTab)
+		].forEach((element) => {
+			element.style.display = 'none';
+		});
+		[
+			GetId(this.Anchors.Options),
+			GetId(this.Anchors.Views)
+		].forEach(element => {
+			element.parentElement.style.display = 'block';
+		});
+		GetId(this.Anchors.SwitchModeBtn).innerText = 'Flow';
+		this.DisplayFlowPanel = false;
+	}
+
+	setFlowRecordMode() {
+		[
+			GetId(this.Anchors.Actions),
+			GetId(this.Anchors.FlowRecordHistory),
+			GetId(this.Anchors.WellSourcesCountColorsMap),
+		].forEach((element) => {
+			element.parentElement.style.display = 'block';
+		});
+		[
+			GetId(this.Anchors.TargetLayerTab)
+		].forEach((element) => {
+			element.style.display = 'block';
+		});
+		[
+			GetId(this.Anchors.Options),
+			GetId(this.Anchors.Views)
+		].forEach(element => {
+			element.parentElement.style.display = 'none';
+		});
+		GetId(this.Anchors.SwitchModeBtn).innerText = 'Edit';
+		this.DisplayFlowPanel = true;
+	}
+
+//**************
+//FLOW RECORDING METHODS
+//**************
+
+	addTargetLayer() {
+		let l = this.TagretLastKey++; //Index of the new plate (layer) to add
+		let newLayer = new TargetLayer({
+			Rows: this.Rows,
+			Cols: this.Cols,
+			Index: l,
+			ArrayIndex: this.TargetLayers.length,
+			Plate: this
+		});
+		this.TargetLayers.push(newLayer);
+		this.TargetLayerTab.addTab({
+			Label: newLayer.Name,
+			SetActive: true,
+			Controls: ["Rename", "Duplicate", "Delete"],
+			Content: {Type: "HTML", Value: TargetLayer.rootHTML(newLayer.Name, newLayer.Root)}
+		});
+		newLayer.init().grid(this.Grid);
+		Editor.ResultManager.layerUpdate(); //Update the plate (layer) control
+		return this;
+	}
+
+	openVolumeForm() {
+		const id = "Form_VolumeSelector";
+		const control = id + "_Control";
+		const volumeInput = LinkCtrl.new("Number", {
+			ID: "Input_Volume",
+			Title: "Volume",
+			Min: 0,
+			Default: 20,
+			Label: "Volume",
+			Preserve: true,
+			Chain: {Index: 0}
+		})
+		let html = '<div id="' + control + '">';
+		html += '<div id="' + volumeInput.ID + '">';
+		html += '</div>';
+		html += '</div>';
+
+		Form.open({
+			ID: id,
+			HTML: html,
+			Title: "Volume",
+			Buttons: [
+				{
+					Label: "Ok",
+					Click: function() {
+						if (this.FlowActionsHistory) {
+							this.copySelected(volumeInput.Value);
+						}
+						Form.close(id);
+					}.bind(this)
+				},
+				{
+					Label: "Cancel",
+					Click: function() {Form.close(id)}
+				},
+			],
+			onInit: function() {
+				volumeInput.init();
+			},
+		});
+	}
+
+	copySelected(volume) {
+		const cache = [];
+		this.FlowActionsHistory.clearCached();
+		this.Layers.forEach(layer => {
+			if (layer.Selected) {
+				layer.Selected.forEach(selected => {
+					if (selected.Area) {
+						cache.push({
+							sampleName: selected.Area.Name,
+							sourceWell: selected.Name,
+							sourcePlate: layer.Name,
+							volume
+						})
+					}
+				})
+			}
+		})
+
+		if (cache.length) {
+			cache.forEach(action => this.FlowActionsHistory.cacheAction(action));
+		}
+	}
+
+	pasteSelected() {
+		const targetCache = [];
+		this.TargetLayers.forEach(layer => {
+			if (layer.Selected) {
+				layer.Selected.forEach(selected => {
+					targetCache.push({
+						targetWell: selected.Name,
+						targetPlate: layer.Name
+					});
+				});
+			}
+		});
+
+		if (targetCache.length) {
+			targetCache.forEach((action, index) => this.FlowActionsHistory.saveCachedToHistory(action));
+		}
+
+		this.updateWellColors();
+	}
+
+	updateWellColors() {
+		const wellsPerPlateCount = this.FlowActionsHistory.calculateWellsFrequency();
+		this.TargetLayers.forEach(layer => {
+			const wellsCount = wellsPerPlateCount[layer.Name];
+			if (wellsCount) {
+				layer.Wells.forEach(well => {
+					const count = wellsCount[well.Name];
+					if (count) {
+						well.setArea({Color: `#${TargetWellColorsMap.getColor(count)}`});
+					} else {
+						well.resetArea();
+					}
+				});
+			}
+		});
+
+		this.update();
+	}
+
+	resetFlowHistory() {
+		const id = "Form_VolumeSelector";
+
+		let html = '<div>';
+		html += 'Are you sure you want to reset all flow records?';
+		html += '</div>';
+
+		Form.open({
+			ID: id,
+			HTML: html,
+			Title: "Reset ",
+			Buttons: [
+				{
+					Label: "Ok",
+					Click: function() {
+						if (this.FlowActionsHistory) {
+							this.FlowActionsHistory.reset();
+						}
+						this.TargetLayers.forEach(layer => {
+							layer.Wells.forEach(well => {
+								well.resetArea();
+							})
+						})
+						this.update();
+						Form.close(id);
+					}.bind(this)
+				},
+				{
+					Label: "Cancel",
+					Click: function() {Form.close(id)}
+				},
+			],
+		});
+	}
+
 //**************
 //CANVAS METHODS
 //**************
@@ -445,6 +767,9 @@ class Plate {
 		this.Layers.forEach(function(L) { //redraw all plates (layers)
 			L.content(size, margin);
 		}, this);
+		this.TargetLayers.forEach(function(L) { //redraw all plates (layers)
+			L.content(size, margin);
+		}, this);
 		return this;
 	}
 	grid() { //Draw the grid layer at the current zoom level
@@ -472,6 +797,9 @@ class Plate {
 			ctx.fillText(i+1, x + size / 2, space / 2); //Column header
 		}
 		this.Layers.forEach(function(l) { //Apply the new grid to all layers
+			l.grid(G);
+		});
+		this.TargetLayers.forEach(function(l) { //Apply the new grid to all layers
 			l.grid(G);
 		});
 		this.header(); //Update fixed layer to match the new dimensions
@@ -533,6 +861,15 @@ class Plate {
 		this.Highlighting = w;
 		let todo = this.drawHighlight(w);
 		this.Layers.forEach(function(l) {
+			l.highlight(todo);
+		});
+		Editor.ResultManager.highlight(todo);
+		return this;
+	}
+	highlightTargetLayer(e, w) { //Highlight selected well w for all plates (layers) and display the info popup
+		this.Highlighting = w;
+		let todo = this.drawHighlight(w);
+		this.TargetLayers.forEach(function(l) {
 			l.highlight(todo);
 		});
 		Editor.ResultManager.highlight(todo);
@@ -710,6 +1047,170 @@ class Plate {
 		}
 		return this;
 	}
+//*****************
+//TARGET LAYER SELECTION METHODS
+//*****************
+	targetSelect(e, coords, I) { //Handle the selection process
+		if(I.Start) {
+			this.startTargetSelection(e, coords, I.Start);
+		}
+		if(I.Stop) {
+			if(this.TargetLayerSelecting) {
+				if(I.Layer !== undefined) {
+					let L = this.TargetLayers.find(function(e) {return e.Index == I.Layer});
+					if(L !== undefined) {L.select(this.TargetLayerSelecting.Includes, this.WellSize, this.WellMargin)}
+				}
+				setTimeout(() => {
+					/* this.TargetLayerSelecting.Box.remove(); for some reasons blocks the click event propagation,
+					so execution is postponed to few ms */
+					if (this.TargetLayerSelecting) {
+						this.TargetLayerSelecting.Box.remove(); //Remove the 2 HTML canvas elements
+						this.TargetLayerSelecting.Select.remove();
+					}
+					this.TargetLayerSelecting = undefined;
+				}, 100)
+			}
+			GetId(Editor.Anchors.Popup.Select).innerHTML = ""; //Remove the selection information
+			if(GetId(Editor.Anchors.Popup.Area).innerHTML.length + GetId(Editor.Anchors.Popup.Conc).innerHTML.length == 0) {this.infoTargetPopup()} //Hide the tooltip if nothing else to show
+		}
+		if(I.Move) {
+			this.moveTargetSelection(e, coords, I.Move);
+		}
+		return this;
+	}
+
+	resetTargetSelection() { //Reset selection for all the plates (layers)
+		let size = this.WellSize;
+		let margin = this.WellMargin;
+		this.TargetLayers.forEach(function(L) {
+			L.unselect(size, margin);
+		});
+		return this;
+	}
+
+	startTargetSelection(e, coords, w) { //Start the selection process
+		let B = document.createElement("canvas"); //Create 2 new canvas, one is for the selection box, the other is for the highlight of the selected wells
+		let width = this.Grid.width;
+		B.width = width;			   //
+		B.height = this.Grid.height;   //
+		B.style.position = "absolute"; // Adjust dimensions and styling of first canvas, box
+		B.style.left = 0;			   //
+		B.style.top = 0;			   //
+		B.style.zIndex = 10; //To be on top of the pile
+		B.style.width = (width / Editor.pixelRatio) + "px";
+		let S = B.cloneNode(); //Second canvas (select) is cloned from the first
+		S.style.zIndex = -1; //To be at the bottom
+		S.style.width = (width / Editor.pixelRatio) + "px";
+		Plate.styleCtx(B.getContext("2d"), "selectBox");
+		let ctx = S.getContext("2d");
+		Plate.styleCtx(ctx, "selecting");
+		e.target.parentElement.append(B); //Append both canvas to the page
+		e.target.parentElement.append(S); //
+		this.TargetLayerSelecting = {Start: w, Box: B, Select: S, x: coords.layerX, y: coords.layerY, LastVisited: w, Includes: [w]} //Update the Select object
+		this.drawTargetWellsInLasso(ctx, w);
+	}
+	moveTargetSelection(e, coords, w) {
+		var x = this.TargetLayerSelecting.x;
+		var y = this.TargetLayerSelecting.y;
+		var B = this.TargetLayerSelecting.Box;
+		var ctx = B.getContext("2d");
+		ctx.clearRect(0, 0, B.width, B.height); //Draw the selection lasso
+		ctx.fillRect(x, y, coords.layerX - x, coords.layerY - y);
+		ctx.strokeRect(x, y, coords.layerX - x, coords.layerY - y);
+		if(w.Index == this.TargetLayerSelecting.LastVisited.Index) {return} //Cursor is still on the same well, no need to update the selection
+		else { //Update the selection
+			var S = this.TargetLayerSelecting.Select;
+			var ctx = S.getContext("2d");
+			ctx.clearRect(0, 0, S.width, S.height); //Reset the canvas
+			this.drawTargetWellsInLasso(ctx, w); //Draw again
+			this.TargetLayerSelecting.LastVisited = w;
+		}
+	}
+	drawTargetWellsInLasso(ctx, w) { //Draw wells in lasso on the canvas context
+		let size = this.WellSize;
+		let margin = this.WellMargin;
+		let start = this.TargetLayerSelecting.Start;
+		this.TargetLayerSelecting.Includes = [];
+		let startRow = Math.min(start.Row, w.Row);
+		let startCol = Math.min(start.Col, w.Col);
+		let spanRow = Math.abs(start.Row - w.Row) + 1; //The number of rows in the lasso
+		let spanCol = Math.abs(start.Col - w.Col) + 1; //The number of cols in the lasso
+		let html = "R <b>";
+		if(startRow == -1) { //When a header is selected, extend the selection to the whole row
+			spanRow = this.Rows + 1;
+			html += this.Rows;
+		}
+		else {html += spanRow}
+		html += " &times; ";
+		if(startCol == -1) { //Or the whole column (or both...)
+			spanCol = this.Cols + 1;
+			html += this.Cols;
+		}
+		else {html += spanCol}
+		GetId(Editor.Anchors.Popup.Select).innerHTML = html + "</b> C";
+		let hor = startCol + spanCol;
+		let ver = startRow + spanRow;
+		let x = (size + margin) * (startCol + 1);
+		let y = (size + margin) * (startRow + 1);
+		let L = this.TargetLayers.find(function(e) {return e.Index == w.Layer.Index});
+		if(L === undefined) {console.warn("Could not find the plate with index " + w.Layer.Index); return} //Could not find the plate (layer)
+		for(let i=startCol;i<hor;i++) { //Loop covering the wells under the lasso, col first
+			for(let j=startRow;j<ver;j++) { //then row
+				if(j == startRow) {y = (size + margin) * (startRow + 1)}
+				if(i > -1 && j > -1) {
+					this.TargetLayerSelecting.Includes.push(L.Wells[i + j * this.Cols]);
+				}
+				ctx.fillRect(x - 3, y - 3, size + 6, size + 6);
+				y += size + margin;
+			}
+			x += size + margin;
+		}
+	}
+
+	infoTargetPopup(e, w, data) { //Display/hide the info popup giving well informations
+		let pop = Editor.Anchors.Popup;
+		let me = GetId(pop.Root);
+		if(e === undefined) {me.style.display = "none"; return this} //Hide if nothing to display
+		let show = false;
+		if(w.Header) {GetId(pop.Well).innerHTML = ""}
+		else { //Well name
+			GetId(pop.Well).innerHTML = Well.alphabet(w.Row) + (w.Col + 1);
+			show = true;
+		}
+		let A = w.Area;
+		if(A) {
+			GetId(pop.Area).innerHTML = "<span class=\"Boxed\">" + TypeMap.symbolForValue(TypeMap.valueForType(A.Type)) + "</span>" + A.Name + " <span id=\"" + pop.ResolvedName + "\"></span>";
+			show = true;
+		}
+		else {GetId(pop.Area).innerHTML = ""}
+		if(w.Conc) {
+			GetId(pop.Conc).innerHTML = Well.dose(w);
+			show = true;
+		}
+		else {GetId(pop.Conc).innerHTML = ""}
+		if(data) {
+			GetId(pop.Data).innerHTML = "Resolving value..."
+			data.Result.getValue(data.Parameter, w).then(function(value) {
+				if(value !== undefined) {GetId(pop.Data).innerHTML = value} //Zero is a falsy value, so a test against "undefined" should be used
+				else {GetId(pop.Data).innerHTML = ""}
+			}.bind(this));
+		}
+		else {GetId(pop.Data).innerHTML = ""}
+		if(show == false && this.TargetLayerSelecting === undefined) {me.style.display = "none"; return this} //Hide if nothing to display
+		me.style.display = "block";
+		if(A && A.Type == "Range") {
+			GetId(pop.ResolvedName).innerHTML = "(Resolving name...)";
+			Area.fetchRangeItem(A, w).then(function(name) { //Fetch the resolved name
+				if(this.Highlighting && this.Highlighting.Area) { //Then check if the cursor is still located at the previous location
+					if(this.Highlighting.Area.Name == A.Name && this.Highlighting.RangeIndex == w.RangeIndex) { //Display cancelled if name is different or if same name but different rangeIndex
+						GetId(pop.ResolvedName).innerHTML = "(" + name + ")";
+					}
+				}
+			}.bind(this));
+		}
+		return this;
+	}
+
 //*****************
 //MAPS METHODS
 //*****************
@@ -918,7 +1419,7 @@ class Plate {
 	}
 
 	applyMetadata(I) {
-		if (I.ExperimentID) {
+		if (I.ExperimentID || I.ExperimentID === 0) {
 			this.Metadata.ExperimentID = I.ExperimentID;
 		}
 		if (I.TransfectionScientist) {

@@ -1,0 +1,23 @@
+.WellColorMap {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.WellColorMap_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.WellColorMap_color {
+    width: 16px;
+    height: 16px;
+    border: 1px solid black;
+}
+
+.WellColorMap_name {
+    margin-left: 0.5em;
+    font-weight: 700;
+}

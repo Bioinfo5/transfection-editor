@@ -7,17 +7,27 @@ const clean = require("gulp-clean");
 const zip = require("gulp-zip");
 const rename = require("gulp-rename");
 const mergeStream = require("merge-stream");
+const change = require('gulp-change');
 
 const paths = {
 	src: "src/",
 	dest: "./dist",
+	root: "."
 }
+
+function updateVersion(content) {
+	const title = `<title>1E Therapeutics Plate Editor - ${process.env.npm_package_version}</title>`;
+	return content.replace(/<title>.*<\/title>/g, title);
+}
+
 gulp.task("clean", function(cb) {
 	return gulp.src("dist/*", {read: false})
 	.pipe(clean());
 });
 gulp.task("build", function(cb) {
-	//let apps = ["editor", "plotter", "helper", "grapher", "shared", "analyzer", "ui"];
+	gulp.src('./Editor.html')
+		.pipe(change(updateVersion))
+		.pipe(gulp.dest(paths.root));
 	const apps = ["editor", "shared", "analyzer", "ui"];
 	apps.forEach(function(a) { //Loop the array of apps to build
 		//Build the js files
@@ -52,6 +62,7 @@ gulp.task("release", function(cb) {
 	});
 	stream.add(
 		gulp.src("Editor.html")
+			.pipe(change(updateVersion))
 	);
 	stream.pipe(zip("Release.zip"))
 	.pipe(gulp.dest(paths.dest));

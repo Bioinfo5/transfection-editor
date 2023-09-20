@@ -1,6 +1,6 @@
 {
   "name": "plateeditor",
-  "version": "1.0.0",
+  "version": "1.5.5",
   "description": "PlateEditor is a free web application to work with multi-well plates, from creation of layouts to data visualization and aggregation",
   "main": "gulpfile.js",
   "scripts": {
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/vindelorme/PlateEditor#readme",
   "dependencies": {
+    "gulp-change": "^1.0.2",
     "jszip": "^3.6.0",
     "papaparse": "^5.3.0"
   },

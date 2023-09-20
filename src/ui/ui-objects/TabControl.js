@@ -17,8 +17,12 @@ class TabControl {
     this.AfterDuplicate = (I.AfterDuplicate || function (i) {
     });
 		this.AfterRename = (I.AfterRename || function(i) {});
-		this.AfterSelect = (I.AfterSelect || function (i) {
-    });
+		this.AfterSelect = (I.AfterSelect || function (i) {});
+    this.Sortable = I.Sortable || false;
+    this.Anchors = {
+      TabHeaders: this.ID + "_Tab_Headers_Container",
+      TabContent: this.ID + "_Tab_Content_Container",
+    };
     if (I.Tabs) {
       I.Tabs.forEach(function (t, i) { //Create the TabPanel Object using user input
         t.Key = i;
@@ -94,61 +98,87 @@ class TabControl {
 
   init() { //Initialize the html for the tabs in the ID container
     if (this.Tabs.length == 0) {
-      return this
+      return this;
     } //Nothing there, end of the story...
-    var container = GetId(this.ID);
+
+    const container = GetId(this.ID);
     if (container === null || container === undefined) {
-      return this
+      return this;
     } //Do nothing if the container does not exist
-    if (!container.classList.contains("LinkCtrl_Tab")) {
-      container.classList.add("LinkCtrl_Tab")
+    if (!container.classList.contains('LinkCtrl_Tab')) {
+      container.classList.add('LinkCtrl_Tab');
+    } //Add classes for the tab
+    if (!container.classList.contains('LinkCtrl_Round')) {
+      container.classList.add('LinkCtrl_Round');
     }
-    ; //Add classes for the tab
-    if (!container.classList.contains("LinkCtrl_Round")) {
-      container.classList.add("LinkCtrl_Round")
-    }
-    ;
-    var html = "";
+
+    let html = '';
     switch (this.Layout) {
-      case "Horizontal": //In this case, the headers are prepared first horizontally, followed by the contents
-        html += "<div class=\"LinkCtrl_TabHeaders\">"; //Wrapper div for the headers
+      case 'Horizontal': //In this case, the headers are prepared first horizontally, followed by the contents
+        html += '<div class="LinkCtrl_TabHeaders LinkCtrl_TabHeaders_Horizontal" id="' + this.Anchors.TabHeaders + '">'; //Wrapper div for the headers
         this.Tabs.forEach(function (t, i) {
           html += t.initHeader();
         });
-        html += "</div>"; //End of Header wrapper
-        html += "<div class=\"LinkCtrl_TabContents\">"; //Wrapper div for the contents
+        html += '</div>'; //End of Header wrapper
+        html += '<div class="LinkCtrl_TabContents" id="' + this.Anchors.TabContent + '">'; //Wrapper div for the contents
         this.Tabs.forEach(function (t) { //Add the contents
           html += t.initContent();
         });
-        html += "</div>"; //End of Content wrapper
+        html += '</div>'; //End of Content wrapper
         break;
-      case "Menu": //In this case, contents are displayed directly below the active headers, on top of each others
+      case 'Menu': //In this case, contents are displayed directly below the active headers, on top of each others
         this.Tabs.forEach(function (t) {
-          html += "<div class=\"LinkCtrl_TabHeaders\">" + t.initHeader() + "</div>";
-          html += "<div class=\"LinkCtrl_TabContents\">" + t.initContent() + "</div>";
-        });
+          html += '<div class="LinkCtrl_TabHeaders" id="' + this.Anchors.TabHeaders + '">' + t.initHeader() + '</div>';
+          html += '<div class="LinkCtrl_TabContents" id="' + this.Anchors.TabContent + '">' + t.initContent() + '</div>';
+        }.bind(this));
         break;
-      case "Vertical": //In this case, headers are displayed in a column, then contents are adjacent and also in a column
-        html += "<div class=\"LinkCtrl_TabHeaders\" style=\"float: left;\">"; //Wrapper div for the headers
+      case 'Vertical': //In this case, headers are displayed in a column, then contents are adjacent and also in a column
+        html += '<div class="LinkCtrl_TabHeaders"  id="' + this.Anchors.TabHeaders + '" style="float: left;">'; //Wrapper div for the headers
         this.Tabs.forEach(function (t, i) {
-          html += t.initHeader() + "<br>";
+          html += t.initHeader() + '<br>';
         });
-        html += "</div>"; //End of Header wrapper
-        html += "<div class=\"LinkCtrl_TabContents\">"; //Wrapper div for the contents
+        html += '</div>'; //End of Header wrapper
+        html += '<div class="LinkCtrl_TabContents" id="' + this.Anchors.TabContent + '">'; //Wrapper div for the contents
         this.Tabs.forEach(function (t) { //Add the contents
           html += t.initContent();
         });
-        html += "</div>"; //End of Content wrapper
+        html += '</div>'; //End of Content wrapper
         break;
       default:
         return this; //Exit here if an unknown layout is requested
     }
+
     if (this.Preserve) {
-      container.insertAdjacentHTML("beforeend", html)
+      container.insertAdjacentHTML('beforeend', html);
     } //Preserve previous content
     else {
-      container.innerHTML = html
+      container.innerHTML = html;
     } //Erase previous content
+
+    if (this.Sortable) {
+      const el = GetId(this.Anchors.TabHeaders);
+      Sortable.create(el, {
+        onChange: () => {
+          const contentContainer = GetId(this.Anchors.TabContent);
+          const plates = Array.from(GetId(this.Anchors.TabContent).children);
+          const platesMap = plates.reduce((acc, plate) => {
+            const index = plate.getAttribute('data-tabkey');
+            if (index) {
+              acc[index] = plate;
+            }
+
+            return acc;
+          }, {});
+          const tabs = Array.from(GetId(this.Anchors.TabHeaders).children);
+          const newOrder = tabs.map(tab => parseInt(tab.getAttribute('tabkey'), 10));
+
+          newOrder.forEach(tabKey => {
+            contentContainer.appendChild(platesMap[tabKey]);
+          });
+        },
+      });
+    }
+
     this.bindEvents(); //Attach the events to the tab headers
     return this;
   }

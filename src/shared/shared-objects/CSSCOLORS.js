@@ -41,6 +41,13 @@ class CSSCOLORS {
 			case "Simple": return [ //Alternative array of 16 unique, css lvl3, shuffled basic colors
 				"blue","green","maroon","orange","violet","olive","purple","darkcyan","red","gray","magenta","steelblue","yellowgreen","salmon","darkslateblue","black"
 			];
+			case "WellSourcesCountMap": return [
+				"2D728F",
+				"3B8EA5",
+				"F5EE9E",
+				"F49E4C",
+				"AB3428",
+			]
 			default: return [ //Array of 138 unique, css lvl3, shuffled color names
 				"lightskyblue","lightgreen","lightpink","plum","khaki","lightgray","ivory","lightcyan","lavenderblush","aquamarine","peachpuff","powderblue","lightsteelblue","lightsalmon","darkgray","orchid","lightyellow","lightgoldenrodyellow","papayawhip","greenyellow",
 				"yellow","cyan","moccasin","mediumaquamarine","azure","lightcoral","mintcream","pink","rosybrown","lemonchiffon","chartreuse","floralwhite","bisque","snow","white","palegreen","palegoldenrod","gainsboro","thistle","turquoise",
@@ -95,7 +102,7 @@ class CSSCOLORS {
 	}
 	static heatmap(c, min, max, colors) { //Return the heatmap color for the value c, normalized between min and max, following rgb color gradient given as 2d array [min[R, G, B], middle[R, G, B], max[R, G, B]]
 		if(min == max) {return "rgb(" + colors[1][0] + ", " + colors[1][1] + ", " + colors[1][2] + ")"} //Only one value, return the middle color
-		if(c <= min) {c = min} 
+		if(c <= min) {c = min}
 		if(c >= max) {c = max}
 		c = (c - min) / (max - min); //normalize value
 		if(c == 0.5) {return "rgb(" + colors[1][0] + ", " + colors[1][1] + ", " + colors[1][2] + ")"} //Easy

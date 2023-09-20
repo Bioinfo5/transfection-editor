@@ -81,9 +81,16 @@ class Editor {
 		this.Main = new TabControl({
 			ID: this.Anchors.Main.Root,
 			Multiple: true,
-			Layout: "Menu",
+			Layout: 'Horizontal',
 			Tabs: [
-				{Label: "Layout", Active: true, Content: {Type: "HTML", Value: "<div id=\"" + this.Anchors.Main.Plate + "\"><p>Choose a plate format or load a layout to start</p></div>"} },
+				{
+					Label: 'Layout',
+					Active: true,
+					Content: {
+						Type: 'HTML',
+						Value: '<div id="' + this.Anchors.Main.Plate + '"><p>Choose a plate format or load a layout to start</p></div>'
+					}
+				},
 			]
 		});
 		this.Tables = {
@@ -204,6 +211,36 @@ class Editor {
 					Title: "",
 					NewLine: true,
 					Chain: {Index: 7, Last: true}
+				}),
+				ViabilityPercentage: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Viability percentage",
+					Min: 0,
+					Max: 100,
+					Default: "",
+					Label: "Viability percentage",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 8, Last: false}
+				}),
+				ViabilityPercentageUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Viability percentage Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.ViabilityPercentageUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 9, Last: false}
+				}),
+				UpdateViabilityPercentage: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 10, Last: true}
 				}),
 			},
 			MetadataWellLevel: {
@@ -479,6 +516,7 @@ class Editor {
 				'TRANSFECTION_REAGENT',
 				'TRANSFECTION_REAGENT_LOT',
 				'TRANSFECTION_END_POINT',
+				'VIABILITY_PERCENTAGE',
 				'TRANSFECTION_ID',
 				'TRANSFECTION_SCIENTIST',
 				'TRANSFECTION_DATE',
@@ -495,6 +533,7 @@ class Editor {
 				item.TRANSFECTION_REAGENT,
 				item.TRANSFECTION_REAGENT_LOT,
 				item.TRANSFECTION_END_POINT,
+				item.VIABILITY_PERCENTAGE,
 				item.TRANSFECTION_ID,
 				item.TRANSFECTION_SCIENTIST,
 				item.TRANSFECTION_DATE,
@@ -509,7 +548,7 @@ class Editor {
 		let reasons = [];
 
 		if (
-			!this.Plate.Metadata.ExperimentID
+			(!this.Plate.Metadata.ExperimentID && this.Plate.Metadata.ExperimentID !== 0)
 			|| !this.Plate.Metadata.TransfectionScientist
 		) {
 			isValid = false;
@@ -523,6 +562,7 @@ class Editor {
 				|| !layer.Metadata.TransfectionReagent
 				|| !layer.Metadata.TransfectionReagentLOT
 				|| isNaN(layer.Metadata.TransfectionEndPoint)
+				|| isNaN(layer.Metadata.ViabilityPercentage)
 			) {
 				isValid = false;
 				reasons.push(`Plate ${layer.Name} metadata should be filled`);
@@ -647,7 +687,23 @@ class Editor {
 	}
 
 	static isMetadataIncluded(file) {
-		const exportedFileHeaders = ['SAMPLE_NAME', 'TRANSFECTION_POS', 'TRANSFECTION_CONCENTRATION', 'TRANSFECTION_CELL_AMOUNT', 'TRANSFECTION_PLATE_NAME', 'TRANSFECTION_CELL_LINE', 'TRANSFECTION_CELL_LINE_PASSAGE', 'TRANSFECTION_REAGENT', 'TRANSFECTION_REAGENT_AMOUNT', 'TRANSFECTION_REAGENT_LOT', 'TRANSFECTION_END_POINT', 'TRANSFECTION_ID', 'TRANSFECTION_SCIENTIST', 'TRANSFECTION_DATE'];
+		const exportedFileHeaders = [
+			'SAMPLE_NAME',
+			'TRANSFECTION_POS',
+			'TRANSFECTION_CONCENTRATION',
+			'TRANSFECTION_CELL_AMOUNT',
+			'TRANSFECTION_PLATE_NAME',
+			'TRANSFECTION_CELL_LINE',
+			'TRANSFECTION_CELL_LINE_PASSAGE',
+			'TRANSFECTION_REAGENT',
+			'TRANSFECTION_REAGENT_AMOUNT',
+			'TRANSFECTION_REAGENT_LOT',
+			'TRANSFECTION_END_POINT',
+			'VIABILITY_PERCENTAGE',
+			'TRANSFECTION_ID',
+			'TRANSFECTION_SCIENTIST',
+			'TRANSFECTION_DATE'
+		];
 
 		const workbook = XLSX.read(file);
 		const firstSheet = workbook.SheetNames[0];
@@ -744,7 +800,7 @@ class Editor {
 		return _.chain(data)
 			.map(item => item.TRANSFECTION_PLATE_INDEX)
 			.uniq()
-			.value();;
+			.value();
 	}
 
 	static getUniqLayerIndexesByArea(data, area) {
@@ -787,16 +843,21 @@ class Editor {
 				.value();
 
 			const [transfectionEndPoint, transfectionEndPointUnit] = row.TRANSFECTION_END_POINT.toString().split('_');
+			const [viabilityPercentage, viabilityPercentageUnit] = (row.VIABILITY_PERCENTAGE)
+				? row.VIABILITY_PERCENTAGE.toString().split('_')
+				: ['', ''];
 
 			return {
 				Index: row.TRANSFECTION_PLATE_INDEX,
 				Metadata: {
 					CellLine: row.TRANSFECTION_CELL_LINE,
-					CellLinePassage: row.TRANSFECTION_CELL_LINE_PASSAGE,
+					CellLinePassage: row.TRANSFECTION_CELL_LINE_PASSAGE.toString(),
 					TransfectionReagent: row.TRANSFECTION_REAGENT,
 					TransfectionReagentLOT: row.TRANSFECTION_REAGENT_LOT,
 					TransfectionEndPoint: transfectionEndPoint,
 					TransfectionEndPointUnit: transfectionEndPointUnit,
+					ViabilityPercentage: viabilityPercentage,
+					ViabilityPercentageUnit: viabilityPercentageUnit,
 				}
 			}
 		});
@@ -1383,6 +1444,7 @@ class Editor {
 				CellLinePassage: this.Controls.MetadataPlateLevel.CellLinePassage.getValue(),
 				TransfectionReagentLOT: this.Controls.MetadataPlateLevel.TransfectionReagentLOT.getValue(),
 				TransfectionEndPoint: this.Controls.MetadataPlateLevel.TransfectionEndPoint.getValue(),
+				ViabilityPercentage: this.Controls.MetadataPlateLevel.ViabilityPercentage.getValue(),
 			};
 			if (this.Controls.MetadataPlateLevel.CellLine.Value > 0) {
 				values.CellLine = this.Controls.MetadataPlateLevel.CellLine.Selected
@@ -1392,6 +1454,9 @@ class Editor {
 			}
 			if (this.Controls.MetadataPlateLevel.UpdateTransfectionEndPoint.Value) {
 				values.TransfectionEndPointUnit = this.Controls.MetadataPlateLevel.TransfectionEndPointUnit.Selected
+			}
+			if (this.Controls.MetadataPlateLevel.UpdateViabilityPercentage.Value) {
+				values.ViabilityPercentageUnit = this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.Selected
 			}
 			const updatedPlateID = this.Plate.applyLayerMetadata(values);
 
@@ -1406,6 +1471,7 @@ class Editor {
 				}
 				Editor.Console.log({Message: `Transfection Reagent LOT: ${values.TransfectionReagentLOT}`, Gravity: "Success"});
 				Editor.Console.log({Message: `Transfection End Point: ${[values.TransfectionEndPoint, values.TransfectionEndPointUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				Editor.Console.log({Message: `Viability percentage: ${[values.ViabilityPercentage, values.ViabilityPercentageUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 			} else {
 				this.Console.log({Message: "No plate selected", Gravity: "Error"})
 			}
@@ -1473,6 +1539,8 @@ class Editor {
 		this.Controls.MetadataPlateLevel.TransfectionReagentLOT.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionEndPoint.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionEndPointUnit.setValue(0);
+		this.Controls.MetadataPlateLevel.ViabilityPercentage.setValue("");
+		this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.setValue(0);
 	}
 
 	static resetWellMetadataControls() {

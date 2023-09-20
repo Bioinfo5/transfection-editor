@@ -139,6 +139,15 @@ class Well {
 		ctx.restore();
 		return this;
 	}
+
+	setArea(area) {
+		this.Area = area;
+	}
+
+	resetArea() {
+		this.Area = null;
+	}
+
 	tag(a, I) { //Tag the well with area a
 		if(I.Keep == false) {this.Selected = false}
 		let t = I.Map.get(this.Index) //Type at this location when no area is defined here is directly obtained from the map
@@ -203,15 +212,15 @@ class Well {
 
 	applyMetadata(I) {
 		if (I.NumberOfCellsPerWell) {
-			this.Metadata.NumberOfCellsPerWell = parseFloat(I.NumberOfCellsPerWell);
+			this.Metadata.NumberOfCellsPerWell = I.NumberOfCellsPerWell;
 			this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
 		}
 		if (I.Concentration) {
-			this.Metadata.Concentration = parseFloat(I.Concentration);
+			this.Metadata.Concentration = I.Concentration;
 			this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
 		}
 		if (I.TransfectionReagentAmount) {
-			this.Metadata.TransfectionReagentAmount = parseFloat(I.TransfectionReagentAmount);
+			this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
 			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
 		}
 	}

@@ -562,8 +562,8 @@ class Layer {
 		if (I.CellLine) {
 			this.Metadata.CellLine = I.CellLine;
 		}
-		if (I.CellLinePassage) {
-			this.Metadata.CellLinePassage = parseFloat(I.CellLinePassage);
+		if (I.CellLinePassage || I.CellLinePassage === 0) {
+			this.Metadata.CellLinePassage = I.CellLinePassage;
 		}
 		if (I.TransfectionReagent) {
 			this.Metadata.TransfectionReagent = I.TransfectionReagent;
@@ -572,8 +572,12 @@ class Layer {
 			this.Metadata.TransfectionReagentLOT = I.TransfectionReagentLOT;
 		}
 		if (I.TransfectionEndPoint) {
-			this.Metadata.TransfectionEndPoint = parseFloat(I.TransfectionEndPoint);
+			this.Metadata.TransfectionEndPoint = I.TransfectionEndPoint;
 			this.Metadata.TransfectionEndPointUnit = I.TransfectionEndPointUnit;
+		}
+		if (I.ViabilityPercentage) {
+			this.Metadata.ViabilityPercentage = I.ViabilityPercentage;
+			this.Metadata.ViabilityPercentageUnit = I.ViabilityPercentageUnit;
 		}
 	}
 

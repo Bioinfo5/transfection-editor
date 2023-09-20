@@ -196,6 +196,12 @@
 	clear: both;
 	font-weight: bold;
 }
+.LinkCtrl_TabHeaders_Horizontal {
+	text-align: left;
+}
+.LinkCtrl_TabHeaders_Horizontal > span {
+	margin-right: 4px;
+}
 .LinkCtrl_TabContents { /*Wrapper for the contents (each content is a div with TabPanel Styling)*/
 	overflow: auto;
 }

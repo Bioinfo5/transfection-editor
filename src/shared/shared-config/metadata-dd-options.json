@@ -31,6 +31,9 @@
   "transfection_end_point_units": [
     "h"
   ],
+  "viability_percentage_units": [
+    "%"
+  ],
   "number_of_cells_per_well_units": [
     "M",
     "K"

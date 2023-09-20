@@ -1,0 +1,37 @@
+.FlowActionsHistoryListContainer {
+    min-height: 35px;
+    padding: 0.5rem;
+    overflow: auto;
+}
+
+.FlowActionsHistoryListContainer .ListItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.FlowActionsHistoryListContainer .ListItem:not(:last-child) {
+    padding-bottom: 0.75rem;
+}
+
+.FlowActionsHistoryListContainer .ListItem_Label {
+
+}
+
+.FlowActionsHistoryListContainer .ListItem_Btn {
+    cursor: pointer;
+    margin-left: 1rem;
+}
+
+.FlowActionsHistoryListContainer .ListItem_Btn:hover {
+    opacity: 0.75;
+}
+
+.FlowActionsHistoryListContainer .ListItem_Delete_Btn {
+    background-image: url("../images/Icon_set.png");
+    background-repeat: no-repeat;
+    background-position: -80px 0;
+    background-size: 100px 100px;
+    width: 20px;
+    height: 20px;
+}

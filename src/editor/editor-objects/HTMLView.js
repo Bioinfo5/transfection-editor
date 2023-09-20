@@ -10,6 +10,7 @@ class HTMLView {
         transfectionReagent: false,
         transfectionReagentLOT: false,
         transfectionEndPoint: false,
+        viabilityPercentage: false,
       },
       well: {
         cellsPerWell: true,
@@ -107,12 +108,25 @@ class HTMLView {
           Title: 'Check to display the cell line value'
         }
       ),
+      LinkCtrl.new('Checkbox', {
+          ID: `plate_metadata_checkbox-viabilityPercentage`,
+          Default: this.metadataDisplayState.plate.viabilityPercentage,
+          Label: 'Viability percentage',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.plate.viabilityPercentage = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
     ];
     const layerMetadataControlsContainers = `<span id="plate_metadata_checkbox-cellLine"></span>`
       + `<span id="plate_metadata_checkbox-cellLinePassage"></span>`
       + `<span id="plate_metadata_checkbox-transfectionReagent"></span>`
       + `<span id="plate_metadata_checkbox-transfectionReagentLOT"></span>`
-      + `<span id="plate_metadata_checkbox-transfectionEndPoint"></span>`;
+      + `<span id="plate_metadata_checkbox-transfectionEndPoint"></span>`
+      + `<span id="plate_metadata_checkbox-viabilityPercentage"></span>`;
 
     const wellMetadataControls = [
       LinkCtrl.new('Checkbox', {
@@ -266,6 +280,9 @@ class HTMLView {
             : '')
           + ((metadataDisplayState.plate.transfectionEndPoint)
               ? '<div>Transfection end-point: ' + ([layer.Metadata.TransfectionEndPoint, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join(' ') || '') + '</div>'
+            : '')
+          + ((metadataDisplayState.plate.viabilityPercentage)
+            ? '<div>Viability percentage: ' + ([layer.Metadata.ViabilityPercentage, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
           + '</p>'
           : '';
