@@ -20,7 +20,7 @@
 
 .FlowActionsHistoryListContainer .ListItem_Btn {
     cursor: pointer;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
 }
 
 .FlowActionsHistoryListContainer .ListItem_Btn:hover {
@@ -32,6 +32,6 @@
     background-repeat: no-repeat;
     background-position: -80px 0;
     background-size: 100px 100px;
-    width: 20px;
+    width: 25px;
     height: 20px;
 }

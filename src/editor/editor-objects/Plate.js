@@ -434,6 +434,11 @@ class Plate {
 				Click: function () {this.pasteSelected()}.bind(this)
 			},
 			{
+				Label: 'Paste shape',
+				Title: 'Paste shape into selected wells',
+				Click: function () {this.pasteSelectedShape()}.bind(this)
+			},
+			{
 				Label: 'Reset',
 				Title: 'Reset record',
 				Click: function () {this.resetFlowHistory()}.bind(this)
@@ -677,6 +682,47 @@ class Plate {
 
 		this.updateWellColors();
 	}
+
+
+	pasteSelectedShape() {
+		const targetCache = [];
+
+		this.TargetLayers.forEach((layer) => {
+			if (layer.Selected) {
+				const copiedWellsNames = this.FlowActionsHistory.ActionsCache.map(item => item.sourceWell);
+				const copiedSet = new Set(copiedWellsNames);
+				const copiedWellsVectors = layer.Wells
+					.filter(well => copiedSet.has(well.Name))
+					.map(well => ({Row: well.Row, Col: well.Col}));
+				const [firstCopiedWellVector] = copiedWellsVectors;
+				const [firstTargetWell] = layer.Selected;
+				const firstTargetWellVector = {Row: firstTargetWell.Row, Col: firstTargetWell.Col};
+				const offset = {
+					Row: firstTargetWellVector.Row - firstCopiedWellVector.Row,
+					Col: firstTargetWellVector.Col - firstCopiedWellVector.Col
+				};
+				const targets = copiedWellsVectors
+					.map(source => {
+						if ((source.Row + offset.Row < this.Rows) && (source.Col + offset.Col < this.Cols)) {
+							const row = source.Row + offset.Row;
+							const col = source.Col + offset.Col + 1;
+							return [Well.alphabet(row), col].join('');
+						}
+					})
+					.filter(Boolean);
+				_.uniqWith(targets, _.isEqual).forEach(item => {
+					targetCache.push({
+						targetWell: item,
+						targetPlate: layer.Name
+					});
+				});
+				if (targetCache.length) {
+					targetCache.forEach((action, index) => this.FlowActionsHistory.saveCachedShapeToHistory(action, index));
+				}
+				this.updateWellColors();
+			}
+		});
+	};
 
 	updateWellColors() {
 		const wellsPerPlateCount = this.FlowActionsHistory.calculateWellsFrequency();

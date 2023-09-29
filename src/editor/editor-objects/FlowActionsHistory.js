@@ -58,6 +58,16 @@ class FlowActionsHistory {
     return this;
   }
 
+  saveCachedShapeToHistory({targetWell, targetPlate}, index) {
+    this.ActionsCache.forEach((item, i) => {
+      if (index === i) {
+        this.addAction({...item, targetWell, targetPlate})
+      }
+    })
+
+    return this;
+  }
+
   clearCached() {
     this.ActionsCache = [];
   }
