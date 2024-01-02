@@ -338,13 +338,13 @@ class HTMLView {
               ranges.push(area); //Push unique ranges
             }
           }
-          if (metadataDisplayState.well.cellsPerWell && typeof well.Metadata.NumberOfCellsPerWell === 'number') {
+          if (metadataDisplayState.well.cellsPerWell && well.Metadata.NumberOfCellsPerWell) {
             metadataNumberOfCellsPerWell = `<div style="white-space: nowrap;"><span>Cells per well: </span><span>${[well.Metadata.NumberOfCellsPerWell, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
-          if (metadataDisplayState.well.concentration && typeof well.Metadata.Concentration === 'number') {
+          if (metadataDisplayState.well.concentration && well.Metadata.Concentration) {
             metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${[well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
-          if (metadataDisplayState.well.transfectionReagentAmount && typeof well.Metadata.TransfectionReagentAmount === 'number') {
+          if (metadataDisplayState.well.transfectionReagentAmount && well.Metadata.TransfectionReagentAmount) {
             metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Reagent amount: </span><span>${[well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
         }
