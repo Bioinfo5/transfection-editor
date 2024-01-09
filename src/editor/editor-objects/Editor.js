@@ -242,6 +242,46 @@ class Editor {
 					NewLine: true,
 					Chain: {Index: 10, Last: true}
 				}),
+				SeedingMedian: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Seeding median",
+					Default: "",
+					Label: "Seeding median",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 11, Last: false}
+				}),
+				SeedingMedianUnit: LinkCtrl.new("Text", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Seeding median unit",
+					Label: "",
+					Default: "",
+					Preserve: true,
+					NewLine: true,
+					Chain: {Index: 12, Last: true},
+					Size: 1,
+					MaxLength: 1,
+				}),
+				TransfectionMedian: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Transfection median",
+					Default: "",
+					Label: "Transfection median",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 13, Last: false}
+				}),
+				TransfectionMedianUnit: LinkCtrl.new("Text", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Transfection median unit",
+					Label: "",
+					Default: "",
+					Preserve: true,
+					NewLine: true,
+					Chain: {Index: 14, Last: true},
+					Size: 1,
+					MaxLength: 1,
+				}),
 			},
 			MetadataWellLevel: {
 				NumberOfCellsPerWell: LinkCtrl.new("Number", {
@@ -517,6 +557,8 @@ class Editor {
 				'TRANSFECTION_REAGENT_LOT',
 				'TRANSFECTION_END_POINT',
 				'VIABILITY_PERCENTAGE',
+				'SEEDING_MEDIAN',
+				'TRANSFECTION_MEDIAN',
 				'TRANSFECTION_ID',
 				'TRANSFECTION_SCIENTIST',
 				'TRANSFECTION_DATE',
@@ -534,6 +576,8 @@ class Editor {
 				item.TRANSFECTION_REAGENT_LOT,
 				item.TRANSFECTION_END_POINT,
 				item.VIABILITY_PERCENTAGE,
+				item.SEEDING_MEDIAN,
+				item.TRANSFECTION_MEDIAN,
 				item.TRANSFECTION_ID,
 				item.TRANSFECTION_SCIENTIST,
 				item.TRANSFECTION_DATE,
@@ -563,6 +607,8 @@ class Editor {
 				|| !layer.Metadata.TransfectionReagentLOT
 				|| isNaN(layer.Metadata.TransfectionEndPoint)
 				|| isNaN(layer.Metadata.ViabilityPercentage)
+				|| isNaN(layer.Metadata.SeedingMedian)
+				|| isNaN(layer.Metadata.TransfectionMedian)
 			) {
 				isValid = false;
 				reasons.push(`Plate ${layer.Name} metadata should be filled`);
@@ -846,6 +892,12 @@ class Editor {
 			const [viabilityPercentage, viabilityPercentageUnit] = (row.VIABILITY_PERCENTAGE)
 				? row.VIABILITY_PERCENTAGE.toString().split('_')
 				: ['', ''];
+			const [seedingMedian, seedingMedianUnit] =  (row.SEEDING_MEDIAN)
+				? row.SEEDING_MEDIAN.toString().split('_')
+				: ['', ''];
+			const [transfectionMedian, transfectionMedianUnit] =  (row.TRANSFECTION_MEDIAN)
+				? row.TRANSFECTION_MEDIAN.toString().split('_')
+				: ['', ''];
 
 			return {
 				Index: row.TRANSFECTION_PLATE_INDEX,
@@ -858,6 +910,10 @@ class Editor {
 					TransfectionEndPointUnit: transfectionEndPointUnit,
 					ViabilityPercentage: viabilityPercentage,
 					ViabilityPercentageUnit: viabilityPercentageUnit,
+					SeedingMedian: seedingMedian,
+					SeedingMedianUnit: seedingMedianUnit,
+					TransfectionMedian: transfectionMedian,
+					TransfectionMedianUnit: transfectionMedianUnit,
 				}
 			}
 		});
@@ -1445,6 +1501,8 @@ class Editor {
 				TransfectionReagentLOT: this.Controls.MetadataPlateLevel.TransfectionReagentLOT.getValue(),
 				TransfectionEndPoint: this.Controls.MetadataPlateLevel.TransfectionEndPoint.getValue(),
 				ViabilityPercentage: this.Controls.MetadataPlateLevel.ViabilityPercentage.getValue(),
+				SeedingMedian: this.Controls.MetadataPlateLevel.SeedingMedian.getValue(),
+				TransfectionMedian: this.Controls.MetadataPlateLevel.TransfectionMedian.getValue(),
 			};
 			if (this.Controls.MetadataPlateLevel.CellLine.Value > 0) {
 				values.CellLine = this.Controls.MetadataPlateLevel.CellLine.Selected
@@ -1458,20 +1516,42 @@ class Editor {
 			if (this.Controls.MetadataPlateLevel.UpdateViabilityPercentage.Value) {
 				values.ViabilityPercentageUnit = this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.Selected
 			}
-			const updatedPlateID = this.Plate.applyLayerMetadata(values);
 
-			if (updatedPlateID >= 0) {
-				Editor.Console.log({Message: `Plate ${updatedPlateID + 1} metadata updated with following values:`, Gravity: "Success"});
+			if (this.Controls.MetadataPlateLevel.SeedingMedian.Value > 0) {
+				values.SeedingMedianUnit = this.Controls.MetadataPlateLevel.SeedingMedianUnit.getValue();
+			}
+			if (this.Controls.MetadataPlateLevel.TransfectionMedian.Value > 0) {
+				values.TransfectionMedianUnit = this.Controls.MetadataPlateLevel.TransfectionMedianUnit.getValue();
+			}
+			const updatedPlateNames = this.Plate.applyLayerMetadata(values);
+
+			if (updatedPlateNames.length >= 0) {
+				const updatedPlates = updatedPlateNames.join(', ');
+				Editor.Console.log({Message: `${updatedPlates} metadata updated with following values:`, Gravity: "Success"});
 				if (values.CellLine) {
 					Editor.Console.log({Message: `Cell Line: ${values.CellLine}`, Gravity: "Success"});
 				}
-				Editor.Console.log({Message: `Cell Line Passage: ${values.CellLinePassage}`, Gravity: "Success"});
+				if (values.CellLinePassage) {
+					Editor.Console.log({Message: `Cell Line Passage: ${values.CellLinePassage}`, Gravity: "Success"});
+				}
 				if (values.TransfectionReagent) {
 					Editor.Console.log({Message: `Transfection Reagent: ${values.TransfectionReagent}`, Gravity: "Success"});
 				}
-				Editor.Console.log({Message: `Transfection Reagent LOT: ${values.TransfectionReagentLOT}`, Gravity: "Success"});
-				Editor.Console.log({Message: `Transfection End Point: ${[values.TransfectionEndPoint, values.TransfectionEndPointUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
-				Editor.Console.log({Message: `Viability percentage: ${[values.ViabilityPercentage, values.ViabilityPercentageUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				if (values.TransfectionReagentLOT) {
+					Editor.Console.log({Message: `Transfection Reagent LOT: ${values.TransfectionReagentLOT}`, Gravity: "Success"});
+				}
+				if (values.TransfectionEndPoint) {
+					Editor.Console.log({Message: `Transfection End Point: ${[values.TransfectionEndPoint, values.TransfectionEndPointUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
+				if (values.ViabilityPercentage) {
+					Editor.Console.log({Message: `Viability percentage: ${[values.ViabilityPercentage, values.ViabilityPercentageUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
+				if (values.SeedingMedian) {
+					Editor.Console.log({Message: `Seeding median: ${[values.SeedingMedian, values.SeedingMedianUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
+				if (values.TransfectionMedian) {
+					Editor.Console.log({Message: `Transfection median: ${[values.TransfectionMedian, values.TransfectionMedianUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
 			} else {
 				this.Console.log({Message: "No plate selected", Gravity: "Error"})
 			}
@@ -1541,6 +1621,10 @@ class Editor {
 		this.Controls.MetadataPlateLevel.TransfectionEndPointUnit.setValue(0);
 		this.Controls.MetadataPlateLevel.ViabilityPercentage.setValue("");
 		this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.setValue(0);
+		this.Controls.MetadataPlateLevel.SeedingMedian.setValue("");
+		this.Controls.MetadataPlateLevel.SeedingMedianUnit.setValue("");
+		this.Controls.MetadataPlateLevel.TransfectionMedian.setValue("");
+		this.Controls.MetadataPlateLevel.TransfectionMedianUnit.setValue("");
 	}
 
 	static resetWellMetadataControls() {

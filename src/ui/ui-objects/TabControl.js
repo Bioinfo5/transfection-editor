@@ -221,7 +221,7 @@ class TabControl {
           this.duplicateConfirm(index);
           break;
         case "Select":
-          this.AfterSelect(index);
+          this.AfterSelect(index, e);
           break;
 				case "Rename":
 					this.renamingConfirm(index);
@@ -254,7 +254,7 @@ class TabControl {
 		let index = this.getTabIndex(key);
 
     if (index >= 0) {
-      this.AfterSelect(index);
+      this.AfterSelect(index, e);
     }
 	}
 

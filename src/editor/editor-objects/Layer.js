@@ -579,6 +579,14 @@ class Layer {
 			this.Metadata.ViabilityPercentage = I.ViabilityPercentage;
 			this.Metadata.ViabilityPercentageUnit = I.ViabilityPercentageUnit;
 		}
+		if (I.SeedingMedian) {
+			this.Metadata.SeedingMedian = I.SeedingMedian;
+			this.Metadata.SeedingMedianUnit = I.SeedingMedianUnit;
+		}
+		if (I.TransfectionMedian) {
+			this.Metadata.TransfectionMedian = I.TransfectionMedian;
+			this.Metadata.TransfectionMedianUnit = I.TransfectionMedianUnit;
+		}
 	}
 
 	applyWellsMetadata(I) {

@@ -11,7 +11,7 @@ class Plate {
 		this.Highlighting = undefined; //Well currently highlighted
 		this.Selecting = undefined; //Object to handle the selection
 		this.Metadata = {};
-		this.SelectedLayer = undefined;
+		this.SelectedLayers = [];
 		this.DisplayFlowPanel = false;
 
 		this.Anchors = {
@@ -52,7 +52,7 @@ class Plate {
 			}],
 			AfterDelete: function(l) {this.deleteLayer(l)}.bind(this),
 			AfterDuplicate: function (l, t) {this.duplicateLayer(l, t)}.bind(this),
-			AfterSelect: function (l) {this.selectLayer(l)}.bind(this),
+			AfterSelect: function (l, e) {this.selectLayer(l, e)}.bind(this),
 			AfterRename: function (index, value) {this.renameLayer(index, value)}.bind(this),
 			Sortable: true,
 		});
@@ -174,6 +174,12 @@ class Plate {
 			const VIABILITY_PERCENTAGE = (layer.Metadata.ViabilityPercentage || layer.Metadata.ViabilityPercentage === 0)
 				? [`${layer.Metadata.ViabilityPercentage}`, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join('_')
 				: '';
+			const SEEDING_MEDIAN = (layer.Metadata.SeedingMedian || layer.Metadata.SeedingMedian === 0)
+				? [`${layer.Metadata.SeedingMedian}`, layer.Metadata.SeedingMedianUnit].filter(Boolean).join('_')
+				: '';
+			const TRANSFECTION_MEDIAN = (layer.Metadata.TransfectionMedian || layer.Metadata.TransfectionMedian === 0)
+				? [`${layer.Metadata.TransfectionMedian}`, layer.Metadata.TransfectionMedianUnit].filter(Boolean).join('_')
+				: '';
 
 			layer.Wells.forEach(well => {
 				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${sampleNameIndex}` : '';
@@ -192,7 +198,8 @@ class Plate {
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
-					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT
+					SEEDING_MEDIAN, TRANSFECTION_MEDIAN,
+					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT,
 				});
 				sampleNameIndex = sampleNameIndex + 1;
 			})
@@ -970,6 +977,7 @@ class Plate {
 		this.Layers.forEach(function(L) {
 			L.unselect(size, margin);
 		});
+		this.SelectedLayers = [];
 		return this;
 	}
 	startSelection(e, coords, w) { //Start the selection process
@@ -1429,11 +1437,23 @@ class Plate {
 
 	}
 
-	selectLayer(layerIndex) {
+	selectLayer(layerIndex, e) {
 		if (layerIndex >= 0) {
-			this.SelectedLayer = layerIndex;
+			if (e && e.ctrlKey) {
+				if (this.SelectedLayers.includes(layerIndex)) {
+					this.SelectedLayers = this.SelectedLayers.filter(selected => selected !== layerIndex);
+				} else {
+					this.SelectedLayers = [...this.SelectedLayers, layerIndex];
+				}
+			} else {
+				if (this.SelectedLayers.includes(layerIndex)) {
+					this.SelectedLayers = [];
+				} else {
+					this.SelectedLayers = [layerIndex];
+				}
+			}
 			this.LayerTab.Tabs.forEach((tab, index) => {
-				if (index === layerIndex) {
+				if (this.SelectedLayers.includes(index)) {
 					tab.set("Selected");
 				} else {
 					tab.set("Unselected");
@@ -1474,10 +1494,10 @@ class Plate {
 	}
 
 	applyLayerMetadata(I) {
-		if (this.SelectedLayer >= 0) {
-			this.Layers[this.SelectedLayer].applyMetadata(I);
+		if (this.SelectedLayers.length >= 0) {
+			this.SelectedLayers.forEach((layerIndex) => this.Layers[layerIndex].applyMetadata(I));
 		}
 
-		return this.SelectedLayer;
+		return this.SelectedLayers.map((layerIndex) => this.Layers[layerIndex].Name);
 	}
 }
