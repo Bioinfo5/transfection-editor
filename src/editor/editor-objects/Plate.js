@@ -174,11 +174,11 @@ class Plate {
 			const VIABILITY_PERCENTAGE = (layer.Metadata.ViabilityPercentage || layer.Metadata.ViabilityPercentage === 0)
 				? [`${layer.Metadata.ViabilityPercentage}`, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join('_')
 				: '';
-			const SEEDING_MEDIAN = (layer.Metadata.SeedingMedian || layer.Metadata.SeedingMedian === 0)
-				? [`${layer.Metadata.SeedingMedian}`, layer.Metadata.SeedingMedianUnit].filter(Boolean).join('_')
+			const SEEDING_MEDIUM = (layer.Metadata.SeedingMedium || layer.Metadata.SeedingMedium === 0)
+				? [`${layer.Metadata.SeedingMedium}`, layer.Metadata.SeedingMediumUnit].filter(Boolean).join('_')
 				: '';
-			const TRANSFECTION_MEDIAN = (layer.Metadata.TransfectionMedian || layer.Metadata.TransfectionMedian === 0)
-				? [`${layer.Metadata.TransfectionMedian}`, layer.Metadata.TransfectionMedianUnit].filter(Boolean).join('_')
+			const TRANSFECTION_MEDIUM = (layer.Metadata.TransfectionMedium || layer.Metadata.TransfectionMedium === 0)
+				? [`${layer.Metadata.TransfectionMedium}`, layer.Metadata.TransfectionMediumUnit].filter(Boolean).join('_')
 				: '';
 
 			layer.Wells.forEach(well => {
@@ -198,7 +198,7 @@ class Plate {
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
-					SEEDING_MEDIAN, TRANSFECTION_MEDIAN,
+					SEEDING_MEDIUM, TRANSFECTION_MEDIUM,
 					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT,
 				});
 				sampleNameIndex = sampleNameIndex + 1;

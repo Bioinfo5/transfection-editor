@@ -11,8 +11,8 @@ class HTMLView {
         transfectionReagentLOT: false,
         transfectionEndPoint: false,
         viabilityPercentage: false,
-        seedingMedian: false,
-        transfectionMedian: false,
+        seedingMedium: false,
+        transfectionMedium: false,
       },
       well: {
         cellsPerWell: true,
@@ -123,24 +123,24 @@ class HTMLView {
         }
       ),
       LinkCtrl.new('Checkbox', {
-          ID: `plate_metadata_checkbox-seedingMedian`,
-          Default: this.metadataDisplayState.plate.seedingMedian,
-          Label: 'Seeding median',
+          ID: `plate_metadata_checkbox-seedingMedium`,
+          Default: this.metadataDisplayState.plate.seedingMedium,
+          Label: 'Seeding medium',
           NewLine: false,
           Change: function (checked) {
-            this.metadataDisplayState.plate.seedingMedian = checked;
+            this.metadataDisplayState.plate.seedingMedium = checked;
             this.updateOutput(dataList, this.metadataDisplayState);
           }.bind(this),
           Title: 'Check to display the cell line value'
         }
       ),
       LinkCtrl.new('Checkbox', {
-          ID: `plate_metadata_checkbox-transfectionMedian`,
-          Default: this.metadataDisplayState.plate.transfectionMedian,
-          Label: 'Transfection median',
+          ID: `plate_metadata_checkbox-transfectionMedium`,
+          Default: this.metadataDisplayState.plate.transfectionMedium,
+          Label: 'Transfection medium',
           NewLine: false,
           Change: function (checked) {
-            this.metadataDisplayState.plate.transfectionMedian = checked;
+            this.metadataDisplayState.plate.transfectionMedium = checked;
             this.updateOutput(dataList, this.metadataDisplayState);
           }.bind(this),
           Title: 'Check to display the cell line value'
@@ -153,8 +153,8 @@ class HTMLView {
       + `<span id="plate_metadata_checkbox-transfectionReagentLOT"></span>`
       + `<span id="plate_metadata_checkbox-transfectionEndPoint"></span>`
       + `<span id="plate_metadata_checkbox-viabilityPercentage"></span>`
-      + `<span id="plate_metadata_checkbox-seedingMedian"></span>`
-      + `<span id="plate_metadata_checkbox-transfectionMedian"></span>`;
+      + `<span id="plate_metadata_checkbox-seedingMedium"></span>`
+      + `<span id="plate_metadata_checkbox-transfectionMedium"></span>`;
 
     const wellMetadataControls = [
       LinkCtrl.new('Checkbox', {
@@ -312,11 +312,11 @@ class HTMLView {
           + ((metadataDisplayState.plate.viabilityPercentage)
             ? '<div>Viability percentage: ' + ([layer.Metadata.ViabilityPercentage, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
-          + ((metadataDisplayState.plate.seedingMedian)
-            ? '<div>Seeding median: ' + ([layer.Metadata.SeedingMedian, layer.Metadata.SeedingMedianUnit].filter(Boolean).join(' ') || '') + '</div>'
+          + ((metadataDisplayState.plate.seedingMedium)
+            ? '<div>Seeding medium: ' + ([layer.Metadata.SeedingMedium, layer.Metadata.SeedingMediumUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
-          + ((metadataDisplayState.plate.transfectionMedian)
-            ? '<div>Transfection median: ' + ([layer.Metadata.TransfectionMedian, layer.Metadata.TransfectionMedianUnit].filter(Boolean).join(' ') || '') + '</div>'
+          + ((metadataDisplayState.plate.transfectionMedium)
+            ? '<div>Transfection medium: ' + ([layer.Metadata.TransfectionMedium, layer.Metadata.TransfectionMediumUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
           + '</p>'
           : '';

@@ -636,13 +636,13 @@ class TargetLayer {
       this.Metadata.ViabilityPercentage = parseFloat(I.ViabilityPercentage);
       this.Metadata.ViabilityPercentageUnit = I.ViabilityPercentageUnit;
     }
-    if (I.SeedingMedian) {
-      this.Metadata.SeedingMedian = parseFloat(I.SeedingMedian);
-      this.Metadata.SeedingMedianUnit = I.SeedingMedianUnit;
+    if (I.SeedingMedium) {
+      this.Metadata.SeedingMedium = parseFloat(I.SeedingMedium);
+      this.Metadata.SeedingMediumUnit = I.SeedingMediumUnit;
     }
-    if (I.TransfectionMedian) {
-      this.Metadata.TransfectionMedian = parseFloat(I.TransfectionMedian);
-      this.Metadata.TransfectionMedianUnit = I.TransfectionMedianUnit;
+    if (I.TransfectionMedium) {
+      this.Metadata.TransfectionMedium = parseFloat(I.TransfectionMedium);
+      this.Metadata.TransfectionMediumUnit = I.TransfectionMediumUnit;
     }
   }
 
