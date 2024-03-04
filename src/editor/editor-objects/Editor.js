@@ -248,19 +248,8 @@ class Editor {
 					Default: "",
 					Label: "Seeding medium",
 					Preserve: true,
-					NewLine: false,
-					Chain: {Index: 11, Last: false}
-				}),
-				SeedingMediumUnit: LinkCtrl.new("Text", {
-					ID: this.Anchors.Menu.MetadataPlateLevel,
-					Title: "Seeding medium unit",
-					Label: "",
-					Default: "",
-					Preserve: true,
 					NewLine: true,
-					Chain: {Index: 12, Last: true},
-					Size: 1,
-					MaxLength: 1,
+					Chain: {Index: 11, Last: true}
 				}),
 				TransfectionMedium: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataPlateLevel,
@@ -268,19 +257,8 @@ class Editor {
 					Default: "",
 					Label: "Transfection medium",
 					Preserve: true,
-					NewLine: false,
-					Chain: {Index: 13, Last: false}
-				}),
-				TransfectionMediumUnit: LinkCtrl.new("Text", {
-					ID: this.Anchors.Menu.MetadataPlateLevel,
-					Title: "Transfection medium unit",
-					Label: "",
-					Default: "",
-					Preserve: true,
 					NewLine: true,
-					Chain: {Index: 14, Last: true},
-					Size: 1,
-					MaxLength: 1,
+					Chain: {Index: 12, Last: true}
 				}),
 			},
 			MetadataWellLevel: {
@@ -892,12 +870,6 @@ class Editor {
 			const [viabilityPercentage, viabilityPercentageUnit] = (row.VIABILITY_PERCENTAGE)
 				? row.VIABILITY_PERCENTAGE.toString().split('_')
 				: ['', ''];
-			const [seedingMedium, seedingMediumUnit] =  (row.SEEDING_MEDIUM)
-				? row.SEEDING_MEDIUM.toString().split('_')
-				: ['', ''];
-			const [transfectionMedium, transfectionMediumUnit] =  (row.TRANSFECTION_MEDIUM)
-				? row.TRANSFECTION_MEDIUM.toString().split('_')
-				: ['', ''];
 
 			return {
 				Index: row.TRANSFECTION_PLATE_INDEX,
@@ -910,10 +882,8 @@ class Editor {
 					TransfectionEndPointUnit: transfectionEndPointUnit,
 					ViabilityPercentage: viabilityPercentage,
 					ViabilityPercentageUnit: viabilityPercentageUnit,
-					SeedingMedium: seedingMedium,
-					SeedingMediumUnit: seedingMediumUnit,
-					TransfectionMedium: transfectionMedium,
-					TransfectionMediumUnit: transfectionMediumUnit,
+					SeedingMedium: row.SEEDING_MEDIUM,
+					TransfectionMedium: row.TRANSFECTION_MEDIUM,
 				}
 			}
 		});
@@ -1517,12 +1487,6 @@ class Editor {
 				values.ViabilityPercentageUnit = this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.Selected
 			}
 
-			if (this.Controls.MetadataPlateLevel.SeedingMedium.Value > 0) {
-				values.SeedingMediumUnit = this.Controls.MetadataPlateLevel.SeedingMediumUnit.getValue();
-			}
-			if (this.Controls.MetadataPlateLevel.TransfectionMedium.Value > 0) {
-				values.TransfectionMediumUnit = this.Controls.MetadataPlateLevel.TransfectionMediumUnit.getValue();
-			}
 			const updatedPlateNames = this.Plate.applyLayerMetadata(values);
 
 			if (updatedPlateNames.length >= 0) {
@@ -1547,10 +1511,10 @@ class Editor {
 					Editor.Console.log({Message: `Viability percentage: ${[values.ViabilityPercentage, values.ViabilityPercentageUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 				}
 				if (values.SeedingMedium) {
-					Editor.Console.log({Message: `Seeding medium: ${[values.SeedingMedium, values.SeedingMediumUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+					Editor.Console.log({Message: `Seeding medium: ${values.SeedingMedium}`, Gravity: "Success"});
 				}
 				if (values.TransfectionMedium) {
-					Editor.Console.log({Message: `Transfection medium: ${[values.TransfectionMedium, values.TransfectionMediumUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+					Editor.Console.log({Message: `Transfection medium: ${values.TransfectionMedium}`, Gravity: "Success"});
 				}
 			} else {
 				this.Console.log({Message: "No plate selected", Gravity: "Error"})
@@ -1622,9 +1586,7 @@ class Editor {
 		this.Controls.MetadataPlateLevel.ViabilityPercentage.setValue("");
 		this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.setValue(0);
 		this.Controls.MetadataPlateLevel.SeedingMedium.setValue("");
-		this.Controls.MetadataPlateLevel.SeedingMediumUnit.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionMedium.setValue("");
-		this.Controls.MetadataPlateLevel.TransfectionMediumUnit.setValue("");
 	}
 
 	static resetWellMetadataControls() {

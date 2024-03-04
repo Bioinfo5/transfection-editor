@@ -174,12 +174,8 @@ class Plate {
 			const VIABILITY_PERCENTAGE = (layer.Metadata.ViabilityPercentage || layer.Metadata.ViabilityPercentage === 0)
 				? [`${layer.Metadata.ViabilityPercentage}`, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join('_')
 				: '';
-			const SEEDING_MEDIUM = (layer.Metadata.SeedingMedium || layer.Metadata.SeedingMedium === 0)
-				? [`${layer.Metadata.SeedingMedium}`, layer.Metadata.SeedingMediumUnit].filter(Boolean).join('_')
-				: '';
-			const TRANSFECTION_MEDIUM = (layer.Metadata.TransfectionMedium || layer.Metadata.TransfectionMedium === 0)
-				? [`${layer.Metadata.TransfectionMedium}`, layer.Metadata.TransfectionMediumUnit].filter(Boolean).join('_')
-				: '';
+			const SEEDING_MEDIUM = layer.Metadata.SeedingMedium || '';
+			const TRANSFECTION_MEDIUM = layer.Metadata.TransfectionMedium || '';
 
 			layer.Wells.forEach(well => {
 				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${sampleNameIndex}` : '';

@@ -313,10 +313,10 @@ class HTMLView {
             ? '<div>Viability percentage: ' + ([layer.Metadata.ViabilityPercentage, layer.Metadata.ViabilityPercentageUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
           + ((metadataDisplayState.plate.seedingMedium)
-            ? '<div>Seeding medium: ' + ([layer.Metadata.SeedingMedium, layer.Metadata.SeedingMediumUnit].filter(Boolean).join(' ') || '') + '</div>'
+            ? '<div>Seeding medium: ' + (layer.Metadata.SeedingMedium || '') + '</div>'
             : '')
           + ((metadataDisplayState.plate.transfectionMedium)
-            ? '<div>Transfection medium: ' + ([layer.Metadata.TransfectionMedium, layer.Metadata.TransfectionMediumUnit].filter(Boolean).join(' ') || '') + '</div>'
+            ? '<div>Transfection medium: ' + (layer.Metadata.TransfectionMedium || '') + '</div>'
             : '')
           + '</p>'
           : '';

@@ -581,11 +581,9 @@ class Layer {
 		}
 		if (I.SeedingMedium) {
 			this.Metadata.SeedingMedium = I.SeedingMedium;
-			this.Metadata.SeedingMediumUnit = I.SeedingMediumUnit;
 		}
 		if (I.TransfectionMedium) {
 			this.Metadata.TransfectionMedium = I.TransfectionMedium;
-			this.Metadata.TransfectionMediumUnit = I.TransfectionMediumUnit;
 		}
 	}
 
