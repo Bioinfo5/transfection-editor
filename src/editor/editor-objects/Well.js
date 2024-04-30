@@ -223,6 +223,9 @@ class Well {
 			this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
 			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
 		}
+		if (I.Treatment) {
+			this.Metadata.Treatment = I.Treatment;
+		}
 	}
 
 	getMetadata() {

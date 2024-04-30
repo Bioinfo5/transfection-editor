@@ -5,11 +5,13 @@ class LinkCtrl_Select extends LinkCtrl {
 	constructor(I) {
 		super(I); //Call the super class constructor and pass in the input object
 		this.Type = "Select";
+		this.OriginalList = (I.List || []);
 		this.List = (I.List || []); //List of available options in the select element
 		this.NavBar = I.NavBar; //Whether to add navBar elements to this select
 		if(I.Lookup) {
 			this.Lookup = {Active: false, Query: "", Values: [], LastVisited: 0}
 		}
+		this.LookupValue = ""
 		return this;
 	}
 	//Getter
@@ -53,7 +55,8 @@ class LinkCtrl_Select extends LinkCtrl {
 		return html;
 	}
 	htmlInput() { //Html for the input per se
-		let html = "<select id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\"LinkCtrl_Select\">";
+		let selectClass = this.Lookup ? 'LinkCtrl_Select_WithLookup' : 'LinkCtrl_Select';
+		let html = "<select id=\"" + this.Control + "\" title=\"" + this.Title + "\" class=\""+ selectClass + "\">";
 		html += this.htmlOptions();
 		html += "</select>";
 		return html;
@@ -103,6 +106,12 @@ class LinkCtrl_Select extends LinkCtrl {
 					out.innerHTML = ""; //
 				}
 			}.bind(this));
+
+			text.addEventListener("input", function(e) {
+				this.LookupValue = e.target.value || '';
+				this.updateList(this.OriginalList.filter((option) => (this.LookupValue.length === 0) || option.startsWith(this.LookupValue)));
+			}.bind(this));
+
 			text.addEventListener("keyup", function(e) { //Handle for the lookup
 				let LU = this.Lookup;
 				let query = text.value;
@@ -183,16 +192,19 @@ class LinkCtrl_Select extends LinkCtrl {
 		if(ui) {ui.children[0].selectedIndex = v}
 		return this;
 	}
+
 	htmlOptions() { //Returns an html string to populate a select control with available elements in the list
-		var html = "";
-		var selected = "";
+		let html = "";
 		this.List.forEach(function(a, i) {
-			if(i == this.Value) {selected = "selected"}
-			else {selected = ""}
-			html += "<option value=\"" + i + "\" " + selected + ">" + a + "</option>";
+			if (i === this.Value) {
+				html += "<option value=\"" + i + "\" selected>" + a + "</option>";
+			} else {
+				html += "<option value=\"" + i + "\">" + a + "</option>";
+			}
 		}, this);
 		return html;
 	}
+
 	updateList(list) { //Update the control with a new list provided in input as an array
 		this.List = list;
 		if(this.Value >= list.length) {this.Value = list.length - 1} //Less items than before, rebase to be at the highest possible

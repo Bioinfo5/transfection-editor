@@ -5,7 +5,7 @@ class InputObject {
 	constructor() {
 		this.Controls = {
 			Parser: LinkCtrl.new("Select", {
-				ID: Form_Import.Anchors.Parser, Label: "Parser", Default: 0, List: ["TXT/CSV", "XLSX", "XLS"], 
+				ID: Form_Import.Anchors.Parser, Label: "Parser", Lookup: true, Default: 0, List: ["TXT/CSV", "XLSX", "XLS"],
 				Title: "The parser to use to parse this input",
 				Change: function(v, I) {
 					if(I) {I.Input = this}
@@ -16,7 +16,7 @@ class InputObject {
 				}.bind(this)
 			}),
 			Limit: LinkCtrl.new("Select", { //The limit to the number of lines to parse for the preview
-				ID: Form_Import.Anchors.Preview, Index: 1, Default: 0, Label: "Limit", Preserve: true, List: ["20", "100", "500", "1000", "All"], Title: "Only this number of rows will be displayed in the preview. Prevent big files from crashing the browser.",
+				ID: Form_Import.Anchors.Preview, Index: 1, Default: 0, Lookup: true, Label: "Limit", Preserve: true, List: ["20", "100", "500", "1000", "All"], Title: "Only this number of rows will be displayed in the preview. Prevent big files from crashing the browser.",
 				Change: function() { //on change, trigger a new parsing of the input and supply the new limit to use
 					this.InputParser.parse({Limit: this.Controls.Limit.Selected, Input: this});
 				}.bind(this),

@@ -54,7 +54,7 @@
 	border: 1px solid black;
 }
 .Form_Body { /*Style for the body*/
-	min-height: 50px;
+	min-height: 120px;
 	padding: 0.5em;
 	overflow: auto;
 }

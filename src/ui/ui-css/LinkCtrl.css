@@ -11,6 +11,7 @@
 	line-height: 2.5em;
 	cursor: pointer;
 	white-space: nowrap;
+	position: relative;
 }
 .LinkCtrl_Disabled {
 	background: lightgray;
@@ -68,9 +69,14 @@
 	cursor: pointer;
 	vertical-align: middle;
 }
+.LinkCtrl_Select_WithLookup,
 .LinkCtrl_Select {
 	padding: 0.2em;
 	cursor: pointer;
+	position: relative;
+}
+.LinkCtrl_Select_WithLookup {
+	min-width: 120px;
 }
 .LinkCtrl_SelectLookup {
 	position: absolute;
@@ -209,12 +215,7 @@
 	margin: 0.5em;
 }
 
-
 /*
-Using thses fucking <button> elements leads you knowwhere good,
-as it becomes impossible to have homogenous height and text size
-with the rest of the controls. <span> works just fine...
-
 .LinkCtrl_Button {
 	font-size: 0.9em;
 	border: 1px solid silver;

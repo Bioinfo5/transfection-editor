@@ -44,7 +44,7 @@ class Report_Grouped extends Report {
 			Rows: [[], []],
 			Cols: [[], []],
 		};
-		this.UI.DataView = LinkCtrl.new("Select", {ID: "Data_Options", Default: 0, Label: "Aggregation", List: ["Avg, SD, N", "Average", "Column", "Row"], Preserve: true, Change: this.update.bind(this),
+		this.UI.DataView = LinkCtrl.new("Select", {ID: "Data_Options", Default: 0, Lookup: true, Label: "Aggregation", List: ["Avg, SD, N", "Average", "Column", "Row"], Preserve: true, Change: this.update.bind(this),
 			Title: "Indicates how multiple values are displayed in the grouped table: arrayed in a single column or in consecutive rows; show only the average; show the average, standard deviation and number of samples"
 		});
 		let buttons = LinkCtrl.buttonBar([

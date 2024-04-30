@@ -14,7 +14,7 @@ class Report_Hits extends Report {
 			Threshold: LinkCtrl.new("Number", {ID: "Start", Default: 50, Label: "Threshold (%)", Chain: {Index: 0},
 				Title: "Indicate here the threshold to use for hit selection, as a percentage. All values above the threshold will be selected"
 			}),
-			Limit: LinkCtrl.new("Select", {ID: "Start", Default: 3, Label: "Hit limit", Chain: {Index: 1, Last: true}, List: [100, 500, 1000, 5000, 10000, 50000],
+			Limit: LinkCtrl.new("Select", {ID: "Start", Default: 3, Lookup: true, Label: "Hit limit", Chain: {Index: 1, Last: true}, List: [100, 500, 1000, 5000, 10000, 50000],
 				Title: "Limit for the number of hits that can be collected by a single parameter. The hit search will stop when any given parameter reaches this limit"
 			}),
 			Mode: LinkCtrl.new("Radio", {ID: "Config", Default: 0, Label: "Mode", List: ["Global", "Plate", "Custom"],
@@ -29,10 +29,10 @@ class Report_Hits extends Report {
 					}
 				}, Title: "Whether the normalization should be done using the aggregated control values from the entire set of plates (Global), on a plate-by-plate basis (Plate), or a set of values manually provided (Custom)",
 			}),
-			ControlHigh: LinkCtrl.new("Select", {ID: "Control", Default: 0, Label: "Control High (100%)", List: this.Controls.map(function(c) {return c.Name}), Chain: {Index: 0},
+			ControlHigh: LinkCtrl.new("Select", {ID: "Control", Default: 0, Lookup: true, Label: "Control High (100%)", List: this.Controls.map(function(c) {return c.Name}), Chain: {Index: 0},
 				Title: "Select the control to use as reference for the high percentage. The average of all its values will be used as the 100% reference"
 			}),
-			ControlLow: LinkCtrl.new("Select", {ID: "Control", Default: 0, Label: "Control Low (0%)", List: this.Controls.map(function(c) {return c.Name}), Chain: {Index: 1, Last: true},
+			ControlLow: LinkCtrl.new("Select", {ID: "Control", Default: 0, Lookup: true, Label: "Control Low (0%)", List: this.Controls.map(function(c) {return c.Name}), Chain: {Index: 1, Last: true},
 				Title: "Select the control to use as reference for the low percentage. The average of all its values will be used as the 0% reference"
 			}),
 			CustomHigh: LinkCtrl.new("Number", {ID: "Custom", Default: 0, Label: "High (100%)", Chain: {Index: 0}, Title: "The value to use as reference for the high percentage. Will be used as the 100% reference"}),

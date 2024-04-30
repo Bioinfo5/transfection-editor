@@ -41,74 +41,159 @@ class Area {
 			a.Tags[index].Wells = a.Tags[index].Wells.filter(function(w) {return w.Index != well.Index}); //Exclude the well to untag
 		}
 	}
+
 	static form(I) { //Open a form to create or edit an area (Mode: create/edit), passing the necessary options
 		let id = I.ID;
-		let input = id + "_Input";
-		let range = id + "_InputRange";
-		let rangeOptions = id + "_InputRange_Options";
-		let rangeCustom = id + "_InputRange_Custom";
-		let title = "New Area";
-		if(I.Edit) {title = "Edit Area"}
+		let input = id + '_Input';
+		let range = id + '_InputRange';
+		let rangeOptions = id + '_InputRange_Options';
+		let rangeCustom = id + '_InputRange_Custom';
+		let title = 'New Area';
+		if (I.Edit) {
+			title = 'Edit Area';
+		}
 		let Controls = {
-			Name: LinkCtrl.new("Text", {ID: input, Default: "", Label: "Name", Title: "The name of the area", Chain: {Index: 0}}),
-			Color: LinkCtrl.new("Color", {ID: input, Default: I.Color, Label: "Color", Title: "The color that will be used to represent this area", Chain: {Index: 1, Last: true}, NewLine: true, }),
-			Type: LinkCtrl.new("Select", {ID: input, Index: 2, Default: 2, Label: "Type", Title: "The type of area to create", Preserve: true, List: ["Positive Control", "Negative Control", "Sample", "Range"], Change: function(v) {
-				if(v == 3) { //Display range options
-					GetId(range).style.display = "block";
-					Object.values(RangeControls).forEach(function(c) {c.init()});
-					if(RangeControls.Custom.Value) {GetId(rangeOptions).style.display = "none"}
-					else {GetId(rangeOptions).style.display = "block"}
+			Name: LinkCtrl.new('Select', {
+				ID: input,
+				Index: 0,
+				Default: 0,
+				Lookup: true,
+				Label: 'Name',
+				Title: 'The name of the area',
+				Preserve: true,
+				List: DDOptions.sampleNames(),
+			}),
+			Color: LinkCtrl.new('Color', {
+				ID: input,
+				Default: I.Color,
+				Label: 'Color',
+				Title: 'The color that will be used to represent this area',
+				Chain: {Index: 1, Last: true},
+				NewLine: true,
+			}),
+			Type: LinkCtrl.new('Select', {
+				ID: input,
+				Index: 2,
+				Default: 2,
+				Lookup: true,
+				Label: 'Type',
+				Title: 'The type of area to create',
+				Preserve: true,
+				List: ['Positive Control', 'Negative Control', 'Sample', 'Range'],
+				Change: function (v) {
+					if (parseInt(v, 10) === 3) { //Display range options
+						GetId(range).style.display = 'block';
+						Object.values(RangeControls).forEach(function (c) {c.init();});
+						if (RangeControls.Custom.Value) {
+							GetId(rangeOptions).style.display = 'none';
+						} else {
+							GetId(rangeOptions).style.display = 'block';
+						}
+					} else {
+						GetId(range).style.display = 'none';
+					} //Hide range options
 				}
-				else {GetId(range).style.display = "none"} //Hide range options
-			}}),
-		}
+			}),
+		};
 		let RangeControls = { //Options for the ranges
-			Replicates: LinkCtrl.new("Number", {ID: rangeOptions, Index: 0, Default: 10, Label: "Replicates", Title: "Number of replicates for the range. Should be between 1 and 1536", NewLine: true, Min: 1, Max: 1536}),
-			Direction: LinkCtrl.new("Radio", {ID: rangeOptions, Index: 1, Default: 0, Label: "Direction", Title: "Direction of the replicates", NewLine: true, Preserve: true, List: ["Horizontal", "Vertical"]}),
-			Priority: LinkCtrl.new("Radio", {ID: rangeOptions, Index: 2, Default: 0, Label: "Priority", Title: "Wether numbering should be done per rows or per cols", NewLine: true, Preserve: true, List: ["Row", "Col"]}),
-			Custom: LinkCtrl.new("Checkbox", {ID: rangeCustom, Index: 3, Default: 0, Label: "Custom", Change: function(v) {
-				let target = GetId(rangeOptions);
-				if(v == false) { //Warn if leaving custom mode
-					target.style.display = "block";
-					target.insertAdjacentHTML("beforeend", "<div class=\"Error\" style=\"padding: 5px; text-align: center\">When leaving custom mode, all exisiting custom numbering will be recomputed using the options specified above</div>")
-				}
-				else {
-					if(target.lastChild.nodeName == "DIV") {target.lastChild.remove()} //Remove the warning message if it exists
-					target.style.display = "none";
-				}
-			}, Title: "Tick to allow customized numbering after each tagging"}),
-		}
-		if(I.Edit) { //Set controls to existing values for edition
-			Controls.Name.setValue(I.Area.Name);
-			let type = I.Area.Type;
-			Controls.Type.setValue(Controls.Type.List.findIndex(function(t) {return t == type}));
-			if(type == "Range") {
+			Replicates: LinkCtrl.new('Number', {
+				ID: rangeOptions,
+				Index: 0,
+				Default: 10,
+				Label: 'Replicates',
+				Title: 'Number of replicates for the range. Should be between 1 and 1536',
+				NewLine: true,
+				Min: 1,
+				Max: 1536
+			}),
+			Direction: LinkCtrl.new('Radio', {
+				ID: rangeOptions,
+				Index: 1,
+				Default: 0,
+				Label: 'Direction',
+				Title: 'Direction of the replicates',
+				NewLine: true,
+				Preserve: true,
+				List: ['Horizontal', 'Vertical']
+			}),
+			Priority: LinkCtrl.new('Radio', {
+				ID: rangeOptions,
+				Index: 2,
+				Default: 0,
+				Label: 'Priority',
+				Title: 'Wether numbering should be done per rows or per cols',
+				NewLine: true,
+				Preserve: true,
+				List: ['Row', 'Col']
+			}),
+			Custom: LinkCtrl.new('Checkbox', {
+				ID: rangeCustom,
+				Index: 3,
+				Default: 0,
+				Label: 'Custom',
+				Change: function (v) {
+					let target = GetId(rangeOptions);
+					if (!v) { //Warn if leaving custom mode
+						const message = 'When leaving custom mode, all exisiting custom numbering will be recomputed using the options specified above';
+						target.style.display = 'block';
+						target.insertAdjacentHTML(
+							'beforeend',
+							`<div class="Error" style="padding: 5px; text-align: center">${message}</div>`
+						);
+					} else {
+						if (target.lastChild.nodeName === 'DIV') {
+							target.lastChild.remove();
+						} //Remove the warning message if it exists
+						target.style.display = 'none';
+					}
+				}, Title: 'Tick to allow customized numbering after each tagging'
+			}),
+		};
+
+		if (I.Edit) { //Set controls to existing values for edition
+			Controls.Name.setValue(Controls.Name.List.findIndex(n => n === I.Area.Name));
+			const type = I.Area.Type;
+			Controls.Type.setValue(Controls.Type.List.findIndex(t => t === type));
+			if (type === 'Range') {
 				RangeControls.Replicates.setValue(I.Area.Replicates);
-				RangeControls.Direction.setValue(RangeControls.Direction.List.findIndex(function(d) {return d == I.Area.Direction}));
-				RangeControls.Priority.setValue(RangeControls.Priority.List.findIndex(function(p) {return p == I.Area.Priority}));
+				RangeControls.Direction.setValue(RangeControls.Direction.List.findIndex(d => d === I.Area.Direction));
+				RangeControls.Priority.setValue(RangeControls.Priority.List.findIndex(p => p === I.Area.Priority));
 				RangeControls.Custom.setValue(I.Area.Custom);
 			}
 		}
-		let buttons = [{Label: "Ok", Icon: {Type: "Ok", Space: true, Color: "Green"}, Click: function() {I.Ok(Controls, RangeControls)}}];
-		if(I.Edit === undefined) { //Creation mode, use this button to chain with another area creation
-			buttons.push({Label: "Add another", Icon: {Type: "New", Space: true}, Click: function() {I.Another(Controls, RangeControls)}});
+		const buttons = [{
+			Label: 'Ok',
+			Icon: {Type: 'Ok', Space: true, Color: 'Green'},
+			Click: function () {I.Ok(Controls, RangeControls);}
+		}];
+		if (!I.Edit) { //Creation mode, use this button to chain with another area creation
+			buttons.push({
+				Label: 'Add another',
+				Icon: {Type: 'New', Space: true},
+				Click: function () {I.Another(Controls, RangeControls);}
+			});
 		}
-		buttons.push({Label: "Cancel", Icon: {Type: "Cancel", Space: true, Color: "Red"}, Click: function() {Form.close(id)}});
+		buttons.push({
+			Label: 'Cancel',
+			Icon: {Type: 'Cancel', Space: true, Color: 'Red'},
+			Click: function () {Form.close(id);}
+		});
 		Form.open({ //Open the form
 			ID: id,
-			HTML: "<div id=\"" + input + "\"></div><fieldset id=\"" + range + "\" style=\"display: none; margin-top: 5px\"><legend>Numbering</legend><div id=\"" + rangeOptions + "\"></div><div id=\"" + rangeCustom + "\"></div></fieldset>",
+			HTML: '<div id="' + input + '"></div><fieldset id="' + range + '" style="display: none; margin-top: 5px"><legend>Numbering</legend><div id="' + rangeOptions + '"></div><div id="' + rangeCustom + '"></div></fieldset>',
 			Title: title,
 			Buttons: buttons,
-			onInit: function() { //Initialize the controls on open
-				Object.values(Controls).forEach(function(c) {c.init()});
-				if(I.Edit) {
+			onInit: function () { //Initialize the controls on open
+				Object.values(Controls).forEach(function (c) {c.init();});
+				if (I.Edit) {
 					Controls.Type.disable(); //Edition mode, type cannot be changed
-					if(I.Area.Type == "Range") {Controls.Type.change(Controls.Type.Value)} //Trigger the change() method to display the range options
+					if (I.Area.Type === 'Range') {Controls.Type.change(Controls.Type.Value);} //Trigger the change() method to display the range options
 				}
 				Controls.Name.focus();
 			}
 		});
 	}
+
 	static fetchRangeItem(a, w, I) { //Return a promise for the name to display for area a, using its definition if provided
 		if(a.Definition) { //Use the definition if defined
 			return a.Definition.item(w); //Return a promise

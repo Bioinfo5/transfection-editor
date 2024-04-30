@@ -22,15 +22,12 @@ class FlowActionsHistory {
     const separator = '@';
     return _.chain(this.History)
       .map(item => {
-        // console.log('_.map', item.targetPlate, item.targetWell);
         return [item.targetPlate, item.targetWell].join(separator);
       })
       .countBy(item => {
-        // console.log('_.countBy', item);
         return item;
       })
       .reduce((result, value, key) => {
-        // console.log('_.reduce', result, value, key);
         const [plate, well] = key.split(separator);
         return _.merge(result, {[plate]: {[well]: value}});
       }, {})

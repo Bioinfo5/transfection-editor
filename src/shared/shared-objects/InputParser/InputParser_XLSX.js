@@ -8,7 +8,7 @@ class InputParser_XLSX extends InputParser {
 		this.Help = "Parsing of .xlsx Excel files with streaming capabilities";
 		let target = Form_Import.Anchors.ParserOptions; //Target ID for the options
 		this.Options = Object.assign(this.Options, { //These options require a new parsing to be performed
-			Sheet: LinkCtrl.new("Select", {ID: target, Label: "Sheet", Default: 0, List: [], Preserve: true, NewLine: true, Index: 5, Change: function() {
+			Sheet: LinkCtrl.new("Select", {ID: target, Label: "Sheet", Default: 0, Lookup: true, List: [], Preserve: true, NewLine: true, Index: 5, Change: function() {
 				if(this.Worker) {this.Worker.terminate()}
 				this.FirstParsed = false; //Need to reevaluate available rows/cols
 				this.parse();

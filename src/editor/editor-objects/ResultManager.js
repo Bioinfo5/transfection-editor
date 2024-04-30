@@ -20,13 +20,13 @@ class ResultManager {
 		this.ResultTab = undefined;
 		let action = function(v) {this.draw(this.Results.Selected[0])}.bind(this);
 		this.PlateSelect = LinkCtrl.new("Select", {ID: this.Anchors.PlateSelect, Title: "Select the plate to use for display", Default: 0, Label: "Plate", List: [1], NavBar: true, Lookup: true, Change: action});
-		this.LayerSelect = LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Title: "Select the layer that will be used to display information in the tooltip", Default: 0, NavBar: true, Label: "Layer", List: [1]});
+		this.LayerSelect = LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Title: "Select the layer that will be used to display information in the tooltip", Default: 0, Lookup: true, NavBar: true, Label: "Layer", List: [1]});
 		this.HeatmapOptions = {
 			Low: LinkCtrl.new("Color", {ID: this.Anchors.HeatmapOptions, Title: "Color for the lowest value", Default: "lightblue", Label: "0", Chain: {Index: 0}, Change: action}),
 			Medium: LinkCtrl.new("Color", {ID: this.Anchors.HeatmapOptions, Title: "Color for the average value", Default: "white", Label: "50", Chain: {Index: 1}, Change: action}),
 			High: LinkCtrl.new("Color", {ID: this.Anchors.HeatmapOptions, Title: "Color for the highest value", Default: "tomato", Label: "100", Chain: {Index: 2, Last: true}, Change: action}),
 		}
-		this.ExtremumSource = LinkCtrl.new("Select", {ID: this.Anchors.ExtremumSource, Default: 0, Label: "Source", List: ["Global", "Plate", "Custom"], Change: function(v) {
+		this.ExtremumSource = LinkCtrl.new("Select", {ID: this.Anchors.ExtremumSource, Default: 0, Lookup: true, Label: "Source", List: ["Global", "Plate", "Custom"], Change: function(v) {
 			this.extremum(v);
 		}.bind(this), Title: "Source of the min and max values to build the heatmap. Global: use parameter min/max values from the entire file; Plate: use parameter min/max values from the selected plate only; Custom: manually entered min and max values (applies to all parameters)"}),
 		this.Extremums = {

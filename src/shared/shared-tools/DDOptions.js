@@ -3,9 +3,13 @@ class DDOptions {
 
   static async init() {
     this.MetadataDDOptions = {
+      //dd options
       transfectionScientist: [],
       cellLine: [],
       transfectionReagent: [],
+      sampleNames: [],
+      treatmentInWell: [],
+      //units
       transfectionEndPointUnit: [],
       viabilityPercentageUnit: [],
       numberOfCellsPerWellUnit: [],
@@ -14,17 +18,23 @@ class DDOptions {
     };
     this.Error = false;
     try {
-      const response = await fetch('dist/metadata-dd-options.json');
-      const result = await response.json();
-      this.MetadataDDOptions.transfectionScientist = (result) ? result.transfection_scientist : [];
-      this.MetadataDDOptions.cellLine = (result) ? result.cell_line : [];
-      this.MetadataDDOptions.transfectionReagent = (result) ? result.transfection_reagent : [];
-      this.MetadataDDOptions.transfectionEndPointUnit = (result) ? result.transfection_end_point_units : [];
-      this.MetadataDDOptions.viabilityPercentageUnit = (result) ? result.viability_percentage_units : [];
-      this.MetadataDDOptions.numberOfCellsPerWellUnit = (result) ? result.number_of_cells_per_well_units : [];
-      this.MetadataDDOptions.concentrationUnit = (result) ? result.concentration_units : [];
-      this.MetadataDDOptions.transfectionReagentAmountUnit = (result) ? result.transfection_reagent_amount_units : [];
+      const apiResponse = await fetch('https://1etx.admin.api.botlee.com/api/plateEditor/metadataOptions');
+      const options = await apiResponse.json();
+      this.MetadataDDOptions.transfectionScientist = (options) ? options.transfection_scientist : [];
+      this.MetadataDDOptions.cellLine = (options) ? options.cell_line : [];
+      this.MetadataDDOptions.transfectionReagent = (options) ? options.transfection_reagent : [];
+      this.MetadataDDOptions.sampleNames = (options) ? options.sample_names : [];
+      this.MetadataDDOptions.treatmentInWell = (options) ? options.treatment_in_well : [];
+
+      const fileResponse = await fetch('dist/metadata-dd-options.json');
+      const units = await fileResponse.json();
+      this.MetadataDDOptions.transfectionEndPointUnit = (units) ? units.transfection_end_point_units : [];
+      this.MetadataDDOptions.viabilityPercentageUnit = (units) ? units.viability_percentage_units : [];
+      this.MetadataDDOptions.numberOfCellsPerWellUnit = (units) ? units.number_of_cells_per_well_units : [];
+      this.MetadataDDOptions.concentrationUnit = (units) ? units.concentration_units : [];
+      this.MetadataDDOptions.transfectionReagentAmountUnit = (units) ? units.transfection_reagent_amount_units : [];
     } catch (e) {
+      alert('Error while receiving metadata options');
       this.Error = true;
     }
   };
@@ -39,6 +49,14 @@ class DDOptions {
 
   static transfectionReagentOptions() {
     return ['Please select', ...this.MetadataDDOptions.transfectionReagent];
+  }
+
+  static sampleNames() {
+    return ['Please select', ...this.MetadataDDOptions.sampleNames];
+  }
+
+  static treatmentInWell() {
+    return ['Please select', ...this.MetadataDDOptions.treatmentInWell];
   }
 
   static TransfectionEndPointUnitOptions() {

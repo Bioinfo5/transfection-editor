@@ -30,7 +30,7 @@ class Plate {
 		}
 		this.Options = { /* LinkCtrl instances */}
 		this.Controls = {
-			LayerSelect: LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Default: 0, Label: "Plate", List: [1], NavBar: true, Change: function(v) {
+			LayerSelect: LinkCtrl.new("Select", {ID: this.Anchors.LayerSelect, Default: 0, Lookup: true, Label: "Plate", List: [1], NavBar: true, Change: function(v) {
 				this.Layers[v].concMap(this.Anchors.LayerSelect)
 			}.bind(this), Title: "Select the plate to use for display"}),
 		}
@@ -189,13 +189,14 @@ class Plate {
 				const TRANSFECTION_REAGENT_AMOUNT = (well.Metadata.TransfectionReagentAmount || well.Metadata.TransfectionReagentAmount === 0)
 					?  [`${well.Metadata.TransfectionReagentAmount}`, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
 					: '';
+				const TREATMENT = well.Metadata.Treatment || '';
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
 					SEEDING_MEDIUM, TRANSFECTION_MEDIUM,
-					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT,
+					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT, TREATMENT
 				});
 				sampleNameIndex = sampleNameIndex + 1;
 			})

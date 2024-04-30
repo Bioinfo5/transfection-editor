@@ -65,7 +65,7 @@ class Report {
 			Rows: LinkCtrl.new("Number", {ID: this.Anchors.Options, Label: "Rows", Default: 10, Min: 2, Step: 1, Chain: {Index: 1, Last: true}, Change: function(v) {
 				this.refresh("Rows", {Collapse: true, Rows: v});
 			}.bind(this), Title: "Maximum number of rows to show for each table"}),
-			Decimals: LinkCtrl.new("Select", {ID: this.Anchors.Options, Label: "Decimals", Default: 3, List: [0, 1, 2, 3, 4, 5, 6, "All"], Chain: {Index: 2, NewLine: true}, Change: function(v) {
+			Decimals: LinkCtrl.new("Select", {ID: this.Anchors.Options, Label: "Decimals", Default: 3, Lookup: true, List: [0, 1, 2, 3, 4, 5, 6, "All"], Chain: {Index: 2, NewLine: true}, Change: function(v) {
 				this.refresh("Decimals");
 			}.bind(this), Title: "Number of decimals to show for the computed values. Parsed values from the file are not affected"}),
 			CV: LinkCtrl.new("Checkbox", {ID: this.Anchors.Options, Label: "Show CV", Default: false, Chain: {Index: 3, Last: true}, Change: function(v) {
@@ -82,7 +82,7 @@ class Report {
 			}.bind(this), Title: "Tick to shift the concentration data to their closest parent value (i.e. M or g/mL) when using the log scale"});
 		}
 		this.UI = { //Container for specific LinkCtrl elements
-			Plate: LinkCtrl.new("Select", {ID: this.Anchors.ResultPlate, Default: 0, List: [], Label: "Plate", Change: function(index) {
+			Plate: LinkCtrl.new("Select", {ID: this.Anchors.ResultPlate, Default: 0, Lookup: true, List: [], Label: "Plate", Change: function(index) {
 				this.Result.LoggedPlate = index; //Log the selected plate for this result file
 				this.pairStatus(index);
 				this.do();
@@ -211,7 +211,7 @@ class Report {
 		this.Ranges.forEach(function(r, i) { //For each definition input, prepare a select to change the plate used for resolution of the range item
 			let d = r.Definition;
 			if(d !== undefined) {
-				let sel = LinkCtrl.new("Select", {ID: "Definitions_Select", NewLine: true, Index: i, Default: 0, List: d.PlatesID, Label: d.Area.Name, Title: "The plate to use for the resolution of the names for this range", Change: function(v) {
+				let sel = LinkCtrl.new("Select", {ID: "Definitions_Select", NewLine: true, Index: i, Default: 0, Lookup: true, List: d.PlatesID, Label: d.Area.Name, Title: "The plate to use for the resolution of the names for this range", Change: function(v) {
 					this.resolveNames(d, i).then(function(names) { //Fetch the names for the plate selected for this range
 						this.ResolvedNames[i] = names; //Update the name property for this definition
 						this.updateNames(d.Area, i); //Update the displayed names

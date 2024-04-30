@@ -18,6 +18,7 @@ class HTMLView {
         cellsPerWell: true,
         concentration: true,
         transfectionReagentAmount: true,
+        treatment: true,
       }
     };
 
@@ -193,10 +194,23 @@ class HTMLView {
           Title: 'Check to display the cell line value'
         }
       ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-treatment`,
+          Default: this.metadataDisplayState.well.treatment,
+          Label: 'Treatment',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.treatment = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the treatment value'
+        }
+      ),
     ];
     const wellMetadataControlsContainers = `<span id="well_metadata_checkbox-cellsPerWell"></span>`
       + `<span id="well_metadata_checkbox-concentration"></span>`
-      + `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`;
+      + `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`
+      + `<span id="well_metadata_checkbox-treatment"></span>`;
 
     Form.open({ //Open an empty form with waiting message
       ID: this.id,
@@ -353,6 +367,7 @@ class HTMLView {
         let metadataNumberOfCellsPerWell = '';
         let metadataConcentration = '';
         let metadataTransfectionReagentAmount = '';
+        let metadataTreatment = '';
         if (area) { //Area information
           bgColor = area.Color;
           color = CSSCOLORS.font(area.Color); //Adapt font (black/white) depending on the background
@@ -381,6 +396,9 @@ class HTMLView {
           if (metadataDisplayState.well.transfectionReagentAmount && well.Metadata.TransfectionReagentAmount) {
             metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Reagent amount: </span><span>${[well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
+          if (metadataDisplayState.well.treatment && well.Metadata.Treatment) {
+            metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Treatment: </span><span>${well.Metadata.Treatment || ''}</span></div>`;
+          }
         }
         html += '<td style="background-color:' + bgColor
           + '; color: ' + color
@@ -390,6 +408,7 @@ class HTMLView {
           + metadataNumberOfCellsPerWell
           + metadataConcentration
           + metadataTransfectionReagentAmount
+          + metadataTreatment
           + Well.dose(well) + '</td>';
       }
       html += '</tr>';
