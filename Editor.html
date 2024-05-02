@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>1E Therapeutics Plate Editor - 1.5.11</title>
+	<title>1E Therapeutics Plate Editor - 1.5.12</title>
 	<link href="dist/ui-styles.css" rel="stylesheet" type="text/css">
 	<link href="dist/editor-styles.css" rel="stylesheet" type="text/css">
 	<link href="dist/shared-styles.css" rel="stylesheet" type="text/css">
@@ -20,13 +20,14 @@
 
 	<script type="text/javascript">
 		window.onload = async function() {
+			await AppConfig.init();
 			await DDOptions.init();
 			Editor.init();
 		}
 	</script>
 </head>
 
-<body style="font-family: arial; font-size: 16px" ondrop="event.preventDefault()" ondragover="event.preventDefault()">
+<body style="font-family: arial, sans-serif; font-size: 16px" ondrop="event.preventDefault()" ondragover="event.preventDefault()">
 
 <div style="display: flex; margin-top: 1em">
 	<div id="Editor_Popup" class="Popup"></div>

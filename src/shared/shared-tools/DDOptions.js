@@ -18,7 +18,8 @@ class DDOptions {
     };
     this.Error = false;
     try {
-      const apiResponse = await fetch('https://1etx.admin.api.botlee.com/api/plateEditor/metadataOptions');
+      const url = `${AppConfig.API.URL}/${AppConfig.API.metadata_options}` // 'https://1etx.admin.api.botlee.com/api/plateEditor/metadataOptions'
+      const apiResponse = await fetch(url);
       const options = await apiResponse.json();
       this.MetadataDDOptions.transfectionScientist = (options) ? options.transfection_scientist : [];
       this.MetadataDDOptions.cellLine = (options) ? options.cell_line : [];
@@ -26,7 +27,7 @@ class DDOptions {
       this.MetadataDDOptions.sampleNames = (options) ? options.sample_names : [];
       this.MetadataDDOptions.treatmentInWell = (options) ? options.treatment_in_well : [];
 
-      const fileResponse = await fetch('dist/metadata-dd-options.json');
+      const fileResponse = await fetch('dist/dd-options.json');
       const units = await fileResponse.json();
       this.MetadataDDOptions.transfectionEndPointUnit = (units) ? units.transfection_end_point_units : [];
       this.MetadataDDOptions.viabilityPercentageUnit = (units) ? units.viability_percentage_units : [];
