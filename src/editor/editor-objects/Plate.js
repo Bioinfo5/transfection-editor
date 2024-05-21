@@ -190,13 +190,28 @@ class Plate {
 					?  [`${well.Metadata.TransfectionReagentAmount}`, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
 					: '';
 				const TREATMENT = well.Metadata.Treatment || '';
+				const PLASMID_1 = well.Metadata.Plasmid1 || '';
+				const PLASMID_1_CONCENTRATION = (well.Metadata.Plasmid1Concentration || well.Metadata.Plasmid1Concentration === 0)
+					? [`${well.Metadata.Plasmid1Concentration}`, well.Metadata.Plasmid1ConcentrationUnit].filter(Boolean).join('_')
+					: '';
+				const PLASMID_2 = well.Metadata.Plasmid2 || '';
+				const PLASMID_2_CONCENTRATION = (well.Metadata.Plasmid2Concentration || well.Metadata.Plasmid2Concentration === 0)
+					? [`${well.Metadata.Plasmid2Concentration}`, well.Metadata.Plasmid2ConcentrationUnit].filter(Boolean).join('_')
+					: '';
+				const PLASMID_3 = well.Metadata.Plasmid3 || '';
+				const PLASMID_3_CONCENTRATION = (well.Metadata.Plasmid3Concentration || well.Metadata.Plasmid3Concentration === 0)
+					? [`${well.Metadata.Plasmid3Concentration}`, well.Metadata.Plasmid3ConcentrationUnit].filter(Boolean).join('_')
+					: '';
 
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
 					SEEDING_MEDIUM, TRANSFECTION_MEDIUM,
-					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT, TREATMENT
+					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT, TREATMENT,
+					PLASMID_1, PLASMID_1_CONCENTRATION,
+					PLASMID_2, PLASMID_2_CONCENTRATION,
+					PLASMID_3, PLASMID_3_CONCENTRATION,
 				});
 				sampleNameIndex = sampleNameIndex + 1;
 			})

@@ -19,6 +19,15 @@ class HTMLView {
         concentration: true,
         transfectionReagentAmount: true,
         treatment: true,
+        plasmid1: true,
+        plasmid1Concentration: true,
+        plasmid1ConcentrationUnit: true,
+        plasmid2: true,
+        plasmid2Concentration: true,
+        plasmid2ConcentrationUnit: true,
+        plasmid3: true,
+        plasmid3Concentration: true,
+        plasmid3ConcentrationUnit: true,
       }
     };
 
@@ -206,11 +215,89 @@ class HTMLView {
           Title: 'Check to display the treatment value'
         }
       ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmid1`,
+          Default: this.metadataDisplayState.well.plasmid1,
+          Label: 'Plasmid 1',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid1 = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 1 value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-Plasmid1Concentration`,
+          Default: this.metadataDisplayState.well.plasmid1Concentration,
+          Label: 'Plasmid 1 concentration',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid1Concentration = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 1 concentration value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmid2`,
+          Default: this.metadataDisplayState.well.plasmid2,
+          Label: 'Plasmid 2',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid2 = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 2 value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-Plasmid2Concentration`,
+          Default: this.metadataDisplayState.well.plasmid2Concentration,
+          Label: 'Plasmid 2 concentration',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid2Concentration = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 1 concentration value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmid3`,
+          Default: this.metadataDisplayState.well.plasmid3,
+          Label: 'Plasmid 3',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid3 = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 1 value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-Plasmid3Concentration`,
+          Default: this.metadataDisplayState.well.plasmid3Concentration,
+          Label: 'Plasmid 3 concentration',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmid3Concentration = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the plasmid 1 concentration value'
+        }
+      ),
     ];
     const wellMetadataControlsContainers = `<span id="well_metadata_checkbox-cellsPerWell"></span>`
       + `<span id="well_metadata_checkbox-concentration"></span>`
       + `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`
-      + `<span id="well_metadata_checkbox-treatment"></span>`;
+      + `<span id="well_metadata_checkbox-treatment"></span>`
+      + `<span id="well_metadata_checkbox-plasmid1"></span>`
+      + `<span id="well_metadata_checkbox-Plasmid1Concentration"></span>`
+      + `<span id="well_metadata_checkbox-plasmid2"></span>`
+      + `<span id="well_metadata_checkbox-plasmid2Concentration"></span>`
+      + `<span id="well_metadata_checkbox-plasmid3"></span>`
+      + `<span id="well_metadata_checkbox-plasmid3Concentration"></span>`;
 
     Form.open({ //Open an empty form with waiting message
       ID: this.id,
@@ -368,6 +455,12 @@ class HTMLView {
         let metadataConcentration = '';
         let metadataTransfectionReagentAmount = '';
         let metadataTreatment = '';
+        let metadataPlasmid1 = '';
+        let metadataPlasmid1Concentration = '';
+        let metadataPlasmid2 = '';
+        let metadataPlasmid2Concentration = '';
+        let metadataPlasmid3 = '';
+        let metadataPlasmid3Concentration = '';
         if (area) { //Area information
           bgColor = area.Color;
           color = CSSCOLORS.font(area.Color); //Adapt font (black/white) depending on the background
@@ -399,6 +492,24 @@ class HTMLView {
           if (metadataDisplayState.well.treatment && well.Metadata.Treatment) {
             metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Treatment: </span><span>${well.Metadata.Treatment || ''}</span></div>`;
           }
+          if (metadataDisplayState.well.plasmid1 && well.Metadata.Plasmid1) {
+            metadataPlasmid1 = `<div style="white-space: nowrap;"><span>Plasmid 1: </span><span>${well.Metadata.Plasmid1 || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmid1Concentration && well.Metadata.Plasmid1Concentration) {
+            metadataPlasmid1Concentration = `<div style="white-space: nowrap;"><span>Plasmid 1 Concentration: </span><span>${[well.Metadata.Plasmid1Concentration, well.Metadata.Plasmid1ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmid2 && well.Metadata.Plasmid2) {
+            metadataPlasmid2 = `<div style="white-space: nowrap;"><span>Plasmid 2: </span><span>${well.Metadata.Plasmid2 || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmid2Concentration && well.Metadata.Plasmid2Concentration) {
+            metadataPlasmid2Concentration = `<div style="white-space: nowrap;"><span>Plasmid 2 Concentration: </span><span>${[well.Metadata.Plasmid2Concentration, well.Metadata.Plasmid2ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmid3 && well.Metadata.Plasmid3) {
+            metadataPlasmid3 = `<div style="white-space: nowrap;"><span>Plasmid 3: </span><span>${well.Metadata.Plasmid3 || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmid3Concentration && well.Metadata.Plasmid3Concentration) {
+            metadataPlasmid3Concentration = `<div style="white-space: nowrap;"><span>Plasmid 3 Concentration: </span><span>${[well.Metadata.Plasmid3Concentration, well.Metadata.Plasmid3ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;
+          }
         }
         html += '<td style="background-color:' + bgColor
           + '; color: ' + color
@@ -409,6 +520,12 @@ class HTMLView {
           + metadataConcentration
           + metadataTransfectionReagentAmount
           + metadataTreatment
+          + metadataPlasmid1
+          + metadataPlasmid1Concentration
+          + metadataPlasmid2
+          + metadataPlasmid2Concentration
+          + metadataPlasmid3
+          + metadataPlasmid3Concentration
           + Well.dose(well) + '</td>';
       }
       html += '</tr>';

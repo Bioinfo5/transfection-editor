@@ -16,5 +16,9 @@
   "transfection_reagent_amount_units": [
     "uL",
     "mL"
+  ],
+  "plasmid_in_well_concentration_units": [
+    "ng",
+    "ul"
   ]
 }

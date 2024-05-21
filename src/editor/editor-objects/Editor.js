@@ -371,6 +371,150 @@ class Editor {
 					NewLine: true,
 					Chain: {Index: 14, Last: true}
 				}),
+				Plasmid1: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "Plasmid 1",
+					Default: 0,
+					Lookup: true,
+					Preserve: true,
+					Title: "Plasmid 1",
+					List: DDOptions.plasmidInWell(),
+					NewLine: false,
+					Chain: {Index: 15, Last: true},
+				}),
+				UpdatePlasmid1: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 16, Last: true}
+				}),
+				Plasmid1Concentration: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 1 Concentration",
+					Min: 0,
+					Default: "",
+					Label: "Plasmid 1 Concentration",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 17, Last: false}
+				}),
+				Plasmid1ConcentrationUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 1 Concentration Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 18, Last: false}
+				}),
+				UpdatePlasmid1ConcentrationUnit: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 19, Last: true}
+				}),
+				Plasmid2: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "Plasmid 2",
+					Default: 0,
+					Lookup: true,
+					Preserve: true,
+					Title: "Plasmid 2",
+					List: DDOptions.plasmidInWell(),
+					NewLine: false,
+					Chain: {Index: 20, Last: true},
+				}),
+				UpdatePlasmid2: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 21, Last: true}
+				}),
+				Plasmid2Concentration: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 2 Concentration",
+					Min: 0,
+					Default: "",
+					Label: "Plasmid 2 Concentration",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 22, Last: false}
+				}),
+				Plasmid2ConcentrationUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 2 Concentration Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 23, Last: false}
+				}),
+				UpdatePlasmid2ConcentrationUnit: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 24, Last: true}
+				}),
+				Plasmid3: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "Plasmid 3",
+					Default: 0,
+					Lookup: true,
+					Preserve: true,
+					Title: "Plasmid 3",
+					List: DDOptions.plasmidInWell(),
+					NewLine: false,
+					Chain: {Index: 25, Last: true},
+				}),
+				UpdatePlasmid3: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 26, Last: true}
+				}),
+				Plasmid3Concentration: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 3 Concentration",
+					Min: 0,
+					Default: "",
+					Label: "Plasmid 3 Concentration",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 27, Last: false}
+				}),
+				Plasmid3ConcentrationUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid 3 Concentration Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 28, Last: false}
+				}),
+				UpdatePlasmid3ConcentrationUnit: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 29, Last: true}
+				}),
 			}
 		}
 		this.Console = new EditorConsole("Console");
@@ -563,6 +707,12 @@ class Editor {
 				'TRANSFECTION_ID',
 				'TRANSFECTION_SCIENTIST',
 				'TRANSFECTION_DATE',
+				'PLASMID_1',
+				'PLASMID_1_CONCENTRATION',
+				'PLASMID_2',
+				'PLASMID_2_CONCENTRATION',
+				'PLASMID_3',
+				'PLASMID_3_CONCENTRATION',
 			],
 			...data.map(item => [
 				item.SAMPLE_NAME,
@@ -583,6 +733,12 @@ class Editor {
 				item.TRANSFECTION_ID,
 				item.TRANSFECTION_SCIENTIST,
 				item.TRANSFECTION_DATE,
+				item.PLASMID_1,
+				item.PLASMID_1_CONCENTRATION,
+				item.PLASMID_2,
+				item.PLASMID_2_CONCENTRATION,
+				item.PLASMID_3,
+				item.PLASMID_3_CONCENTRATION,
 			])
 		]
 
@@ -624,6 +780,9 @@ class Editor {
 						|| isNaN(well.Metadata.Concentration)
 						|| isNaN(well.Metadata.TransfectionReagentAmount)
 						|| !well.Metadata.Treatment
+						|| !well.Metadata.Plasmid1
+						|| !well.Metadata.Plasmid2
+						|| !well.Metadata.Plasmid3
 					)
 				) {
 					isValid = false;
@@ -936,6 +1095,12 @@ class Editor {
 			const [concentration, concentrationUnit] = item.TRANSFECTION_CONCENTRATION.toString().split('_');
 			const [transfectionReagentAmount, transfectionReagentAmountUnit] = item.TRANSFECTION_REAGENT_AMOUNT.toString().split('_');
 			const treatment = item.TREATMENT;
+			const plasmid1 = item.PLASMID_1;
+			const [plasmid1Concentration, plasmid1ConcentrationUnit] = item.PLASMID_1_CONCENTRATION.toString().split('_');
+			const plasmid2 = item.PLASMID_2;
+			const [plasmid2Concentration, plasmid2ConcentrationUnit] = item.PLASMID_2_CONCENTRATION.toString().split('_');
+			const plasmid3 = item.PLASMID_3;
+			const [plasmid3Concentration, plasmid3ConcentrationUnit] = item.PLASMID_3_CONCENTRATION.toString().split('_');
 
 			return {
 				Layer: item.TRANSFECTION_PLATE_INDEX,
@@ -948,6 +1113,15 @@ class Editor {
 					TransfectionReagentAmount: transfectionReagentAmount,
 					TransfectionReagentAmountUnit: transfectionReagentAmountUnit,
 					Treatment: treatment,
+					Plasmid1: plasmid1,
+					Plasmid1Concentration: plasmid1Concentration,
+					Plasmid1ConcentrationUnit: plasmid1ConcentrationUnit,
+					Plasmid2: plasmid2,
+					Plasmid2Concentration: plasmid2Concentration,
+					Plasmid2ConcentrationUnit: plasmid2ConcentrationUnit,
+					Plasmid3: plasmid3,
+					Plasmid3Concentration: plasmid3Concentration,
+					Plasmid3ConcentrationUnit: plasmid3ConcentrationUnit,
 				}
 			}
 		});
@@ -1603,6 +1777,27 @@ class Editor {
 			if (this.Controls.MetadataWellLevel.UpdateTreatment.Value) {
 				values.Treatment = this.Controls.MetadataWellLevel.Treatment.Selected;
 			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid1.Value) {
+				values.Plasmid1 = this.Controls.MetadataWellLevel.Plasmid1.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid1ConcentrationUnit.Value) {
+				values.Plasmid1Concentration = this.Controls.MetadataWellLevel.Plasmid1Concentration.getValue();
+				values.Plasmid1ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid1ConcentrationUnit.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid2.Value) {
+				values.Plasmid2 = this.Controls.MetadataWellLevel.Plasmid2.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid2ConcentrationUnit.Value) {
+				values.Plasmid2Concentration = this.Controls.MetadataWellLevel.Plasmid2Concentration.getValue();
+				values.Plasmid2ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid2ConcentrationUnit.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid3.Value) {
+				values.Plasmid3 = this.Controls.MetadataWellLevel.Plasmid3.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmid3ConcentrationUnit.Value) {
+				values.Plasmid3Concentration = this.Controls.MetadataWellLevel.Plasmid3Concentration.getValue();
+				values.Plasmid3ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid3ConcentrationUnit.Selected;
+			}
 			let totalUpdated = 0;
 			let totalEmpty = 0;
 
@@ -1625,6 +1820,24 @@ class Editor {
 				}
 				if (this.Controls.MetadataWellLevel.UpdateTreatment.Value) {
 					Editor.Console.log({Message: `Treatment: ${values.Treatment}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid1.Value) {
+					Editor.Console.log({Message: `Plasmid 1: ${values.Plasmid1}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid1ConcentrationUnit.Value) {
+					Editor.Console.log({Message: `Plasmid 1 Concentration: ${[values.Plasmid1Concentration, values.Plasmid1ConcentrationUnit].filter(Boolean). join(' ')}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid2.Value) {
+					Editor.Console.log({Message: `Plasmid 2: ${values.Plasmid2}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid2ConcentrationUnit.Value) {
+					Editor.Console.log({Message: `Plasmid 2 Concentration: ${[values.Plasmid2Concentration, values.Plasmid2ConcentrationUnit].filter(Boolean). join(' ')}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid3.Value) {
+					Editor.Console.log({Message: `Plasmid 3: ${values.Plasmid3}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmid3ConcentrationUnit.Value) {
+					Editor.Console.log({Message: `Plasmid 3 Concentration: ${[values.Plasmid3Concentration, values.Plasmid3ConcentrationUnit].filter(Boolean). join(' ')}`, Gravity: "Success"});
 				}
 			}
 			if (totalEmpty > 0) {
@@ -1664,5 +1877,14 @@ class Editor {
 		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue("");
 		this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.setValue(0);
 		this.Controls.MetadataWellLevel.Treatment.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid1.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid1Concentration.setValue("");
+		this.Controls.MetadataWellLevel.Plasmid1ConcentrationUnit.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid2.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid2Concentration.setValue("");
+		this.Controls.MetadataWellLevel.Plasmid2ConcentrationUnit.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid3.setValue(0);
+		this.Controls.MetadataWellLevel.Plasmid3Concentration.setValue("");
+		this.Controls.MetadataWellLevel.Plasmid3ConcentrationUnit.setValue(0);
 	}
 }

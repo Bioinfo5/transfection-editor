@@ -226,6 +226,21 @@ class Well {
 		if (I.Treatment) {
 			this.Metadata.Treatment = I.Treatment;
 		}
+		if (I.Plasmid1) {
+			this.Metadata.Plasmid1 = I.Plasmid1;
+			this.Metadata.Plasmid1Concentration = I.Plasmid1Concentration;
+			this.Metadata.Plasmid1ConcentrationUnit = I.Plasmid1ConcentrationUnit;
+		}
+		if (I.Plasmid2) {
+			this.Metadata.Plasmid2 = I.Plasmid2;
+			this.Metadata.Plasmid2Concentration = I.Plasmid2Concentration;
+			this.Metadata.Plasmid2ConcentrationUnit = I.Plasmid2ConcentrationUnit;
+		}
+		if (I.Plasmid3) {
+			this.Metadata.Plasmid3 = I.Plasmid3;
+			this.Metadata.Plasmid3Concentration = I.Plasmid3Concentration;
+			this.Metadata.Plasmid3ConcentrationUnit = I.Plasmid3ConcentrationUnit;
+		}
 	}
 
 	getMetadata() {

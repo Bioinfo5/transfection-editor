@@ -9,6 +9,7 @@ class DDOptions {
       transfectionReagent: [],
       sampleNames: [],
       treatmentInWell: [],
+      plasmidInWell: [],
       //units
       transfectionEndPointUnit: [],
       viabilityPercentageUnit: [],
@@ -26,6 +27,7 @@ class DDOptions {
       this.MetadataDDOptions.transfectionReagent = (options) ? options.transfection_reagent : [];
       this.MetadataDDOptions.sampleNames = (options) ? options.sample_names : [];
       this.MetadataDDOptions.treatmentInWell = (options) ? options.treatment_in_well : [];
+      this.MetadataDDOptions.plasmidInWell = (options) ? options.plasmid_in_well : [];
 
       const fileResponse = await fetch('dist/dd-options.json');
       const units = await fileResponse.json();
@@ -34,6 +36,7 @@ class DDOptions {
       this.MetadataDDOptions.numberOfCellsPerWellUnit = (units) ? units.number_of_cells_per_well_units : [];
       this.MetadataDDOptions.concentrationUnit = (units) ? units.concentration_units : [];
       this.MetadataDDOptions.transfectionReagentAmountUnit = (units) ? units.transfection_reagent_amount_units : [];
+      this.MetadataDDOptions.plasmidInWellConcentrationUnit = (units) ? units.plasmid_in_well_concentration_units : [];
     } catch (e) {
       alert('Error while receiving metadata options');
       this.Error = true;
@@ -60,6 +63,10 @@ class DDOptions {
     return ['Please select', ...this.MetadataDDOptions.treatmentInWell];
   }
 
+  static plasmidInWell() {
+    return ['Please select', ...this.MetadataDDOptions.plasmidInWell];
+  }
+
   static TransfectionEndPointUnitOptions() {
     return [...this.MetadataDDOptions.transfectionEndPointUnit];
   }
@@ -78,5 +85,9 @@ class DDOptions {
 
   static TransfectionReagentAmountUnitOptions() {
     return [...this.MetadataDDOptions.transfectionReagentAmountUnit];
+  }
+
+  static PlasmidInWellConcentrationUnitOptions() {
+    return [...this.MetadataDDOptions.plasmidInWellConcentrationUnit];
   }
 }
