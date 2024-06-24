@@ -211,36 +211,26 @@ class Well {
 	}
 
 	applyMetadata(I) {
-		if (I.NumberOfCellsPerWell) {
-			this.Metadata.NumberOfCellsPerWell = I.NumberOfCellsPerWell;
-			this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
-		}
-		if (I.Concentration) {
-			this.Metadata.Concentration = I.Concentration;
-			this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
-		}
-		if (I.TransfectionReagentAmount) {
-			this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
-			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
-		}
-		if (I.Treatment) {
-			this.Metadata.Treatment = I.Treatment;
-		}
-		if (I.Plasmid1) {
-			this.Metadata.Plasmid1 = I.Plasmid1;
-			this.Metadata.Plasmid1Concentration = I.Plasmid1Concentration;
-			this.Metadata.Plasmid1ConcentrationUnit = I.Plasmid1ConcentrationUnit;
-		}
-		if (I.Plasmid2) {
-			this.Metadata.Plasmid2 = I.Plasmid2;
-			this.Metadata.Plasmid2Concentration = I.Plasmid2Concentration;
-			this.Metadata.Plasmid2ConcentrationUnit = I.Plasmid2ConcentrationUnit;
-		}
-		if (I.Plasmid3) {
-			this.Metadata.Plasmid3 = I.Plasmid3;
-			this.Metadata.Plasmid3Concentration = I.Plasmid3Concentration;
-			this.Metadata.Plasmid3ConcentrationUnit = I.Plasmid3ConcentrationUnit;
-		}
+		this.Metadata.NumberOfCellsPerWell = I.NumberOfCellsPerWell;
+		this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
+		this.Metadata.Concentration = I.Concentration;
+		this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
+		this.Metadata.DZReagent = I.DZReagent;
+		this.Metadata.DZReagentLOT = I.DZReagentLOT;
+		this.Metadata.PlasmidReagent = I.PlasmidReagent;
+		this.Metadata.PlasmidReagentLOT = I.PlasmidReagentLOT;
+		this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
+		this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
+		this.Metadata.Treatment = I.Treatment;
+		this.Metadata.Plasmid1 = I.Plasmid1;
+		this.Metadata.Plasmid1Concentration = I.Plasmid1Concentration;
+		this.Metadata.Plasmid1ConcentrationUnit = I.Plasmid1ConcentrationUnit;
+		this.Metadata.Plasmid2 = I.Plasmid2;
+		this.Metadata.Plasmid2Concentration = I.Plasmid2Concentration;
+		this.Metadata.Plasmid2ConcentrationUnit = I.Plasmid2ConcentrationUnit;
+		this.Metadata.Plasmid3 = I.Plasmid3;
+		this.Metadata.Plasmid3Concentration = I.Plasmid3Concentration;
+		this.Metadata.Plasmid3ConcentrationUnit = I.Plasmid3ConcentrationUnit;
 	}
 
 	getMetadata() {

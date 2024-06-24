@@ -4,9 +4,8 @@
 function Form_Color(I) { //I.Caller should be a LinkCtrl Object, or an object with setValue() and getValue() methods defined
 	this.Selected = "white";
 	if(I && I.Caller) {this.Selected = I.Caller.getValue()}
-	//var txt = "<div>Colors available:</div>";
 	var txt = "";
-	CSSCOLORS.list().forEach(function(c) { //Append all available colors
+	CSSCOLORS.list('boxColors').forEach(function(c) { //Append all available colors
 		txt += "<div class=\"ColorBlock\" style=\"float: left; background-color: " + c + "\" title=\"" + c + "\"></div>";
 	});
 	txt += "<div style=\"clear: both; padding-top: 10px; text-align: center\">Selected:&nbsp;";

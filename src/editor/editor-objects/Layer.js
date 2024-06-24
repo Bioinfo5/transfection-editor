@@ -461,7 +461,6 @@ class Layer {
 			html += "<tr><th>" + Well.alphabet(i) + "</th>";
 			for(let j=0;j<c;j++) { //For each col
 				let w = this.Wells[i * c + j];
-				//html += "<td style=\"background-color:" + CSSCOLORS.heatmap(Math.log10(w.Value), min, max, colors) + "\">" + Well.dose(w) + "</td>";
 				html += "<td style=\"background-color:";
 				if(logAvailable) {html += CSSCOLORS.heatmap(Math.log10(w.Value), min, max, colors)}
 				else {html += CSSCOLORS.heatmap(w.Value, min, max, colors)}
@@ -565,12 +564,6 @@ class Layer {
 		if (I.CellLinePassage || I.CellLinePassage === 0) {
 			this.Metadata.CellLinePassage = I.CellLinePassage;
 		}
-		if (I.TransfectionReagent) {
-			this.Metadata.TransfectionReagent = I.TransfectionReagent;
-		}
-		if (I.TransfectionReagentLOT) {
-			this.Metadata.TransfectionReagentLOT = I.TransfectionReagentLOT;
-		}
 		if (I.TransfectionEndPoint) {
 			this.Metadata.TransfectionEndPoint = I.TransfectionEndPoint;
 			this.Metadata.TransfectionEndPointUnit = I.TransfectionEndPointUnit;
@@ -584,6 +577,10 @@ class Layer {
 		}
 		if (I.TransfectionMedium) {
 			this.Metadata.TransfectionMedium = I.TransfectionMedium;
+		}
+		if (I.NumberOfCellsPer10CmPlate) {
+			this.Metadata.NumberOfCellsPer10CmPlate = I.NumberOfCellsPer10CmPlate;
+			this.Metadata.NumberOfCellsPer10CmPlateUnit = I.NumberOfCellsPer10CmPlateUnit;
 		}
 	}
 

@@ -7,16 +7,19 @@ class HTMLView {
       plate: {
         cellLine: false,
         cellLinePassage: false,
-        transfectionReagent: false,
-        transfectionReagentLOT: false,
         transfectionEndPoint: false,
         viabilityPercentage: false,
         seedingMedium: false,
         transfectionMedium: false,
+        numberOfCellsPer10CmPlate: false,
       },
       well: {
         cellsPerWell: true,
         concentration: true,
+        dzReagent: true,
+        dzReagentLOT: true,
+        plasmidReagent: true,
+        plasmidReagentLOT: true,
         transfectionReagentAmount: true,
         treatment: true,
         plasmid1: true,
@@ -85,30 +88,6 @@ class HTMLView {
         }
       ),
       LinkCtrl.new('Checkbox', {
-          ID: `plate_metadata_checkbox-transfectionReagent`,
-          Default: this.metadataDisplayState.plate.transfectionReagent,
-          Label: 'Transfection Reagent',
-          NewLine: false,
-          Change: function (checked) {
-            this.metadataDisplayState.plate.transfectionReagent = checked;
-            this.updateOutput(dataList, this.metadataDisplayState);
-          }.bind(this),
-          Title: 'Check to display the cell line value'
-        }
-      ),
-      LinkCtrl.new('Checkbox', {
-          ID: `plate_metadata_checkbox-transfectionReagentLOT`,
-          Default: this.metadataDisplayState.plate.transfectionReagentLOT,
-          Label: 'Transfection Reagent LOT',
-          NewLine: false,
-          Change: function (checked) {
-            this.metadataDisplayState.plate.transfectionReagentLOT = checked;
-            this.updateOutput(dataList, this.metadataDisplayState);
-          }.bind(this),
-          Title: 'Check to display the cell line value'
-        }
-      ),
-      LinkCtrl.new('Checkbox', {
           ID: `plate_metadata_checkbox-transfectionEndPoint`,
           Default: this.metadataDisplayState.plate.transfectionEndPoint,
           Label: 'Transfection End-Point',
@@ -156,15 +135,26 @@ class HTMLView {
           Title: 'Check to display the cell line value'
         }
       ),
+      LinkCtrl.new('Checkbox', {
+          ID: `plate_metadata_checkbox-numberOfCellsPer10CmPlate`,
+          Default: this.metadataDisplayState.plate.numberOfCellsPer10CmPlate,
+          Label: 'Number Of Cells Per 10Cm Plate',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.plate.numberOfCellsPer10CmPlate = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
     ];
     const layerMetadataControlsContainers = `<span id="plate_metadata_checkbox-cellLine"></span>`
       + `<span id="plate_metadata_checkbox-cellLinePassage"></span>`
-      + `<span id="plate_metadata_checkbox-transfectionReagent"></span>`
-      + `<span id="plate_metadata_checkbox-transfectionReagentLOT"></span>`
       + `<span id="plate_metadata_checkbox-transfectionEndPoint"></span>`
       + `<span id="plate_metadata_checkbox-viabilityPercentage"></span>`
       + `<span id="plate_metadata_checkbox-seedingMedium"></span>`
-      + `<span id="plate_metadata_checkbox-transfectionMedium"></span>`;
+      + `<span id="plate_metadata_checkbox-transfectionMedium"></span>`
+      + `<span id="plate_metadata_checkbox-numberOfCellsPer10CmPlate"></span>`;
 
     const wellMetadataControls = [
       LinkCtrl.new('Checkbox', {
@@ -186,6 +176,54 @@ class HTMLView {
           NewLine: false,
           Change: function (checked) {
             this.metadataDisplayState.well.concentration = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-dzReagent`,
+          Default: this.metadataDisplayState.well.dzReagent,
+          Label: 'DZ Reagent',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.dzReagent = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-dzReagentLOT`,
+          Default: this.metadataDisplayState.well.dzReagentLOT,
+          Label: 'DZ Reagent LOT',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.dzReagentLOT = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmidReagent`,
+          Default: this.metadataDisplayState.well.dzReagent,
+          Label: 'Plasmid Reagent',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmidReagent = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmidReagentLOT`,
+          Default: this.metadataDisplayState.well.plasmidReagentLOT,
+          Label: 'Plasmid Reagent LOT',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmidReagentLOT = checked;
             this.updateOutput(dataList, this.metadataDisplayState);
           }.bind(this),
           Title: 'Check to display the cell line value'
@@ -290,6 +328,10 @@ class HTMLView {
     ];
     const wellMetadataControlsContainers = `<span id="well_metadata_checkbox-cellsPerWell"></span>`
       + `<span id="well_metadata_checkbox-concentration"></span>`
+      + `<span id="well_metadata_checkbox-dzReagent"></span>`
+      + `<span id="well_metadata_checkbox-dzReagentLOT"></span>`
+      + `<span id="well_metadata_checkbox-plasmidReagent"></span>`
+      + `<span id="well_metadata_checkbox-plasmidReagentLOT"></span>`
       + `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`
       + `<span id="well_metadata_checkbox-treatment"></span>`
       + `<span id="well_metadata_checkbox-plasmid1"></span>`
@@ -401,12 +443,6 @@ class HTMLView {
           + ((metadataDisplayState.plate.cellLinePassage)
             ? '<div>Cell line passage: ' + (layer.Metadata.CellLinePassage || '') + '</div>'
             : '')
-          + ((metadataDisplayState.plate.transfectionReagent)
-            ? '<div>Transfection reagent: ' + (layer.Metadata.TransfectionReagent || '') + '</div>'
-            : '')
-          + ((metadataDisplayState.plate.transfectionReagentLOT)
-            ? '<div>Transfection reagent LOT: ' + (layer.Metadata.TransfectionReagentLOT || '') + '</div>'
-            : '')
           + ((metadataDisplayState.plate.transfectionEndPoint)
               ? '<div>Transfection end-point: ' + ([layer.Metadata.TransfectionEndPoint, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join(' ') || '') + '</div>'
             : '')
@@ -418,6 +454,9 @@ class HTMLView {
             : '')
           + ((metadataDisplayState.plate.transfectionMedium)
             ? '<div>Transfection medium: ' + (layer.Metadata.TransfectionMedium || '') + '</div>'
+            : '')
+          + ((metadataDisplayState.plate.numberOfCellsPer10CmPlate)
+            ? '<div>Number of cells per 10cm plate: ' + (layer.Metadata.NumberOfCellsPer10CmPlate || '') + '</div>'
             : '')
           + '</p>'
           : '';
@@ -453,6 +492,10 @@ class HTMLView {
         let name = '';
         let metadataNumberOfCellsPerWell = '';
         let metadataConcentration = '';
+        let metadataDZReagent = '';
+        let metadataDZReagentLOT = '';
+        let metadataPlasmidReagent = '';
+        let metadataPlasmidReagentLOT = '';
         let metadataTransfectionReagentAmount = '';
         let metadataTreatment = '';
         let metadataPlasmid1 = '';
@@ -486,6 +529,18 @@ class HTMLView {
           if (metadataDisplayState.well.concentration && well.Metadata.Concentration) {
             metadataConcentration = `<div style="white-space: nowrap;"><span>Concentration: </span><span>${[well.Metadata.Concentration, well.Metadata.ConcentrationUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
+          if (metadataDisplayState.well.dzReagent) {
+            metadataDZReagent = `<div style="white-space: nowrap;"><span>DZ reagent: </span><span>${well.Metadata.DZReagent || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.dzReagentLOT) {
+            metadataDZReagentLOT = `<div style="white-space: nowrap;"><span>DZ reagent LOT: </span><span>${well.Metadata.DZReagentLOT || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmidReagent) {
+            metadataPlasmidReagent = `<div style="white-space: nowrap;"><span>Plasmid reagent: </span><span>${well.Metadata.PlasmidReagent || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmidReagentLOT) {
+            metadataPlasmidReagentLOT = `<div style="white-space: nowrap;"><span>Plasmid reagent LOT: </span><span>${well.Metadata.PlasmidReagentLOT || ''}</span></div>`;
+          }
           if (metadataDisplayState.well.transfectionReagentAmount && well.Metadata.TransfectionReagentAmount) {
             metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Reagent amount: </span><span>${[well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
@@ -518,6 +573,10 @@ class HTMLView {
           + '<br>'
           + metadataNumberOfCellsPerWell
           + metadataConcentration
+          + metadataDZReagent
+          + metadataDZReagentLOT
+          + metadataPlasmidReagent
+          + metadataPlasmidReagentLOT
           + metadataTransfectionReagentAmount
           + metadataTreatment
           + metadataPlasmid1

@@ -1,10 +1,68 @@
-//****************************************************
-// CSSCOLORS - Simple object for listing of css colors
-//****************************************************
 class CSSCOLORS {
 	constructor() {}
-	//Static methods
 	static list(type) {
+		const boxColors = [
+			"#ef6e3c", "#0971f0", "#9b5c2a", "#b2b4f0",
+			"#3b8c2a", "#f50422", "#250662", "#060e27",
+			"#0f525f", "#c4fd57", "#3f16d9", "#21d52e",
+			"#e08c56", "#28fcfd", "#36486a", "#d02e29",
+			"#41d158", "#fb21a3", "#566ca0", "#15b9ee",
+			"#c9d730", "#30cc49",	"#3d6751", "#fb4c03",
+			"#640fc1", "#d3493a", "#1ae6db", "#289812",
+			"#3e464c", "#a84a8f",	"#51aed9", "#5bb32d",
+			"#21538e", "#89d534",	"#d36647", "#fc7e41",
+			"#0023b8", "#c188a2", "#67eb4b", "#b308d3",
+			"#af3101", "#71b1f4", "#c4d647", "#11dec1",
+			"#ea24a3", "#79352c", "#521250", "#df514a",
+			"#c79ed2", "#e33e52", "#21538e", "#539397",
+			"#1bb699", "#6b2e5f", "#0023b8", "#3b8c2a",
+			"#d36647", "#7fb411",	"#986b53", "#f50422",
+			"#79352c", "#521250", "#c79ed2", "#983f7a",
+			"#3f8473", "#421f79", "#7a3d93", "#635f6d",
+			"#0f5997", "#409188", "#911e20", "#f1ae16",
+			"#1350ce", "#10e5b1", "#cb2582", "#ce00be",
+			"#32d5d6", "#608572", "#c79bc2", "#00f87c",
+			"#77772a", "#6995ba", "#fc6b57", "#983f7a",
+			"#8fd883", "#96e591", "#f07815", "#d00043",
+			"#b47162", "#1ec227", "#4f0f6f", "#1d1d58",
+			"#947002", "#bde052", "#911e7e",
+			"#406df9", "#615af0", "#2a3434", "#4a543f",
+			"#a8b8d4", "#00efd4", "#7ad236",
+			"#ac7c0a", "#2f1179", "#dd93fd",
+			"#7260d8", "#1deaa7", "#06f43a", "#823c59",
+			"#e3d94c", "#dc1c06", "#f53b2a",
+			"#b46238", "#2dfff6", "#a82b89", "#1a8011",
+			"#436a9f", "#1a806a", "#4cf09d",
+			"#63b598", "#ce7d78", "#ea9e70", "#a48a9e",
+			"#648177", "#0d5ac1", "#4b5bdc", "#0cd36d",
+			"#f205e6", "#1c0365", "#14a9ad", "#4ca2f9",
+			"#a4e43f", "#d298e2", "#6119d0",
+			"#d2737d", "#c0a43c", "#f2510e", "#651be6",
+			"#79806e", "#61da5e", "#cd2f00",
+			"#9348af", "#01ac53", "#c5a4fb", "#996635",
+			"#b11573", "#4bb473", "#75d89e",
+			"#2f3f94", "#2f7b99", "#da967d", "#34891f",
+			"#b0d87b", "#ca4751", "#7e50a8","#fa06ec",
+			"#1bb699", "#6b2e5f",	"#996c48", "#9ab9b7",
+			"#06e052","#e3a481", "#0eb621", "#fc458e",
+			"#b2db15", "#aa226d", "#792ed8",
+			"#73872a", "#520d3a", "#a5b3d9",
+			"#935b6d", "#513d98", "#aead3a",
+			"#cb5bea", "#228916", "#ac3e1b",
+			"#f697c1", "#ba96ce", "#679c9d", "#c6c42c",
+			"#5d2c52", "#48b41b", "#e1cf3b",
+			"#5be4f0", "#57c4d8", "#a4d17a", "#be608b",
+			"#96b00c", "#088baf", "#f158bf",
+			"#e145ba", "#ee91e3", "#05d371", "#5426e0",
+			"#4834d0", "#802234", "#6749e8",
+			"#e23dd0", "#d3486d", "#00f7f9", "#474893",
+			"#3cec35", "#1c65cb", "#5d1d0c",
+			"#2d7d2a", "#ff3420", "#5cdd87", "#a259a4",
+			"#e4ac44", "#1bede6", "#8798a4",
+			"#d7790f", "#b2c24f", "#76fc1b", "#608fa4",
+			"#ae90e2", "#1a806b", "#436a9e", "#0ec0ff",
+			"#f812b3", "#8d6c2f",	"#d3277a", "#2ca1ae",
+		];
 		switch(type) {
 			case "RGB": return [ //RGB values
 				[135,206,250],[144,238,144],[255,182,193],[221,160,221],[240,230,140],[211,211,211],[255,255,240],[224,255,255],[255,240,245],[127,255,212],
@@ -48,15 +106,9 @@ class CSSCOLORS {
 				"F49E4C",
 				"AB3428",
 			]
-			default: return [ //Array of 138 unique, css lvl3, shuffled color names
-				"lightskyblue","lightgreen","lightpink","plum","khaki","lightgray","ivory","lightcyan","lavenderblush","aquamarine","peachpuff","powderblue","lightsteelblue","lightsalmon","darkgray","orchid","lightyellow","lightgoldenrodyellow","papayawhip","greenyellow",
-				"yellow","cyan","moccasin","mediumaquamarine","azure","lightcoral","mintcream","pink","rosybrown","lemonchiffon","chartreuse","floralwhite","bisque","snow","white","palegreen","palegoldenrod","gainsboro","thistle","turquoise",
-				"ghostwhite","paleturquoise","honeydew","cornsilk","wheat","lime","aliceblue","lawngreen","gold","seashell","lavender","whitesmoke","lightblue","tan","oldlace","salmon","lightseagreen","beige","darkorange","deepskyblue",
-				"limegreen","blanchedalmond","mediumspringgreen","skyblue","linen","silver","yellowgreen","antiquewhite","darkkhaki","hotpink","goldenrod","mistyrose","navajowhite","springgreen","burlywood","orange","violet","darkseagreen","sandybrown","darkturquoise",
-				"coral","mediumseagreen","darksalmon","mediumturquoise","tomato","cornflowerblue","peru","cadetblue","palevioletred","magenta","dodgerblue","darkgoldenrod","orangered","chocolate","deeppink","lightslategray","mediumpurple","olivedrab","mediumorchid","gray",
-				"indianred","red","slategray","steelblue","darkcyan","mediumslateblue","olive","seagreen","forestgreen","teal","royalblue","crimson","green","slateblue","mediumvioletred","dimgray","sienna","darkorchid","darkolivegreen","blueviolet",
-				"darkviolet","firebrick","brown","saddlebrown","darkgreen","darkmagenta","blue","darkslategray","darkslateblue","purple","darkred","maroon","mediumblue","indigo","midnightblue","darkblue","navy","black"
-			];
+			case "boxColors":
+			default:
+				return boxColors
 		}
 	}
 	static cutOff(I) { //The cutoff value to determine black/white font
@@ -73,7 +125,7 @@ class CSSCOLORS {
 		return source.findIndex(function(c) {return c == color});
 	}
 	static fetchRGB(color, returnAsTxt) { //Return the rgb color corresponding to the color name provided. Specify in options the list and whether to return as an array of three numbers [R, G, B] or a css-compatible text string
-		let source = this.list("RGB");
+		let source = this.list("boxColors");
 		let index = this.fetchIndex(color);
 		let out = source[index];
 		if(returnAsTxt) {return "rgb(" + out[0] + "," + out[1] + "," + out[2] + ")"} //CSS-compatible string for rgb color
@@ -129,29 +181,4 @@ class CSSCOLORS {
 			["black", "blue", "white"],
 		];
 	}
-	/*static font(i) { //Return the font color for the color of index i from the full list
-		var cut = this.cutOff();
-		var index = i % cut;
-		if(index < cut) {return "black"}
-		else {return "white"}
-	}*/
-	/*static hexa(name, I) { //Return the hexadecimal value corresponding to the color name provided
-		var out = "";
-		if(I && I.Sharp) {out += "#"} //Add the sharp if needed
-		if(I && I.Simple) {
-			var source = this.ListSimple;
-			var target = this.HexaSimple;
-		}
-		else {
-			var source = this.List;
-			var target = this.Hexa;
-		}
-		var i = 0;
-		var l = source.length;
-		while(i<l) {
-			if(source[i] == name) {return out + target[i]}
-			i++
-		}
-		return out + "000000"; //black is returned as default if nothing match the name provided
-	}*/
 }

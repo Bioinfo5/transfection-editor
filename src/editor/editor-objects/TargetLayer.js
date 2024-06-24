@@ -622,12 +622,6 @@ class TargetLayer {
     if (I.CellLinePassage) {
       this.Metadata.CellLinePassage = parseFloat(I.CellLinePassage);
     }
-    if (I.TransfectionReagent) {
-      this.Metadata.TransfectionReagent = I.TransfectionReagent;
-    }
-    if (I.TransfectionReagentLOT) {
-      this.Metadata.TransfectionReagentLOT = I.TransfectionReagentLOT;
-    }
     if (I.TransfectionEndPoint) {
       this.Metadata.TransfectionEndPoint = parseFloat(I.TransfectionEndPoint);
       this.Metadata.TransfectionEndPointUnit = I.TransfectionEndPointUnit;
@@ -641,6 +635,10 @@ class TargetLayer {
     }
     if (I.TransfectionMedium) {
       this.Metadata.TransfectionMedium = parseFloat(I.TransfectionMedium);
+    }
+    if (I.NumberOfCellsPer10CmPlate) {
+      this.Metadata.NumberOfCellsPer10CmPlate = parseFloat(I.NumberOfCellsPer10CmPlate);
+      this.Metadata.NumberOfCellsPer10CmPlateUnit = I.NumberOfCellsPer10CmPlateUnit;
     }
   }
 

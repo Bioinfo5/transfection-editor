@@ -166,8 +166,6 @@ class Plate {
 			const TRANSFECTION_CELL_LINE_PASSAGE = (layer.Metadata.CellLinePassage || layer.Metadata.CellLinePassage === 0)
 				? `${layer.Metadata.CellLinePassage}`
 				: '';
-			const TRANSFECTION_REAGENT = layer.Metadata.TransfectionReagent || '';
-			const TRANSFECTION_REAGENT_LOT = layer.Metadata.TransfectionReagentLOT || '';
 			const TRANSFECTION_END_POINT = (layer.Metadata.TransfectionEndPoint || layer.Metadata.TransfectionEndPoint === 0)
 				? [`${layer.Metadata.TransfectionEndPoint}`, layer.Metadata.TransfectionEndPointUnit].filter(Boolean).join('_')
 				: '';
@@ -176,6 +174,9 @@ class Plate {
 				: '';
 			const SEEDING_MEDIUM = layer.Metadata.SeedingMedium || '';
 			const TRANSFECTION_MEDIUM = layer.Metadata.TransfectionMedium || '';
+			const NUMBER_OF_CEllS_PER_10_CM_PLATE = (layer.Metadata.NumberOfCellsPer10CmPlate || layer.Metadata.NumberOfCellsPer10CmPlate === 0)
+				? [`${layer.Metadata.NumberOfCellsPer10CmPlate}`, layer.Metadata.NumberOfCellsPer10CmPlateUnit].filter(Boolean).join('_')
+				: '';
 
 			layer.Wells.forEach(well => {
 				const SAMPLE_NAME = (well.Area) ? `${well.Area.Name}_${sampleNameIndex}` : '';
@@ -183,6 +184,10 @@ class Plate {
 				const TRANSFECTION_CONCENTRATION = (well.Metadata.Concentration || well.Metadata.Concentration === 0)
 					? [`${well.Metadata.Concentration}`, well.Metadata.ConcentrationUnit].filter(Boolean).join('_')
 					: '';
+				const DZ_REAGENT = well.Metadata.DZReagent || '';
+				const DZ_REAGENT_LOT = well.Metadata.DZReagentLOT || '';
+				const PLASMID_REAGENT = well.Metadata.PlasmidReagent || '';
+				const PLASMID_REAGENT_LOT = well.Metadata.PlasmidReagentLOT || '';
 				const TRANSFECTION_CELL_AMOUNT = (well.Metadata.NumberOfCellsPerWell || well.Metadata.NumberOfCellsPerWell === 0)
 					? [`${well.Metadata.NumberOfCellsPerWell}`, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join('_')
 					: '';
@@ -206,12 +211,14 @@ class Plate {
 				output.push({
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
-					TRANSFECTION_REAGENT, TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_REAGENT_LOT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
+					DZ_REAGENT, DZ_REAGENT_LOT, PLASMID_REAGENT, PLASMID_REAGENT_LOT,
+					TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
 					SEEDING_MEDIUM, TRANSFECTION_MEDIUM,
 					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT, TREATMENT,
 					PLASMID_1, PLASMID_1_CONCENTRATION,
 					PLASMID_2, PLASMID_2_CONCENTRATION,
 					PLASMID_3, PLASMID_3_CONCENTRATION,
+					NUMBER_OF_CEllS_PER_10_CM_PLATE
 				});
 				sampleNameIndex = sampleNameIndex + 1;
 			})

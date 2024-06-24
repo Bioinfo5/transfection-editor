@@ -1,10 +1,10 @@
 class TargetWellColorsMap {
   static WellSourcesCountColorsMap = {
-    '1': CSSCOLORS.list('WellSourcesCountMap')[0],
-    '2': CSSCOLORS.list('WellSourcesCountMap')[1],
-    '3': CSSCOLORS.list('WellSourcesCountMap')[2],
-    '4': CSSCOLORS.list('WellSourcesCountMap')[3],
-    '>5': CSSCOLORS.list('WellSourcesCountMap')[4],
+    '1': CSSCOLORS.list('boxColors')[0],
+    '2': CSSCOLORS.list('boxColors')[1],
+    '3': CSSCOLORS.list('boxColors')[2],
+    '4': CSSCOLORS.list('boxColors')[3],
+    '>5': CSSCOLORS.list('boxColors')[4],
   };
 
   static getLegendHTML() {

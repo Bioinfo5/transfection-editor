@@ -10,6 +10,7 @@ class DDOptions {
       sampleNames: [],
       treatmentInWell: [],
       plasmidInWell: [],
+      numberOfCellsPer10CmPlate: [],
       //units
       transfectionEndPointUnit: [],
       viabilityPercentageUnit: [],
@@ -37,6 +38,7 @@ class DDOptions {
       this.MetadataDDOptions.concentrationUnit = (units) ? units.concentration_units : [];
       this.MetadataDDOptions.transfectionReagentAmountUnit = (units) ? units.transfection_reagent_amount_units : [];
       this.MetadataDDOptions.plasmidInWellConcentrationUnit = (units) ? units.plasmid_in_well_concentration_units : [];
+      this.MetadataDDOptions.numberOfCellsPer10CmPlateUnit = (units) ? units.number_of_cells_per_10_cm_plate_units : [];
     } catch (e) {
       alert('Error while receiving metadata options');
       this.Error = true;
@@ -89,5 +91,9 @@ class DDOptions {
 
   static PlasmidInWellConcentrationUnitOptions() {
     return [...this.MetadataDDOptions.plasmidInWellConcentrationUnit];
+  }
+
+  static NumberOfCellsPer10CmPlateUnitOptions() {
+    return [...this.MetadataDDOptions.numberOfCellsPer10CmPlateUnit];
   }
 }

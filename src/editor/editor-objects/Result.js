@@ -110,7 +110,7 @@ class Result {
 								else {bgColor = CSSCOLORS.heatmap(val, o.Min, o.Max, grad)} //set bgColor as the heatmap color
 							}
 						}
-						let color = CSSCOLORS.font(bgColor, "RGB_Unnamed"); //Adapt font (black/white) depending on the background
+						let color = CSSCOLORS.font(bgColor, "boxColors"); //Adapt font (black/white) depending on the background
 						html += "<td style=\"background-color:" + bgColor + "; color: " + color + "; padding: 0.2em; border: 1px solid black\">" + val + "</td>";
 					}
 					html += "</tr>";

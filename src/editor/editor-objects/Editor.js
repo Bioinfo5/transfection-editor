@@ -94,8 +94,14 @@ class Editor {
 			]
 		});
 		this.Tables = {
-			Areas: new RespTable({ID: this.Anchors.Menu.Areas, Fields: ["Type", "Name", "Color", "Other"], Preserve: true, FullWidth: true, RowNumbers: true,
-				onDelete: function(a) {this.deleteArea(a)}.bind(this)}),
+			Areas: new RespTable({
+				ID: this.Anchors.Menu.Areas,
+				Fields: ["Name", "Color"],
+				Preserve: true,
+				FullWidth: true,
+				RowNumbers: true,
+				onDelete: function(a) {this.deleteArea(a)}.bind(this)
+			}),
 			Results: new RespTable({ID: this.Anchors.Menu.Results, Fields: ["Name", "Size", "Info", "Validated"], Headers: ["Name", "Size", "Parameters", "&check;"], Preserve: true, FullWidth: true, RowNumbers: true,
 				onDelete: function(r) {this.deleteResult(r)}.bind(this),
 				onSelect: function(newSelect, oldSelect, newIndices, oldIndices) { //Redraw when necessary
@@ -165,26 +171,6 @@ class Editor {
 					Preserve: true,
 					NewLine: true,
 					Chain: {Index: 2, Last: true}
-				}),
-				TransfectionReagent: LinkCtrl.new("Select", {
-					ID: this.Anchors.Menu.MetadataPlateLevel,
-					Label: "Transfection Reagent",
-					Default: 0,
-					Lookup: true,
-					Preserve: true,
-					Title: "Transfection Reagent",
-					List: DDOptions.transfectionReagentOptions(),
-					NewLine: true,
-					Chain: {Index: 3, Last: true}
-				}),
-				TransfectionReagentLOT: LinkCtrl.new("Text", {
-					ID: this.Anchors.Menu.MetadataPlateLevel,
-					Label: "Transfection Reagent LOT",
-					Default: "",
-					Preserve: true,
-					Title: "Transfection Reagent LOT",
-					NewLine: true,
-					Chain: {Index: 4, Last: true}
 				}),
 				TransfectionEndPoint: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataPlateLevel,
@@ -263,6 +249,35 @@ class Editor {
 					NewLine: true,
 					Chain: {Index: 12, Last: true}
 				}),
+				NumberOfCellsPer10CmPlate: LinkCtrl.new("Number", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Number Of Cells Per 10cm Plate",
+					Min: 0,
+					Default: "",
+					Label: "Number Of Cells Per 10cm Plate",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 13, Last: false}
+				}),
+				NumberOfCellsPer10CmPlateUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Title: "Number Of Cells Per 10cm Plate Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.NumberOfCellsPer10CmPlateUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 14, Last: false}
+				}),
+				UpdateNumberOfCellsPer10CmPlate: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataPlateLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: true,
+					Chain: {Index: 15, Last: true}
+				}),
 			},
 			MetadataWellLevel: {
 				NumberOfCellsPerWell: LinkCtrl.new("Number", {
@@ -323,6 +338,46 @@ class Editor {
 					NewLine: true,
 					Chain: {Index: 6, Last: true}
 				}),
+				DZReagent: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "DZ Reagent",
+					Default: 0,
+					Lookup: true,
+					Preserve: true,
+					Title: "DZ Reagent",
+					List: DDOptions.transfectionReagentOptions(),
+					NewLine: true,
+					Chain: {Index: 7, Last: true}
+				}),
+				DZReagentLOT: LinkCtrl.new("Text", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "DZ Reagent LOT",
+					Default: "",
+					Preserve: true,
+					Title: "DZ Reagent LOT",
+					NewLine: true,
+					Chain: {Index: 8, Last: true}
+				}),
+				PlasmidReagent: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "Plasmid Reagent",
+					Default: 0,
+					Lookup: true,
+					Preserve: true,
+					Title: "Plasmid Reagent",
+					List: DDOptions.transfectionReagentOptions(),
+					NewLine: true,
+					Chain: {Index: 9, Last: true}
+				}),
+				PlasmidReagentLOT: LinkCtrl.new("Text", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Label: "Plasmid Reagent LOT",
+					Default: "",
+					Preserve: true,
+					Title: "Plasmid Reagent LOT",
+					NewLine: true,
+					Chain: {Index: 10, Last: true}
+				}),
 				TransfectionReagentAmount: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Title: "Transfection Reagent Amount",
@@ -331,7 +386,7 @@ class Editor {
 					Label: "Transfection Reagent Amount",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 7, Last: false}
+					Chain: {Index: 11, Last: false}
 				}),
 				TransfectionReagentAmountUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -342,7 +397,7 @@ class Editor {
 					List: DDOptions.TransfectionReagentAmountUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 8, Last: false}
+					Chain: {Index: 12, Last: false}
 				}),
 				UpdateTransfectionReagentAmount: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -350,7 +405,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: false,
-					Chain: {Index: 9, Last: true}
+					Chain: {Index: 13, Last: true}
 				}),
 				Treatment: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -361,7 +416,7 @@ class Editor {
 					Title: "Treatment in well",
 					List: DDOptions.treatmentInWell(),
 					NewLine: false,
-					Chain: {Index: 13, Last: true},
+					Chain: {Index: 14, Last: true},
 				}),
 				UpdateTreatment: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -369,7 +424,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 14, Last: true}
+					Chain: {Index: 15, Last: true}
 				}),
 				Plasmid1: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -380,7 +435,7 @@ class Editor {
 					Title: "Plasmid 1",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 15, Last: true},
+					Chain: {Index: 16, Last: true},
 				}),
 				UpdatePlasmid1: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -388,7 +443,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 16, Last: true}
+					Chain: {Index: 17, Last: true}
 				}),
 				Plasmid1Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -398,7 +453,7 @@ class Editor {
 					Label: "Plasmid 1 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 17, Last: false}
+					Chain: {Index: 18, Last: false}
 				}),
 				Plasmid1ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -409,7 +464,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 18, Last: false}
+					Chain: {Index: 19, Last: false}
 				}),
 				UpdatePlasmid1ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -417,7 +472,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 19, Last: true}
+					Chain: {Index: 20, Last: true}
 				}),
 				Plasmid2: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -428,7 +483,7 @@ class Editor {
 					Title: "Plasmid 2",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 20, Last: true},
+					Chain: {Index: 21, Last: true},
 				}),
 				UpdatePlasmid2: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -436,7 +491,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 21, Last: true}
+					Chain: {Index: 22, Last: true}
 				}),
 				Plasmid2Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -446,7 +501,7 @@ class Editor {
 					Label: "Plasmid 2 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 22, Last: false}
+					Chain: {Index: 23, Last: false}
 				}),
 				Plasmid2ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -457,7 +512,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 23, Last: false}
+					Chain: {Index: 24, Last: false}
 				}),
 				UpdatePlasmid2ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -465,7 +520,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 24, Last: true}
+					Chain: {Index: 25, Last: true}
 				}),
 				Plasmid3: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -476,7 +531,7 @@ class Editor {
 					Title: "Plasmid 3",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 25, Last: true},
+					Chain: {Index: 26, Last: true},
 				}),
 				UpdatePlasmid3: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -484,7 +539,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 26, Last: true}
+					Chain: {Index: 27, Last: true}
 				}),
 				Plasmid3Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -494,7 +549,7 @@ class Editor {
 					Label: "Plasmid 3 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 27, Last: false}
+					Chain: {Index: 28, Last: false}
 				}),
 				Plasmid3ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -505,7 +560,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 28, Last: false}
+					Chain: {Index: 29, Last: false}
 				}),
 				UpdatePlasmid3ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -513,7 +568,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 29, Last: true}
+					Chain: {Index: 30, Last: true}
 				}),
 			}
 		}
@@ -551,6 +606,7 @@ class Editor {
 			{Label: "Untag all", Title: "Remove tagged areas for the whole plate", Click: function() {this.untagAllArea()}.bind(this)},
 			{Label: "Untag", Title: "Remove tagged areas from the selection", Click: function() {this.untagArea()}.bind(this)},
 			{Label: "Tag", Title: "Tag the selected area in the selection", Icon: {Type: "Tag", Space: true},  Click: function() {this.tagArea()}.bind(this)},
+			{Label: "Select wells", Title: "Select wells of relevant type", Icon: {Type: "Select", Space: true},  Click: function() {this.selectRelevantWells()}.bind(this)},
 		]));
 		GetId(this.Anchors.Menu.MetadataMainLevel).append(LinkCtrl.buttonBar([{
 			Label: "Apply",
@@ -676,14 +732,15 @@ class Editor {
 		if (!isValid) {
 			reasons.forEach(reason => this.Console.log({Message: reason, Gravity: "Error"}));
 			return this;
+		} else {
+			const data = this.Plate.exportToXLSX()
+			const save = this.exportToXLSX(data);
+			const today = new Date();
+			const dateStamp = `${today.getDate().toString().padStart(2, '0')}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getFullYear()}`
+			const transfectionId = this.Plate.Metadata.ExperimentID;
+			Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: `${dateStamp}_${transfectionId}_TRANSFECTION_FILE.xlsx`});
+			return this;
 		}
-		const data = this.Plate.exportToXLSX()
-		const save = this.exportToXLSX(data);
-		const today = new Date();
-		const dateStamp = `${today.getDate().toString().padStart(2, '0')}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getFullYear()}`
-		const transfectionId = this.Plate.Metadata.ExperimentID;
-		Form.download(save, {DataType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName: `${dateStamp}_${transfectionId}_TRANSFECTION_FILE.xlsx`});
-		return this;
 	}
 
 	static exportToXLSX(data) {
@@ -698,12 +755,15 @@ class Editor {
 				'TRANSFECTION_PLATE_NAME',
 				'TRANSFECTION_CELL_LINE',
 				'TRANSFECTION_CELL_LINE_PASSAGE',
-				'TRANSFECTION_REAGENT',
-				'TRANSFECTION_REAGENT_LOT',
+				'DZ_REAGENT',
+				'DZ_REAGENT_LOT',
+				'PLASMID_REAGENT',
+				'PLASMID_REAGENT_LOT',
 				'TRANSFECTION_END_POINT',
 				'VIABILITY_PERCENTAGE',
 				'SEEDING_MEDIUM',
 				'TRANSFECTION_MEDIUM',
+				'NUMBER_OF_CEllS_PER_10_CM_PLATE',
 				'TRANSFECTION_ID',
 				'TRANSFECTION_SCIENTIST',
 				'TRANSFECTION_DATE',
@@ -724,12 +784,15 @@ class Editor {
 				item.TRANSFECTION_PLATE_NAME,
 				item.TRANSFECTION_CELL_LINE,
 				item.TRANSFECTION_CELL_LINE_PASSAGE,
-				item.TRANSFECTION_REAGENT,
-				item.TRANSFECTION_REAGENT_LOT,
+				item.DZ_REAGENT,
+				item.DZ_REAGENT_LOT,
+				item.PLASMID_REAGENT,
+				item.PLASMID_REAGENT_LOT,
 				item.TRANSFECTION_END_POINT,
 				item.VIABILITY_PERCENTAGE,
 				item.SEEDING_MEDIUM,
 				item.TRANSFECTION_MEDIUM,
+				item.NUMBER_OF_CEllS_PER_10_CM_PLATE,
 				item.TRANSFECTION_ID,
 				item.TRANSFECTION_SCIENTIST,
 				item.TRANSFECTION_DATE,
@@ -749,9 +812,8 @@ class Editor {
 		let isValid = true;
 		let reasons = [];
 
-		if (
-			(!this.Plate.Metadata.ExperimentID && this.Plate.Metadata.ExperimentID !== 0)
-			|| !this.Plate.Metadata.TransfectionScientist
+		if (!this.Plate.Metadata.ExperimentID
+			|| (!this.Plate.Metadata.TransfectionScientist && this.Plate.Metadata.TransfectionScientist !== 0)
 		) {
 			isValid = false;
 			reasons.push("Transfection metadata should be filled");
@@ -760,35 +822,16 @@ class Editor {
 		this.Plate.Layers.forEach(layer => {
 			if (
 				!layer.Metadata.CellLine
-				|| isNaN(layer.Metadata.CellLinePassage)
-				|| !layer.Metadata.TransfectionReagent
-				|| !layer.Metadata.TransfectionReagentLOT
-				|| isNaN(layer.Metadata.TransfectionEndPoint)
-				|| isNaN(layer.Metadata.ViabilityPercentage)
-				|| isNaN(layer.Metadata.SeedingMedium)
-				|| isNaN(layer.Metadata.TransfectionMedium)
+				|| !layer.Metadata.CellLinePassage
+				|| !layer.Metadata.TransfectionEndPoint
+				|| !layer.Metadata.ViabilityPercentage
+				|| !layer.Metadata.SeedingMedium
+				|| !layer.Metadata.TransfectionMedium
+				|| !layer.Metadata.NumberOfCellsPer10CmPlate
 			) {
 				isValid = false;
 				reasons.push(`Plate ${layer.Name} metadata should be filled`);
 			}
-
-			layer.Wells.forEach(well => {
-				if (
-					well.Area
-					&& (
-						isNaN(well.Metadata.NumberOfCellsPerWell)
-						|| isNaN(well.Metadata.Concentration)
-						|| isNaN(well.Metadata.TransfectionReagentAmount)
-						|| !well.Metadata.Treatment
-						|| !well.Metadata.Plasmid1
-						|| !well.Metadata.Plasmid2
-						|| !well.Metadata.Plasmid3
-					)
-				) {
-					isValid = false;
-					reasons.push(`Well ${well.Name} metadata should be filled`)
-				}
-			})
 		})
 
 		return [isValid, reasons];
@@ -871,6 +914,26 @@ class Editor {
 		}
 	}
 
+	static isSamplesInExcelFileValid(data) {
+		const samplesList = data
+			.map(item => item.SAMPLE_NAME)
+			.map(item => {
+				let name = item.slice(0, 9);
+				return name.endsWith('_') ? name.slice(0, 8) : name
+			});
+		const uniqSamplesList = samplesList.filter((item, i) => i === samplesList.indexOf(item));
+		const samplesValidationErrors = uniqSamplesList
+			.map(item => {
+				if (!(DDOptions.sampleNames().includes(item))) return item
+			})
+			.filter(Boolean);
+		if (samplesValidationErrors.length > 0) {
+			const message = samplesValidationErrors.join(', ');
+			alert(`${message} not in samples list!`);
+			return false
+		} else return true
+	}
+
 	static parseExcelFile(file) {
 		const workbook = XLSX.read(file);
 		const sheet_name_list = workbook.SheetNames;
@@ -882,7 +945,9 @@ class Editor {
 				})
 				.flat();
 
-			return {type: 'transfection-file', data: this.transformMetadataJSONToSave(xlData)};
+			return this.isSamplesInExcelFileValid(xlData)
+				? {type: 'transfection-file', data: this.transformMetadataJSONToSave(xlData)}
+				: null;
 		} else {
 			const xlData = sheet_name_list
 				.map((item) => {
@@ -890,7 +955,9 @@ class Editor {
 				});
 			const {Rows, Cols} = this.getBasePlateRanges(workbook);
 
-			return {type: 'base-plate', data: this.transformJSONToSave(xlData, sheet_name_list, {Rows, Cols})};
+			return this.isSamplesInExcelFileValid(xlData)
+				? {type: 'base-plate', data: this.transformJSONToSave(xlData, sheet_name_list, {Rows, Cols})}
+				: null;
 		}
 	}
 
@@ -903,14 +970,17 @@ class Editor {
 			'TRANSFECTION_PLATE_NAME',
 			'TRANSFECTION_CELL_LINE',
 			'TRANSFECTION_CELL_LINE_PASSAGE',
-			'TRANSFECTION_REAGENT',
+			'DZ_REAGENT',
+			'DZ_REAGENT_LOT',
+			'PLASMID_REAGENT',
+			'PLASMID_REAGENT_LOT',
 			'TRANSFECTION_REAGENT_AMOUNT',
-			'TRANSFECTION_REAGENT_LOT',
 			'TRANSFECTION_END_POINT',
 			'VIABILITY_PERCENTAGE',
 			'TRANSFECTION_ID',
 			'TRANSFECTION_SCIENTIST',
-			'TRANSFECTION_DATE'
+			'TRANSFECTION_DATE',
+			'NUMBER_OF_CEllS_PER_10_CM_PLATE'
 		];
 
 		const workbook = XLSX.read(file);
@@ -1054,20 +1124,23 @@ class Editor {
 			const [viabilityPercentage, viabilityPercentageUnit] = (row.VIABILITY_PERCENTAGE)
 				? row.VIABILITY_PERCENTAGE.toString().split('_')
 				: ['', ''];
+			const [numberOfCellsPer10CmPlate, numberOfCellsPer10CmPlateUnit] = row.NUMBER_OF_CEllS_PER_10_CM_PLATE
+				? row.NUMBER_OF_CEllS_PER_10_CM_PLATE.toString().split('_')
+				: ['', ''];
 
 			return {
 				Index: row.TRANSFECTION_PLATE_INDEX,
 				Metadata: {
 					CellLine: row.TRANSFECTION_CELL_LINE,
 					CellLinePassage: row.TRANSFECTION_CELL_LINE_PASSAGE.toString(),
-					TransfectionReagent: row.TRANSFECTION_REAGENT,
-					TransfectionReagentLOT: row.TRANSFECTION_REAGENT_LOT,
 					TransfectionEndPoint: transfectionEndPoint,
 					TransfectionEndPointUnit: transfectionEndPointUnit,
 					ViabilityPercentage: viabilityPercentage,
 					ViabilityPercentageUnit: viabilityPercentageUnit,
 					SeedingMedium: row.SEEDING_MEDIUM,
 					TransfectionMedium: row.TRANSFECTION_MEDIUM,
+					NumberOfCellsPer10CmPlate: numberOfCellsPer10CmPlate,
+					NumberOfCellsPer10CmPlateUnit: numberOfCellsPer10CmPlateUnit,
 				}
 			}
 		});
@@ -1093,6 +1166,10 @@ class Editor {
 			const well = Well.parseIndex(item.TRANSFECTION_POS, {Rows, Cols});
 			const [numberOfCellsPerWell, numberOfCellsPerWellUnit] = item.TRANSFECTION_CELL_AMOUNT.toString().split('_');
 			const [concentration, concentrationUnit] = item.TRANSFECTION_CONCENTRATION.toString().split('_');
+			const dzReagent = item.DZ_REAGENT;
+			const dzReagentLOT = item.DZ_REAGENT_LOT;
+			const plasmidReagent = item.PLASMID_REAGENT;
+			const plasmidReagentLOT = item.PLASMID_REAGENT_LOT;
 			const [transfectionReagentAmount, transfectionReagentAmountUnit] = item.TRANSFECTION_REAGENT_AMOUNT.toString().split('_');
 			const treatment = item.TREATMENT;
 			const plasmid1 = item.PLASMID_1;
@@ -1110,6 +1187,10 @@ class Editor {
 					NumberOfCellsPerWellUnit: numberOfCellsPerWellUnit,
 					Concentration: concentration,
 					ConcentrationUnit: concentrationUnit,
+					DZReagent: dzReagent,
+					DZReagentLOT: dzReagentLOT,
+					PlasmidReagent: plasmidReagent,
+					PlasmidReagentLOT: plasmidReagentLOT,
 					TransfectionReagentAmount: transfectionReagentAmount,
 					TransfectionReagentAmountUnit: transfectionReagentAmountUnit,
 					Treatment: treatment,
@@ -1130,12 +1211,12 @@ class Editor {
 	static mapMetadataAreas(data, {Rows, Cols}) {
 		const uniqAreaNames = this.getUniqAreaNames(data);
 
-		return uniqAreaNames.map((areaName) => {
+		return uniqAreaNames.map((areaName, index) => {
 			const layerIndexes = this.getUniqLayerIndexes(data, areaName);
 
 			return {
 				Name: areaName,
-				Color: areaName ? this.randomizeAreaColor() : 'white',
+				Color: areaName ? CSSCOLORS.list('boxColors')[index] : 'white',
 				Type: "Sample",
 				Replicates: 1,
 				Direction: "Horizontal",
@@ -1211,10 +1292,10 @@ class Editor {
 			}
 
 			return Object.keys(areasMap)
-				.map((area) => {
+				.map((area, index) => {
 					return {
 						Name: area,
-						Color: Editor.randomizeAreaColor(),
+						Color: CSSCOLORS.list('boxColors')[index],
 						Type: 'Sample',
 						Replicates: 1,
 						Direction: 'Horizontal',
@@ -1254,18 +1335,6 @@ class Editor {
 		})
 
 		return result;
-	}
-
-	static randomizeAreaColor() {
-		if (!this.ColorsList || this.ColorsList.length === 0) {
-			this.ColorsList = [...CSSCOLORS.list()];
-		}
-
-		const [randomColor] = this.ColorsList.splice(
-			Math.floor(Math.random() * this.ColorsList.length),
-			1
-		);
-		return randomColor;
 	}
 
 	static loadPreview(data, options = {}) { //Load provided data, for preview
@@ -1353,16 +1422,18 @@ class Editor {
 // AREA-RELATED METHODS
 //*********************
 	static newArea() { //Open the form with options to create a new area
-		var id = "Form_NewArea";
+		const id = 'Form_NewArea';
 		Area.form({
 			ID: id,
 			Color: CSSCOLORS.fetch(this.Tables.Areas.Length), //Initial color when opening the form
-			Ok: function(Controls, RangeControls) { //What to do when ok is clicked
-				if(this.addArea(Controls, RangeControls)) {Form.close(id)}
+			Ok: function (Controls, RangeControls) { //What to do when ok is clicked
+				if (this.addArea(Controls, RangeControls)) {
+					Form.close(id);
+				}
 			}.bind(this),
-			Another: function(Controls, RangeControls) { //The user wants more
-				if(this.addArea(Controls, RangeControls)) {
-					Controls.Name.setValue("").focus(); //Give the focus back to the text to avoid mouse dragging
+			Another: function (Controls, RangeControls) { //The user wants more
+				if (this.addArea(Controls, RangeControls)) {
+					Controls.Name.setValue('').focus(); //Give the focus back to the text to avoid mouse dragging
 					Controls.Color.setValue(CSSCOLORS.fetch(this.Tables.Areas.Length));
 				}
 			}.bind(this),
@@ -1370,63 +1441,43 @@ class Editor {
 		return this;
 	}
 
-	static addArea(C, R) { //Check and create a new area with the options provided
-		if (C.Name.Value === 0) {
+	static addArea(Control) { //Check and create a new area with the options provided
+		if (Control.Name.Value === 0) {
 			alert('Area name must be selected');
 			return false;
 		}
 
-		const name = C.Name.Selected;
+		const name = Control.Name.Selected;
 		if (this.Tables.Areas.hasElement('Name', name)) {
 			alert('This name has already been defined, please choose another one');
 			return false;
 		}
 
-		const color = C.Color.getValue();
-		const type = C.Type.Selected;
-		if (type === 'Range') {
-			const rep = R.Replicates.getValue();
-			if (rep < 1 || rep > 1536) {
-				alert('Replicates for range must be a valid integer between 1 and 1536');
-				return false;
-			}
-			const dir = R.Direction.Selected;
-			const priority = R.Priority.Selected;
-			const custom = R.Custom.getValue();
-			this.Tables.Areas.addRow(new Area({
-				Name: name,
-				Color: color,
-				Type: type,
-				Replicates: rep,
-				Direction: dir,
-				Priority: priority,
-				Custom: custom
-			}));
-			return true;
-		}
+		const color = Control.Color.getValue();
+		this.Tables.Areas.addRow(new Area({Name: name, Color: color}));
 
-		this.Tables.Areas.addRow(new Area({Name: name, Color: color, Type: type}));
 		return true;
 	}
 
 	static editArea() { //Edit the selected area
-		const sel = this.Tables.Areas.Selected;
-		if (sel.length === 0) {
-			this.Console.log({Message: "No area selected", Gravity: "Error"});
-			return this
+		const selected = this.Tables.Areas.Selected;
+		if (selected.length === 0) {
+			this.Console.log({Message: 'No area selected', Gravity: 'Error'});
+			return this;
 		}
-		const id = "Form_EditArea";
-		const [area] = sel;
+
+		const id = 'Form_EditArea';
+		const [area] = selected;
 		Area.form({
 			ID: id,
 			Edit: true,
 			Area: area,
 			Color: area.Color, //Initial color when opening the form
-			Ok: function(Controls, RangeControls) { //What to do when ok is clicked
+			Ok: function (Controls) { //What to do when ok is clicked
 				const name = Controls.Name.Selected;
 				if (area.Name !== name) { //The name has changed, check unicity
-					if (this.Tables.Areas.hasElement("Name", name)) {
-						alert("This name has already been defined, please choose another one");
+					if (this.Tables.Areas.hasElement('Name', name)) {
+						alert('This name has already been defined, please choose another one');
 						return;
 					}
 				}
@@ -1437,15 +1488,8 @@ class Editor {
 				Pairing.rename(area.Name, name); //Rename within Pairing object
 				area.Name = name;
 				area.Color = Controls.Color.getValue();
-				if (area.Type === "Range") { //Update values for ranges
-					area.Replicates = RangeControls.Replicates.getValue();
-					area.Direction = RangeControls.Direction.Selected;
-					area.Priority = RangeControls.Priority.Selected;
-					area.Custom = RangeControls.Custom.getValue();
-					Area.rangeInfo(area);
-				}
 				if (this.Plate) {
-					area.update(this.Plate.WellSize, this.Plate.WellMargin)
+					area.update(this.Plate.WellSize, this.Plate.WellMargin);
 				} //Update well display if necessary
 				this.Tables.Areas.update();
 				Pairing.update(this.ResultManager.Anchors.Pairing); //Update pairing info for result displayed
@@ -1456,62 +1500,95 @@ class Editor {
 	}
 
 	static tagArea() { //Tag the selected area in the selection
-		if(this.Plate === undefined) {return this}
-		var a = this.Tables.Areas.Selected;
-		if(a.length == 0) {this.Console.log({Message: "No area selected", Gravity: "Error"}); return this}
-		Plate.tagArea(this.Plate, a[0], {Lock: true, Strict: true}).then(function(R) { //Tag and return a feedback object
-			if(R.Cancel) {return this} //Custom tag was cancelled
-			if(R.Selected == 0) {this.Console.log({Message: "No wells selected", Gravity: "Error"}); return this}
-			if(a[0].Type == "Range") {this.Plate.updateRange(a[0])} //Update range information if needed
-			if(R.Tagged < R.Selected) { //Not all wells were tagged
-				if(R.Tagged == 0) { //Nothing was tagged
-					this.Console.log({Message: "None of the selected wells (" + R.Selected + ") were tagged", Gravity: "Error"});
-				}
-				else { //Less than expected
-					this.Console.log({Message: "Only " + R.Tagged + " selected wells (out of " + R.Selected + ") were tagged", Gravity: "Warning"});
-				}
-				return this;
-			}
-			if(R.Tagged == R.Selected) { //Case both equal to 0 excluded above
-				this.Console.log({Message: R.Tagged + " wells tagged", Gravity: "Success"});
-			}
-			this.Tables.Areas.update(); //Update the table
-		}.bind(this));
-		return this;
-	}
-	static untagArea() {
-		if(this.Plate === undefined) {return this}
-		let R = this.Plate.untag();
-		if(R.Untag == 0) {this.Console.log({Message: "No wells selected", Gravity: "Error"}); return this}
-		this.Tables.Areas.update();
-		this.Console.log({Message: R.Untag + " wells untagged", Gravity: "Success"});
-		return this;
-	}
-	static untagAllArea(I) {
-		if(this.Plate === undefined) {return this}
-		let A = this.Tables.Areas;
-		let plate = this.Plate;
-		if(A.Length > 0) {
-			this.warn("tag", I).then(function() {
-				A.Array.forEach(function(a) { //For each area defined
-					a.removeTags(plate); //Remove tags
-					a.Tags = []; //Reset the tag arrays
-					if(a.Type == "Range") {
-						a.MaxRange = 0; //Reset the ranges
-						Area.rangeInfo(a); //Update info
-					}
-				});
-				A.update(); //Update the areas table to reflect any changes in ranges
-				this.Console.log({Message: "All wells untagged", Gravity: "Success"});
-			}.bind(this), function() {});
+		if (!this.Plate) {
+			return this;
 		}
-		else {this.Console.log({Message: "No area defined", Gravity: "Warning"})}
+
+		const selected = this.Tables.Areas.Selected;
+		if (selected.length === 0) {
+			this.Console.log({Message: 'No area selected', Gravity: 'Error'});
+			return this;
+		}
+
+		Plate.tagArea(this.Plate, selected[0], {Lock: true, Strict: true})
+			.then(function (result) { //Tag and return a feedback object
+				if (result.Cancel) {
+					return this;
+				} //Custom tag was cancelled
+
+				if (result.Selected === 0) {
+					this.Console.log({Message: 'No wells selected', Gravity: 'Error'});
+					return this;
+				}
+
+				if (result.Tagged < result.Selected) { //Not all wells were tagged
+					if (result.Tagged === 0) { //Nothing was tagged
+						this.Console.log({
+							Message: 'None of the selected wells (' + result.Selected + ') were tagged',
+							Gravity: 'Error'
+						});
+					} else { //Less than expected
+						this.Console.log({
+							Message: 'Only ' + result.Tagged + ' selected wells (out of ' + result.Selected + ') were tagged',
+							Gravity: 'Warning'
+						});
+					}
+					return this;
+				}
+
+				if (result.Tagged === result.Selected) { //Case both equal to 0 excluded above
+					this.Console.log({Message: result.Tagged + ' wells tagged', Gravity: 'Success'});
+				}
+				this.Tables.Areas.update(); //Update the table
+			}.bind(this));
+
 		return this;
 	}
+
+	static untagArea() {
+		if (!this.Plate) {
+			return this;
+		}
+
+		const result = this.Plate.untag();
+		if (result.Untag === 0) {
+			this.Console.log({Message: 'No wells selected', Gravity: 'Error'});
+			return this;
+		}
+
+		this.Tables.Areas.update();
+		this.Console.log({Message: result.Untag + ' wells untagged', Gravity: 'Success'});
+		return this;
+	}
+
+	static untagAllArea(I) {
+		if (!this.Plate) {
+			return this;
+		}
+
+		const areas = this.Tables.Areas;
+		if (areas.Length > 0) {
+			this.warn('tag', I).then(() => {
+				areas.Array.forEach((a) => { //For each area defined
+					a.removeTags(this.Plate); //Remove tags
+					a.Tags = []; //Reset the tag arrays
+				});
+				areas.update(); //Update the areas table to reflect any changes in ranges
+				this.Console.log({Message: 'All wells untagged', Gravity: 'Success'});
+			}, function () {});
+		} else {
+			this.Console.log({Message: 'No area defined', Gravity: 'Warning'});
+		}
+		return this;
+	}
+
 	static deleteArea(a) { //Delete selected area a
-		if(this.Plate) {a.removeTags(this.Plate)}
+		if (this.Plate) {
+			a.removeTags(this.Plate);
+		}
 		return this;
 	}
+
 	static strictMode(bool) { //Switch strict mode ON or OFF
 		if(this.Plate === undefined) {return this}
 		if(bool) { //Check for conflicts and prevent switching if any
@@ -1523,6 +1600,22 @@ class Editor {
 			}
 		}
 		return this;
+	}
+
+	static selectRelevantWells() { //Select relevant area type wells
+		const areas = this.Tables.Areas.Array;
+		if (areas.length > 0) {
+			const selectedArea = areas.filter(item => Boolean(item.Selected));
+			const selectedTags = selectedArea[0].Tags;
+			this.Plate.SelectedLayers = selectedTags.map(item => item.Layer.Index)
+			const selectedWells = selectedTags.map(item => item.Wells);
+			const plateLayers = this.Plate.Layers;
+			plateLayers.map((item, index) => {
+				item.Selected = selectedWells[index]
+			})
+		}
+
+		return this
 	}
 //***************************
 // DEFINITION-RELATED METHODS
@@ -1681,18 +1774,18 @@ class Editor {
 
 	static applyMainMetadata() {
 		if (this.Plate) {
-			const values = {
-				ExperimentID:  this.Controls.MetadataMainLevel.ExperimentID.getValue(),
-			};
-			if (this.Controls.MetadataMainLevel.TransfectionScientist.Value > 0) {
-				values.TransfectionScientist = this.Controls.MetadataMainLevel.TransfectionScientist.Selected;
-			}
-			this.Plate.applyMetadata(values);
+			const plateMetadata = this.Plate.Metadata;
+			plateMetadata.ExperimentID = this.Controls.MetadataMainLevel.ExperimentID.getValue();
+			plateMetadata.TransfectionScientist = this.Controls.MetadataMainLevel.TransfectionScientist.Selected;
+
+			this.Plate.applyMetadata('main');
 
 			this.Console.log({Message: 'Main metadata updated with following values:', Gravity: "Success"});
-			this.Console.log({Message: `Experiment ID: ${this.Plate.Metadata.ExperimentID}`, Gravity: "Success"});
+			if (this.Controls.MetadataMainLevel.ExperimentID.Value) {
+				this.Console.log({Message: `Experiment ID: ${plateMetadata.ExperimentID}`, Gravity: "Success"});
+			}
 			if (this.Controls.MetadataMainLevel.TransfectionScientist.Value > 0) {
-				this.Console.log({Message: `Transfection Scientist: ${this.Plate.Metadata.TransfectionScientist}`, Gravity: "Success"});
+				this.Console.log({Message: `Transfection Scientist: ${plateMetadata.TransfectionScientist}`, Gravity: "Success"});
 			}
 		} else {
 			this.Console.log({Message: "No plate created", Gravity: "Error"})
@@ -1703,17 +1796,14 @@ class Editor {
 		if (this.Plate) {
 			const values = {
 				CellLinePassage: this.Controls.MetadataPlateLevel.CellLinePassage.getValue(),
-				TransfectionReagentLOT: this.Controls.MetadataPlateLevel.TransfectionReagentLOT.getValue(),
 				TransfectionEndPoint: this.Controls.MetadataPlateLevel.TransfectionEndPoint.getValue(),
 				ViabilityPercentage: this.Controls.MetadataPlateLevel.ViabilityPercentage.getValue(),
 				SeedingMedium: this.Controls.MetadataPlateLevel.SeedingMedium.getValue(),
 				TransfectionMedium: this.Controls.MetadataPlateLevel.TransfectionMedium.getValue(),
+				NumberOfCellsPer10CmPlate: this.Controls.MetadataPlateLevel.NumberOfCellsPer10CmPlate.getValue(),
 			};
 			if (this.Controls.MetadataPlateLevel.CellLine.Value > 0) {
 				values.CellLine = this.Controls.MetadataPlateLevel.CellLine.Selected
-			}
-			if (this.Controls.MetadataPlateLevel.TransfectionReagent.Value > 0) {
-				values.TransfectionReagent = this.Controls.MetadataPlateLevel.TransfectionReagent.Selected
 			}
 			if (this.Controls.MetadataPlateLevel.UpdateTransfectionEndPoint.Value) {
 				values.TransfectionEndPointUnit = this.Controls.MetadataPlateLevel.TransfectionEndPointUnit.Selected
@@ -1721,7 +1811,9 @@ class Editor {
 			if (this.Controls.MetadataPlateLevel.UpdateViabilityPercentage.Value) {
 				values.ViabilityPercentageUnit = this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.Selected
 			}
-
+			if (this.Controls.MetadataPlateLevel.UpdateNumberOfCellsPer10CmPlate.Value) {
+				values.NumberOfCellsPer10CmPlateUnit = this.Controls.MetadataPlateLevel.NumberOfCellsPer10CmPlateUnit.Selected
+			}
 			const updatedPlateNames = this.Plate.applyLayerMetadata(values);
 
 			if (updatedPlateNames.length >= 0) {
@@ -1732,12 +1824,6 @@ class Editor {
 				}
 				if (values.CellLinePassage) {
 					Editor.Console.log({Message: `Cell Line Passage: ${values.CellLinePassage}`, Gravity: "Success"});
-				}
-				if (values.TransfectionReagent) {
-					Editor.Console.log({Message: `Transfection Reagent: ${values.TransfectionReagent}`, Gravity: "Success"});
-				}
-				if (values.TransfectionReagentLOT) {
-					Editor.Console.log({Message: `Transfection Reagent LOT: ${values.TransfectionReagentLOT}`, Gravity: "Success"});
 				}
 				if (values.TransfectionEndPoint) {
 					Editor.Console.log({Message: `Transfection End Point: ${[values.TransfectionEndPoint, values.TransfectionEndPointUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
@@ -1750,6 +1836,9 @@ class Editor {
 				}
 				if (values.TransfectionMedium) {
 					Editor.Console.log({Message: `Transfection medium: ${values.TransfectionMedium}`, Gravity: "Success"});
+				}
+				if (values.NumberOfCellsPer10CmPlate) {
+					Editor.Console.log({Message: `Number Of Cells Per 10 Cm Plate: ${[values.NumberOfCellsPer10CmPlate, values.NumberOfCellsPer10CmPlateUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 				}
 			} else {
 				this.Console.log({Message: "No plate selected", Gravity: "Error"})
@@ -1770,34 +1859,71 @@ class Editor {
 				values.Concentration = this.Controls.MetadataWellLevel.Concentration.getValue();
 				values.ConcentrationUnit = this.Controls.MetadataWellLevel.ConcentrationUnit.Selected;
 			}
+			if (this.Controls.MetadataWellLevel.DZReagent.Value) {
+				if (this.Controls.MetadataWellLevel.DZReagent.Selected === 'Please select') {
+					values.DZReagent = '';
+				} else {
+					values.DZReagent = this.Controls.MetadataWellLevel.DZReagent.Selected;
+				}
+			}
+			if (this.Controls.MetadataWellLevel.DZReagentLOT.Value) {
+				values.DZReagentLOT = this.Controls.MetadataWellLevel.DZReagentLOT.getValue()
+			}
+			if (this.Controls.MetadataWellLevel.PlasmidReagent.Value) {
+				if (this.Controls.MetadataWellLevel.PlasmidReagent.Selected === 'Please select') {
+					values.PlasmidReagent = '';
+				} else {
+					values.PlasmidReagent = this.Controls.MetadataWellLevel.PlasmidReagent.Selected;
+				}
+			}
+			if (this.Controls.MetadataWellLevel.PlasmidReagentLOT.Value) {
+				values.PlasmidReagentLOT = this.Controls.MetadataWellLevel.PlasmidReagentLOT.getValue()
+			}
 			if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
 				values.TransfectionReagentAmount = this.Controls.MetadataWellLevel.TransfectionReagentAmount.getValue();
 				values.TransfectionReagentAmountUnit = this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.Selected;
 			}
 			if (this.Controls.MetadataWellLevel.UpdateTreatment.Value) {
-				values.Treatment = this.Controls.MetadataWellLevel.Treatment.Selected;
+				if (this.Controls.MetadataWellLevel.Treatment.Selected === 'Please select') {
+					values.Treatment = '';
+				} else {
+					values.Treatment = this.Controls.MetadataWellLevel.Treatment.Selected;
+				}
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid1.Value) {
-				values.Plasmid1 = this.Controls.MetadataWellLevel.Plasmid1.Selected;
+				if (this.Controls.MetadataWellLevel.Plasmid1.Selected === 'Please select') {
+					values.Plasmid1 = '';
+				} else {
+					values.Plasmid1 = this.Controls.MetadataWellLevel.Plasmid1.Selected;
+				}
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid1ConcentrationUnit.Value) {
 				values.Plasmid1Concentration = this.Controls.MetadataWellLevel.Plasmid1Concentration.getValue();
 				values.Plasmid1ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid1ConcentrationUnit.Selected;
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid2.Value) {
-				values.Plasmid2 = this.Controls.MetadataWellLevel.Plasmid2.Selected;
+				if (this.Controls.MetadataWellLevel.Plasmid2.Selected === 'Please select') {
+					values.Plasmid2 = '';
+				} else {
+					values.Plasmid2 = this.Controls.MetadataWellLevel.Plasmid2.Selected;
+				}
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid2ConcentrationUnit.Value) {
 				values.Plasmid2Concentration = this.Controls.MetadataWellLevel.Plasmid2Concentration.getValue();
 				values.Plasmid2ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid2ConcentrationUnit.Selected;
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid3.Value) {
-				values.Plasmid3 = this.Controls.MetadataWellLevel.Plasmid3.Selected;
+				if (this.Controls.MetadataWellLevel.Plasmid3.Selected === 'Please select') {
+					values.Plasmid3 = '';
+				} else {
+					values.Plasmid3 = this.Controls.MetadataWellLevel.Plasmid3.Selected;
+				}
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid3ConcentrationUnit.Value) {
 				values.Plasmid3Concentration = this.Controls.MetadataWellLevel.Plasmid3Concentration.getValue();
 				values.Plasmid3ConcentrationUnit = this.Controls.MetadataWellLevel.Plasmid3ConcentrationUnit.Selected;
 			}
+
 			let totalUpdated = 0;
 			let totalEmpty = 0;
 
@@ -1809,11 +1935,20 @@ class Editor {
 
 			if (totalUpdated > 0) {
 				this.Console.log({Message: `Metadata of ${totalUpdated} well${(totalUpdated > 1) ? 's' : ''} updated with following values:`, Gravity: "Success"});
-				if (this.Controls.MetadataWellLevel.UpdateNumberOfCellsPerWell.Value) {
-					this.Console.log({Message: `Number of Cells per Well: ${[values.NumberOfCellsPerWell, values.NumberOfCellsPerWellUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
-				}
 				if (this.Controls.MetadataWellLevel.UpdateConcentration.Value) {
 					this.Console.log({Message: `Concentration: ${[values.Concentration, values.ConcentrationUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.DZReagent.Value) {
+					Editor.Console.log({Message: `DZ Reagent: ${values.DZReagent}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.DZReagentLOT.Value) {
+					Editor.Console.log({Message: `DZ Reagent LOT: ${values.DZReagentLOT}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.PlasmidReagent.Value) {
+					Editor.Console.log({Message: `Plasmid Reagent: ${values.PlasmidReagent}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.PlasmidReagentLOT.Value) {
+					Editor.Console.log({Message: `Plasmid Reagent LOT: ${values.PlasmidReagentLOT}`, Gravity: "Success"});
 				}
 				if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
 					Editor.Console.log({Message: `Transfection Reagent Amount: ${[values.TransfectionReagentAmount, values.TransfectionReagentAmountUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
@@ -1840,6 +1975,7 @@ class Editor {
 					Editor.Console.log({Message: `Plasmid 3 Concentration: ${[values.Plasmid3Concentration, values.Plasmid3ConcentrationUnit].filter(Boolean). join(' ')}`, Gravity: "Success"});
 				}
 			}
+
 			if (totalEmpty > 0) {
 				this.Console.log({Message: `Metadata of ${totalEmpty} empty well${(totalEmpty > 1) ? 's' : ''} was not updated`, Gravity: "Warning"});
 			}
@@ -1859,20 +1995,24 @@ class Editor {
 	static resetPlateMetadataControls() {
 		this.Controls.MetadataPlateLevel.CellLine.setValue(0);
 		this.Controls.MetadataPlateLevel.CellLinePassage.setValue("");
-		this.Controls.MetadataPlateLevel.TransfectionReagent.setValue(0);
-		this.Controls.MetadataPlateLevel.TransfectionReagentLOT.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionEndPoint.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionEndPointUnit.setValue(0);
 		this.Controls.MetadataPlateLevel.ViabilityPercentage.setValue("");
 		this.Controls.MetadataPlateLevel.ViabilityPercentageUnit.setValue(0);
 		this.Controls.MetadataPlateLevel.SeedingMedium.setValue("");
 		this.Controls.MetadataPlateLevel.TransfectionMedium.setValue("");
+		this.Controls.MetadataPlateLevel.NumberOfCellsPer10CmPlate.setValue("");
+		this.Controls.MetadataPlateLevel.NumberOfCellsPer10CmPlateUnit.setValue(0);
 	}
 
 	static resetWellMetadataControls() {
 		this.Controls.MetadataWellLevel.NumberOfCellsPerWell.setValue("");
 		this.Controls.MetadataWellLevel.NumberOfCellsPerWellUnit.setValue(0);
 		this.Controls.MetadataWellLevel.Concentration.setValue("");
+		this.Controls.MetadataWellLevel.DZReagent.setValue(0);
+		this.Controls.MetadataWellLevel.DZReagentLOT.setValue("");
+		this.Controls.MetadataWellLevel.PlasmidReagent.setValue(0);
+		this.Controls.MetadataWellLevel.PlasmidReagentLOT.setValue("");
 		this.Controls.MetadataWellLevel.ConcentrationUnit.setValue(0);
 		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue("");
 		this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.setValue(0);

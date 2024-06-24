@@ -3,5 +3,5 @@
 /node_modules
 .idea
 .vs
-cp-https.crt
 package-lock.json
+yarn.lock
