@@ -918,7 +918,7 @@ class Editor {
 		const samplesList = data
 			.map(item => item.SAMPLE_NAME)
 			.map(item => {
-				let name = item.slice(0, 9);
+				let name = item ? item.slice(0, 9) : '';
 				return name.endsWith('_') ? name.slice(0, 8) : name
 			});
 		const uniqSamplesList = samplesList.filter((item, i) => i === samplesList.indexOf(item));
