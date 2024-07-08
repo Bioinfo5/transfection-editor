@@ -211,26 +211,54 @@ class Well {
 	}
 
 	applyMetadata(I) {
-		this.Metadata.NumberOfCellsPerWell = I.NumberOfCellsPerWell;
-		this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
-		this.Metadata.Concentration = I.Concentration;
-		this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
-		this.Metadata.DZReagent = I.DZReagent;
-		this.Metadata.DZReagentLOT = I.DZReagentLOT;
-		this.Metadata.PlasmidReagent = I.PlasmidReagent;
-		this.Metadata.PlasmidReagentLOT = I.PlasmidReagentLOT;
-		this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
-		this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
-		this.Metadata.Treatment = I.Treatment;
-		this.Metadata.Plasmid1 = I.Plasmid1;
-		this.Metadata.Plasmid1Concentration = I.Plasmid1Concentration;
-		this.Metadata.Plasmid1ConcentrationUnit = I.Plasmid1ConcentrationUnit;
-		this.Metadata.Plasmid2 = I.Plasmid2;
-		this.Metadata.Plasmid2Concentration = I.Plasmid2Concentration;
-		this.Metadata.Plasmid2ConcentrationUnit = I.Plasmid2ConcentrationUnit;
-		this.Metadata.Plasmid3 = I.Plasmid3;
-		this.Metadata.Plasmid3Concentration = I.Plasmid3Concentration;
-		this.Metadata.Plasmid3ConcentrationUnit = I.Plasmid3ConcentrationUnit;
+		if (typeof I.NumberOfCellsPerWell === 'string') {
+			this.Metadata.NumberOfCellsPerWell = I.NumberOfCellsPerWell;
+			this.Metadata.NumberOfCellsPerWellUnit = I.NumberOfCellsPerWellUnit;
+		}
+		if (typeof I.Concentration === 'string') {
+			this.Metadata.Concentration = I.Concentration;
+			this.Metadata.ConcentrationUnit = I.ConcentrationUnit;
+		}
+		if (typeof I.DZReagent === 'string') {
+			this.Metadata.DZReagent = I.DZReagent;
+		}
+		if (typeof I.DZReagentLOT === 'string') {
+			this.Metadata.DZReagentLOT = I.DZReagentLOT;
+		}
+		if (typeof I.PlasmidReagent === 'string') {
+			this.Metadata.PlasmidReagent = I.PlasmidReagent;
+		}
+		if (typeof I.PlasmidReagentLOT === 'string') {
+			this.Metadata.PlasmidReagentLOT = I.PlasmidReagentLOT;
+		}
+		if (typeof I.TransfectionReagentAmount === 'string') {
+			this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
+			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
+		}
+		if (typeof I.Treatment === 'string') {
+			this.Metadata.Treatment = I.Treatment;
+		}
+		if (typeof I.Plasmid1 === 'string') {
+			this.Metadata.Plasmid1 = I.Plasmid1;
+		}
+		if (typeof I.Plasmid1Concentration === 'string') {
+			this.Metadata.Plasmid1Concentration = I.Plasmid1Concentration;
+			this.Metadata.Plasmid1ConcentrationUnit = I.Plasmid1ConcentrationUnit;
+		}
+		if (typeof I.Plasmid2 === 'string') {
+			this.Metadata.Plasmid2 = I.Plasmid2;
+		}
+		if (typeof I.Plasmid2Concentration === 'string') {
+			this.Metadata.Plasmid2Concentration = I.Plasmid2Concentration;
+			this.Metadata.Plasmid2ConcentrationUnit = I.Plasmid2ConcentrationUnit;
+		}
+		if (typeof I.Plasmid3 === 'string') {
+			this.Metadata.Plasmid3 = I.Plasmid3;
+		}
+		if (typeof I.Plasmid3Concentration === 'string') {
+			this.Metadata.Plasmid3Concentration = I.Plasmid3Concentration;
+			this.Metadata.Plasmid3ConcentrationUnit = I.Plasmid3ConcentrationUnit;
+		}
 	}
 
 	getMetadata() {
