@@ -191,8 +191,11 @@ class Plate {
 				const TRANSFECTION_CELL_AMOUNT = (well.Metadata.NumberOfCellsPerWell || well.Metadata.NumberOfCellsPerWell === 0)
 					? [`${well.Metadata.NumberOfCellsPerWell}`, well.Metadata.NumberOfCellsPerWellUnit].filter(Boolean).join('_')
 					: '';
-				const TRANSFECTION_REAGENT_AMOUNT = (well.Metadata.TransfectionReagentAmount || well.Metadata.TransfectionReagentAmount === 0)
-					?  [`${well.Metadata.TransfectionReagentAmount}`, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join('_')
+				const DZ_REAGENT_AMOUNT = (well.Metadata.DZReagentAmount || well.Metadata.DZReagentAmount === 0)
+					?  [`${well.Metadata.DZReagentAmount}`, well.Metadata.DZReagentAmountUnit].filter(Boolean).join('_')
+					: '';
+				const PLASMID_REAGENT_AMOUNT = (well.Metadata.PlasmidReagentAmount || well.Metadata.PlasmidReagentAmount === 0)
+					?  [`${well.Metadata.PlasmidReagentAmount}`, well.Metadata.PlasmidReagentAmountUnit].filter(Boolean).join('_')
 					: '';
 				const TREATMENT = well.Metadata.Treatment || '';
 				const PLASMID_1 = well.Metadata.Plasmid1 || '';
@@ -212,7 +215,8 @@ class Plate {
 					TRANSFECTION_DATE, TRANSFECTION_SCIENTIST, TRANSFECTION_ID,
 					TRANSFECTION_PLATE_NAME, TRANSFECTION_CELL_LINE, TRANSFECTION_CELL_LINE_PASSAGE,
 					DZ_REAGENT, DZ_REAGENT_LOT, PLASMID_REAGENT, PLASMID_REAGENT_LOT,
-					TRANSFECTION_REAGENT_AMOUNT, TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
+					DZ_REAGENT_AMOUNT, PLASMID_REAGENT_AMOUNT,
+					TRANSFECTION_END_POINT, VIABILITY_PERCENTAGE,
 					SEEDING_MEDIUM, TRANSFECTION_MEDIUM,
 					SAMPLE_NAME, TRANSFECTION_POS, TRANSFECTION_CONCENTRATION, TRANSFECTION_CELL_AMOUNT, TREATMENT,
 					PLASMID_1, PLASMID_1_CONCENTRATION,

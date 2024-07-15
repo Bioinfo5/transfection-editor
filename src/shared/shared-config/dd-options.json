@@ -13,7 +13,11 @@
     "nM",
     "uM"
   ],
-  "transfection_reagent_amount_units": [
+  "dz_reagent_amount_units": [
+    "uL",
+    "mL"
+  ],
+  "plasmid_reagent_amount_units": [
     "uL",
     "mL"
   ],

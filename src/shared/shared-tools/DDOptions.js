@@ -16,7 +16,8 @@ class DDOptions {
       viabilityPercentageUnit: [],
       numberOfCellsPerWellUnit: [],
       concentrationUnit: [],
-      transfectionReagentAmountUnit: [],
+      dzReagentAmountUnit: [],
+      plasmidReagentAmountUnit: [],
     };
     this.Error = false;
     try {
@@ -36,7 +37,8 @@ class DDOptions {
       this.MetadataDDOptions.viabilityPercentageUnit = (units) ? units.viability_percentage_units : [];
       this.MetadataDDOptions.numberOfCellsPerWellUnit = (units) ? units.number_of_cells_per_well_units : [];
       this.MetadataDDOptions.concentrationUnit = (units) ? units.concentration_units : [];
-      this.MetadataDDOptions.transfectionReagentAmountUnit = (units) ? units.transfection_reagent_amount_units : [];
+      this.MetadataDDOptions.dzReagentAmountUnit = (units) ? units.dz_reagent_amount_units : [];
+      this.MetadataDDOptions.plasmidReagentAmountUnit = (units) ? units.plasmid_reagent_amount_units : [];
       this.MetadataDDOptions.plasmidInWellConcentrationUnit = (units) ? units.plasmid_in_well_concentration_units : [];
       this.MetadataDDOptions.numberOfCellsPer10CmPlateUnit = (units) ? units.number_of_cells_per_10_cm_plate_units : [];
     } catch (e) {
@@ -85,8 +87,12 @@ class DDOptions {
     return [...this.MetadataDDOptions.concentrationUnit];
   }
 
-  static TransfectionReagentAmountUnitOptions() {
-    return [...this.MetadataDDOptions.transfectionReagentAmountUnit];
+  static DZReagentAmountUnitOptions() {
+    return [...this.MetadataDDOptions.dzReagentAmountUnit];
+  }
+
+  static PlasmidReagentAmountUnitOptions() {
+    return [...this.MetadataDDOptions.plasmidReagentAmountUnit];
   }
 
   static PlasmidInWellConcentrationUnitOptions() {

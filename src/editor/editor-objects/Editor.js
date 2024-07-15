@@ -410,28 +410,28 @@ class Editor {
 					NewLine: true,
 					Chain: {Index: 14, Last: true}
 				}),
-				TransfectionReagentAmount: LinkCtrl.new("Number", {
+				DZReagentAmount: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
-					Title: "Transfection Reagent Amount",
+					Title: "DZ Reagent Amount",
 					Min: 0,
 					Default: "",
-					Label: "Transfection Reagent Amount",
+					Label: "DZ Reagent Amount",
 					Preserve: true,
 					NewLine: false,
 					Chain: {Index: 15, Last: false}
 				}),
-				TransfectionReagentAmountUnit: LinkCtrl.new("Select", {
+				DZReagentAmountUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
-					Title: "Transfection Reagent Amount Units",
+					Title: "DZ Reagent Amount Units",
 					Min: 0,
 					Default: 0,
 					Label: "",
-					List: DDOptions.TransfectionReagentAmountUnitOptions(),
+					List: DDOptions.DZReagentAmountUnitOptions(),
 					Preserve: true,
 					NewLine: false,
 					Chain: {Index: 16, Last: false}
 				}),
-				UpdateTransfectionReagentAmount: LinkCtrl.new("Checkbox", {
+				UpdateDZReagentAmount: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
 					Default: true,
 					Label: "",
@@ -439,16 +439,44 @@ class Editor {
 					NewLine: false,
 					Chain: {Index: 17, Last: true}
 				}),
-				Treatment: LinkCtrl.new("Select", {
+				PlasmidReagentAmount: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
-					Label: "Treatment",
-					Default: 0,
-					Lookup: true,
+					Title: "Plasmid Reagent Amount",
+					Min: 0,
+					Default: "",
+					Label: "Plasmid Reagent Amount",
 					Preserve: true,
-					Title: "Treatment in well",
-					List: DDOptions.treatmentInWell(),
 					NewLine: false,
-					Chain: {Index: 18, Last: true},
+					Chain: {Index: 18, Last: false}
+				}),
+				PlasmidReagentAmountUnit: LinkCtrl.new("Select", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Plasmid Reagent Amount Units",
+					Min: 0,
+					Default: 0,
+					Label: "",
+					List: DDOptions.PlasmidReagentAmountUnitOptions(),
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 19, Last: false}
+				}),
+				UpdatePlasmidReagentAmount: LinkCtrl.new("Checkbox", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Default: true,
+					Label: "",
+					Title: "",
+					NewLine: false,
+					Chain: {Index: 20, Last: true}
+				}),
+				Treatment: LinkCtrl.new("Text", {
+					ID: this.Anchors.Menu.MetadataWellLevel,
+					Title: "Treatment in well",
+					Min: 0,
+					Default: "",
+					Label: "Treatment",
+					Preserve: true,
+					NewLine: false,
+					Chain: {Index: 21, Last: false}
 				}),
 				UpdateTreatment: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -456,7 +484,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 19, Last: true}
+					Chain: {Index: 22, Last: true}
 				}),
 				Plasmid1: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -467,7 +495,7 @@ class Editor {
 					Title: "Plasmid 1",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 20, Last: true},
+					Chain: {Index: 23, Last: true},
 				}),
 				UpdatePlasmid1: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -475,7 +503,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 21, Last: true}
+					Chain: {Index: 24, Last: true}
 				}),
 				Plasmid1Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -485,7 +513,7 @@ class Editor {
 					Label: "Plasmid 1 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 22, Last: false}
+					Chain: {Index: 25, Last: false}
 				}),
 				Plasmid1ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -496,7 +524,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 23, Last: false}
+					Chain: {Index: 26, Last: false}
 				}),
 				UpdatePlasmid1ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -504,7 +532,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 24, Last: true}
+					Chain: {Index: 27, Last: true}
 				}),
 				Plasmid2: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -515,7 +543,7 @@ class Editor {
 					Title: "Plasmid 2",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 25, Last: true},
+					Chain: {Index: 28, Last: true},
 				}),
 				UpdatePlasmid2: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -523,7 +551,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 26, Last: true}
+					Chain: {Index: 29, Last: true}
 				}),
 				Plasmid2Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -533,7 +561,7 @@ class Editor {
 					Label: "Plasmid 2 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 27, Last: false}
+					Chain: {Index: 30, Last: false}
 				}),
 				Plasmid2ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -544,7 +572,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 28, Last: false}
+					Chain: {Index: 31, Last: false}
 				}),
 				UpdatePlasmid2ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -552,7 +580,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 29, Last: true}
+					Chain: {Index: 32, Last: true}
 				}),
 				Plasmid3: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -563,7 +591,7 @@ class Editor {
 					Title: "Plasmid 3",
 					List: DDOptions.plasmidInWell(),
 					NewLine: false,
-					Chain: {Index: 30, Last: true},
+					Chain: {Index: 33, Last: true},
 				}),
 				UpdatePlasmid3: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -571,7 +599,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 31, Last: true}
+					Chain: {Index: 34, Last: true}
 				}),
 				Plasmid3Concentration: LinkCtrl.new("Number", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -581,7 +609,7 @@ class Editor {
 					Label: "Plasmid 3 Concentration",
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 32, Last: false}
+					Chain: {Index: 35, Last: false}
 				}),
 				Plasmid3ConcentrationUnit: LinkCtrl.new("Select", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -592,7 +620,7 @@ class Editor {
 					List: DDOptions.PlasmidInWellConcentrationUnitOptions(),
 					Preserve: true,
 					NewLine: false,
-					Chain: {Index: 33, Last: false}
+					Chain: {Index: 36, Last: false}
 				}),
 				UpdatePlasmid3ConcentrationUnit: LinkCtrl.new("Checkbox", {
 					ID: this.Anchors.Menu.MetadataWellLevel,
@@ -600,7 +628,7 @@ class Editor {
 					Label: "",
 					Title: "",
 					NewLine: true,
-					Chain: {Index: 34, Last: true}
+					Chain: {Index: 37, Last: true}
 				}),
 			}
 		}
@@ -782,7 +810,8 @@ class Editor {
 				'TRANSFECTION_POS',
 				'TRANSFECTION_CONCENTRATION',
 				'TRANSFECTION_CELL_AMOUNT',
-				'TRANSFECTION_REAGENT_AMOUNT',
+				'DZ_REAGENT_AMOUNT',
+				'PLASMID_REAGENT_AMOUNT',
 				'TREATMENT',
 				'TRANSFECTION_PLATE_NAME',
 				'TRANSFECTION_CELL_LINE',
@@ -811,7 +840,8 @@ class Editor {
 				item.TRANSFECTION_POS,
 				item.TRANSFECTION_CONCENTRATION,
 				item.TRANSFECTION_CELL_AMOUNT,
-				item.TRANSFECTION_REAGENT_AMOUNT,
+				item.DZ_REAGENT_AMOUNT,
+				item.PLASMID_REAGENT_AMOUNT,
 				item.TREATMENT,
 				item.TRANSFECTION_PLATE_NAME,
 				item.TRANSFECTION_CELL_LINE,
@@ -1006,7 +1036,8 @@ class Editor {
 			'DZ_REAGENT_LOT',
 			'PLASMID_REAGENT',
 			'PLASMID_REAGENT_LOT',
-			'TRANSFECTION_REAGENT_AMOUNT',
+			'DZ_REAGENT_AMOUNT',
+			'PLASMID_REAGENT_AMOUNT',
 			'TRANSFECTION_END_POINT',
 			'VIABILITY_PERCENTAGE',
 			'TRANSFECTION_ID',
@@ -1202,7 +1233,8 @@ class Editor {
 			const dzReagentLOT = item.DZ_REAGENT_LOT;
 			const plasmidReagent = item.PLASMID_REAGENT;
 			const plasmidReagentLOT = item.PLASMID_REAGENT_LOT;
-			const [transfectionReagentAmount, transfectionReagentAmountUnit] = item.TRANSFECTION_REAGENT_AMOUNT.toString().split('_');
+			const [dzReagentAmount, dzReagentAmountUnit] = item.DZ_REAGENT_AMOUNT.toString().split('_');
+			const [plasmidReagentAmount, plasmidReagentAmountUnit] = item.PLASMID_REAGENT_AMOUNT.toString().split('_');
 			const treatment = item.TREATMENT;
 			const plasmid1 = item.PLASMID_1;
 			const [plasmid1Concentration, plasmid1ConcentrationUnit] = item.PLASMID_1_CONCENTRATION.toString().split('_');
@@ -1223,8 +1255,10 @@ class Editor {
 					DZReagentLOT: dzReagentLOT,
 					PlasmidReagent: plasmidReagent,
 					PlasmidReagentLOT: plasmidReagentLOT,
-					TransfectionReagentAmount: transfectionReagentAmount,
-					TransfectionReagentAmountUnit: transfectionReagentAmountUnit,
+					DZReagentAmount: dzReagentAmount,
+					DZReagentAmountUnit: dzReagentAmountUnit,
+					PlasmidReagentAmount: plasmidReagentAmount,
+					PlasmidReagentAmountUnit: plasmidReagentAmountUnit,
 					Treatment: treatment,
 					Plasmid1: plasmid1,
 					Plasmid1Concentration: plasmid1Concentration,
@@ -1911,16 +1945,16 @@ class Editor {
 			if (this.Controls.MetadataWellLevel.UpdatePlasmidReagentLOT.Value) {
 				values.PlasmidReagentLOT = this.Controls.MetadataWellLevel.PlasmidReagentLOT.getValue()
 			}
-			if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
-				values.TransfectionReagentAmount = this.Controls.MetadataWellLevel.TransfectionReagentAmount.getValue();
-				values.TransfectionReagentAmountUnit = this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.Selected;
+			if (this.Controls.MetadataWellLevel.UpdateDZReagentAmount.Value) {
+				values.DZReagentAmount = this.Controls.MetadataWellLevel.DZReagentAmount.getValue();
+				values.DZReagentAmountUnit = this.Controls.MetadataWellLevel.DZReagentAmountUnit.Selected;
+			}
+			if (this.Controls.MetadataWellLevel.UpdatePlasmidReagentAmount.Value) {
+				values.PlasmidReagentAmount = this.Controls.MetadataWellLevel.PlasmidReagentAmount.getValue();
+				values.PlasmidReagentAmountUnit = this.Controls.MetadataWellLevel.PlasmidReagentAmountUnit.Selected;
 			}
 			if (this.Controls.MetadataWellLevel.UpdateTreatment.Value) {
-				if (this.Controls.MetadataWellLevel.Treatment.Selected === 'Please select') {
-					values.Treatment = '';
-				} else {
-					values.Treatment = this.Controls.MetadataWellLevel.Treatment.Selected;
-				}
+				values.Treatment = this.Controls.MetadataWellLevel.Treatment.getValue()
 			}
 			if (this.Controls.MetadataWellLevel.UpdatePlasmid1.Value) {
 				if (this.Controls.MetadataWellLevel.Plasmid1.Selected === 'Please select') {
@@ -1985,8 +2019,11 @@ class Editor {
 				if (this.Controls.MetadataWellLevel.UpdatePlasmidReagentLOT.Value) {
 					Editor.Console.log({Message: `Plasmid Reagent LOT: ${values.PlasmidReagentLOT}`, Gravity: "Success"});
 				}
-				if (this.Controls.MetadataWellLevel.UpdateTransfectionReagentAmount.Value) {
-					Editor.Console.log({Message: `Transfection Reagent Amount: ${[values.TransfectionReagentAmount, values.TransfectionReagentAmountUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				if (this.Controls.MetadataWellLevel.UpdateDZReagentAmount.Value) {
+					Editor.Console.log({Message: `DZ Reagent Amount: ${[values.DZReagentAmount, values.DZReagentAmountUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
+				}
+				if (this.Controls.MetadataWellLevel.UpdatePlasmidReagentAmount.Value) {
+					Editor.Console.log({Message: `Plasmid Reagent Amount: ${[values.PlasmidReagentAmount, values.PlasmidReagentAmountUnit].filter(Boolean).join(' ')}`, Gravity: "Success"});
 				}
 				if (this.Controls.MetadataWellLevel.UpdateTreatment.Value) {
 					Editor.Console.log({Message: `Treatment: ${values.Treatment}`, Gravity: "Success"});
@@ -2049,9 +2086,11 @@ class Editor {
 		this.Controls.MetadataWellLevel.PlasmidReagent.setValue(0);
 		this.Controls.MetadataWellLevel.PlasmidReagentLOT.setValue("");
 		this.Controls.MetadataWellLevel.ConcentrationUnit.setValue(0);
-		this.Controls.MetadataWellLevel.TransfectionReagentAmount.setValue("");
-		this.Controls.MetadataWellLevel.TransfectionReagentAmountUnit.setValue(0);
-		this.Controls.MetadataWellLevel.Treatment.setValue(0);
+		this.Controls.MetadataWellLevel.DZReagentAmount.setValue("");
+		this.Controls.MetadataWellLevel.DZReagentAmountUnit.setValue(0);
+		this.Controls.MetadataWellLevel.PlasmidReagentAmount.setValue("");
+		this.Controls.MetadataWellLevel.PlasmidReagentAmountUnit.setValue(0);
+		this.Controls.MetadataWellLevel.Treatment.setValue("");
 		this.Controls.MetadataWellLevel.Plasmid1.setValue(0);
 		this.Controls.MetadataWellLevel.Plasmid1Concentration.setValue("");
 		this.Controls.MetadataWellLevel.Plasmid1ConcentrationUnit.setValue(0);

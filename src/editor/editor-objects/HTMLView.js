@@ -20,7 +20,8 @@ class HTMLView {
         dzReagentLOT: true,
         plasmidReagent: true,
         plasmidReagentLOT: true,
-        transfectionReagentAmount: true,
+        dzReagentAmount: true,
+        plasmidReagentAmount: true,
         treatment: true,
         plasmid1: true,
         plasmid1Concentration: true,
@@ -230,12 +231,24 @@ class HTMLView {
         }
       ),
       LinkCtrl.new('Checkbox', {
-          ID: `well_metadata_checkbox-transfectionReagentAmount`,
-          Default: this.metadataDisplayState.well.transfectionReagentAmount,
-          Label: 'Transfection Reagent Amount',
+          ID: `well_metadata_checkbox-dzReagentAmount`,
+          Default: this.metadataDisplayState.well.dzReagentAmount,
+          Label: 'DZ Reagent Amount',
           NewLine: false,
           Change: function (checked) {
-            this.metadataDisplayState.well.transfectionReagentAmount = checked;
+            this.metadataDisplayState.well.dzReagentAmount = checked;
+            this.updateOutput(dataList, this.metadataDisplayState);
+          }.bind(this),
+          Title: 'Check to display the cell line value'
+        }
+      ),
+      LinkCtrl.new('Checkbox', {
+          ID: `well_metadata_checkbox-plasmidReagentAmount`,
+          Default: this.metadataDisplayState.well.plasmidReagentAmount,
+          Label: 'Plasmid Reagent Amount',
+          NewLine: false,
+          Change: function (checked) {
+            this.metadataDisplayState.well.plasmidReagentAmount = checked;
             this.updateOutput(dataList, this.metadataDisplayState);
           }.bind(this),
           Title: 'Check to display the cell line value'
@@ -332,7 +345,8 @@ class HTMLView {
       + `<span id="well_metadata_checkbox-dzReagentLOT"></span>`
       + `<span id="well_metadata_checkbox-plasmidReagent"></span>`
       + `<span id="well_metadata_checkbox-plasmidReagentLOT"></span>`
-      + `<span id="well_metadata_checkbox-transfectionReagentAmount"></span>`
+      + `<span id="well_metadata_checkbox-dzReagentAmount"></span>`
+      + `<span id="well_metadata_checkbox-plasmidReagentAmount"></span>`
       + `<span id="well_metadata_checkbox-treatment"></span>`
       + `<span id="well_metadata_checkbox-plasmid1"></span>`
       + `<span id="well_metadata_checkbox-Plasmid1Concentration"></span>`
@@ -496,7 +510,8 @@ class HTMLView {
         let metadataDZReagentLOT = '';
         let metadataPlasmidReagent = '';
         let metadataPlasmidReagentLOT = '';
-        let metadataTransfectionReagentAmount = '';
+        let metadataDZReagentAmount = '';
+        let metadataPlasmidReagentAmount = '';
         let metadataTreatment = '';
         let metadataPlasmid1 = '';
         let metadataPlasmid1Concentration = '';
@@ -541,11 +556,14 @@ class HTMLView {
           if (metadataDisplayState.well.plasmidReagentLOT) {
             metadataPlasmidReagentLOT = `<div style="white-space: nowrap;"><span>Plasmid reagent LOT: </span><span>${well.Metadata.PlasmidReagentLOT || ''}</span></div>`;
           }
-          if (metadataDisplayState.well.transfectionReagentAmount && well.Metadata.TransfectionReagentAmount) {
-            metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Reagent amount: </span><span>${[well.Metadata.TransfectionReagentAmount, well.Metadata.TransfectionReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
+          if (metadataDisplayState.well.dzReagentAmount && well.Metadata.DZReagentAmount) {
+            metadataDZReagentAmount = `<div style="white-space: nowrap;"><span>DZ Reagent amount: </span><span>${[well.Metadata.DZReagentAmount, well.Metadata.DZReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
+          }
+          if (metadataDisplayState.well.plasmidReagentAmount && well.Metadata.PlasmidReagentAmount) {
+            metadataPlasmidReagentAmount = `<div style="white-space: nowrap;"><span>Plasmid Reagent amount: </span><span>${[well.Metadata.PlasmidReagentAmount, well.Metadata.PlasmidReagentAmountUnit].filter(Boolean).join(' ') || ''}</span></div>`;
           }
           if (metadataDisplayState.well.treatment && well.Metadata.Treatment) {
-            metadataTransfectionReagentAmount = `<div style="white-space: nowrap;"><span>Treatment: </span><span>${well.Metadata.Treatment || ''}</span></div>`;
+            metadataTreatment = `<div style="white-space: nowrap;"><span>Treatment: </span><span>${well.Metadata.Treatment || ''}</span></div>`;
           }
           if (metadataDisplayState.well.plasmid1 && well.Metadata.Plasmid1) {
             metadataPlasmid1 = `<div style="white-space: nowrap;"><span>Plasmid 1: </span><span>${well.Metadata.Plasmid1 || ''}</span></div>`;
@@ -577,7 +595,8 @@ class HTMLView {
           + metadataDZReagentLOT
           + metadataPlasmidReagent
           + metadataPlasmidReagentLOT
-          + metadataTransfectionReagentAmount
+          + metadataDZReagentAmount
+          + metadataPlasmidReagentAmount
           + metadataTreatment
           + metadataPlasmid1
           + metadataPlasmid1Concentration

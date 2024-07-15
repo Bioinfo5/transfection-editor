@@ -231,9 +231,13 @@ class Well {
 		if (typeof I.PlasmidReagentLOT === 'string') {
 			this.Metadata.PlasmidReagentLOT = I.PlasmidReagentLOT;
 		}
-		if (typeof I.TransfectionReagentAmount === 'string') {
-			this.Metadata.TransfectionReagentAmount = I.TransfectionReagentAmount;
-			this.Metadata.TransfectionReagentAmountUnit = I.TransfectionReagentAmountUnit;
+		if (typeof I.DZReagentAmount === 'string') {
+			this.Metadata.DZReagentAmount = I.DZReagentAmount;
+			this.Metadata.DZReagentAmountUnit = I.DZReagentAmountUnit;
+		}
+		if (typeof I.PlasmidReagentAmount === 'string') {
+			this.Metadata.PlasmidReagentAmount = I.PlasmidReagentAmount;
+			this.Metadata.PlasmidReagentAmountUnit = I.PlasmidReagentAmountUnit;
 		}
 		if (typeof I.Treatment === 'string') {
 			this.Metadata.Treatment = I.Treatment;
