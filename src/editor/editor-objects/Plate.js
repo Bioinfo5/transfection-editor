@@ -141,8 +141,7 @@ class Plate {
 		const layersCopy = _.cloneDeep(this.Layers);
 		const tabs = Array.from(GetId(this.LayerTab.Anchors.TabHeaders).children);
 		tabs.forEach((tab, index) => {
-			const order = parseInt(tab.getAttribute('tabkey'), 10);
-			layersCopy[order].TabOrder = index;
+			layersCopy[index].TabOrder = index;
 		})
 		const layers = _.sortBy(layersCopy, layer => layer.TabOrder);
 
