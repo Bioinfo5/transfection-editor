@@ -1,6 +1,6 @@
 {
   "API": {
-    "URL": "https://1etx.admin.api.botlee.com",
-    "metadata_options": "api/plateEditor/metadataOptions"
+    "URL": "${API_URL}",
+    "metadata_options": "${API_METADATA_OPTIONS}"
   }
 }
